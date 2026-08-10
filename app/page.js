@@ -2,16 +2,82 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const SERVICES = [
-  { name: 'Engine wash', basePrice: 60 },
-  { name: 'Headlight restoration', basePrice: 90 },
-  { name: 'Standard Wash / Regular cleaning', basePrice: 120 },
-  { name: 'Deep cleaning', basePrice: 220 },
-  { name: 'Polishing and waxing', basePrice: 550 },
-  { name: 'CERAMIC COATING', basePrice: 1100 },
-]
-
 const VEHICLES = ['Coupe / Sedan', 'Mid-Sized SUV', 'Large SUV / Truck', 'Motorcycle']
+
+const SERVICES = [
+  {
+    name: 'Engine wash',
+    basePrice: 60,
+    duration: '40 min',
+    description: 'Lavado exterior e interior con espuma activa, enjuague detallado y secado para devolver el brillo original del vehículo.',
+    vehiclePricing: {
+      'Coupe / Sedan': 60,
+      'Mid-Sized SUV': 80,
+      'Large SUV / Truck': 90,
+      Motorcycle: 45,
+    },
+  },
+  {
+    name: 'Headlight restoration',
+    basePrice: 90,
+    duration: '60 min',
+    description: 'Recuperación de faros opacos con pulido profesional para mejorar la visibilidad, el estilo y la apariencia general del auto.',
+    vehiclePricing: {
+      'Coupe / Sedan': 90,
+      'Mid-Sized SUV': 110,
+      'Large SUV / Truck': 130,
+      Motorcycle: 70,
+    },
+  },
+  {
+    name: 'Standard Wash / Regular cleaning',
+    basePrice: 120,
+    duration: '60-120 min',
+    description: 'Limpieza regular completa con lavado exterior, interior básico y atención a superficies clave para mantener tu auto impecable.',
+    vehiclePricing: {
+      'Coupe / Sedan': 120,
+      'Mid-Sized SUV': 160,
+      'Large SUV / Truck': 200,
+      Motorcycle: 90,
+    },
+  },
+  {
+    name: 'Deep cleaning',
+    basePrice: 220,
+    duration: '120-180 min',
+    description: 'Cleaning profundo para interiores y exteriores con enfoque en detalles difíciles, tapicería, molduras y acabados delicados.',
+    vehiclePricing: {
+      'Coupe / Sedan': 220,
+      'Mid-Sized SUV': 260,
+      'Large SUV / Truck': 320,
+      Motorcycle: 180,
+    },
+  },
+  {
+    name: 'Polishing and waxing',
+    basePrice: 550,
+    duration: '300-540 min',
+    description: 'Pulido profesional y cera protectora para restaurar brillo, suavidad y protección avanzada del acabado del vehículo.',
+    vehiclePricing: {
+      'Coupe / Sedan': 550,
+      'Mid-Sized SUV': 650,
+      'Large SUV / Truck': 800,
+      Motorcycle: 420,
+    },
+  },
+  {
+    name: 'CERAMIC COATING',
+    basePrice: 1100,
+    duration: '300-600 min',
+    description: 'Protección premium con cerámica de alto rendimiento para una capa duradera, brillo intenso y resistencia a los elementos.',
+    vehiclePricing: {
+      'Coupe / Sedan': 1100,
+      'Mid-Sized SUV': 1300,
+      'Large SUV / Truck': 1600,
+      Motorcycle: 900,
+    },
+  },
+]
 
 function BrandLogo() {
   return (
@@ -592,6 +658,25 @@ export default function Home() {
     </div>
   )
 
+  const [selectedService, setSelectedService] = useState(SERVICES[0].name)
+
+  const activeService = SERVICES.find((service) => service.name === selectedService) || SERVICES[0]
+
+  const getServicePrice = (serviceName, vehicleType) => {
+    const service = SERVICES.find((item) => item.name === serviceName) || SERVICES[0]
+    return service.vehiclePricing[vehicleType] || service.basePrice
+  }
+
+  const handleServiceSelect = (serviceName) => {
+    const selected = SERVICES.find((service) => service.name === serviceName) || SERVICES[0]
+    setSelectedService(serviceName)
+    setFormData((previous) => ({
+      ...previous,
+      service_name: selected.name,
+      price: selected.vehiclePricing[previous.vehicle_type] || selected.basePrice,
+    }))
+  }
+
   // PANTALLA DE RESERVA
   return (
     <main className="min-h-screen bg-[#0F0F11] text-white">
@@ -641,7 +726,7 @@ export default function Home() {
         </header>
 
         <div className="mx-auto w-full max-w-6xl">
-          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.35fr]">
+          <div className="grid gap-6 lg:grid-cols-[0.98fr_1.3fr]">
             <aside className="rounded-3xl border border-zinc-800 bg-[#111318] p-4 shadow-2xl shadow-cyan-950/20 sm:p-5 lg:p-6">
               <div className="mb-5 flex justify-center lg:justify-start">
                 <div className="w-full max-w-[420px] lg:max-w-[360px]">
@@ -649,26 +734,58 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-400">Servicio premium</p>
-                  <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Cuidado perfecto para tu vehículo.</h2>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-400">SERVICIO PREMIUM</p>
+                  <h2 className="mt-3 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl">
+                    Cuidado perfecto para tu vehículo.
+                  </h2>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <div className="grid gap-3">
                   <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Detalle</p>
-                    <p className="mt-2 text-sm font-semibold text-white">Lavado profundo y protección</p>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">DETALLE</p>
+                    <p className="mt-2 text-base font-semibold text-white">Lavado profundo y protección</p>
                   </div>
                   <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Tiempo</p>
-                    <p className="mt-2 text-sm font-semibold text-white">Agendamiento rápido y flexible</p>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">TIEMPO</p>
+                    <p className="mt-2 text-base font-semibold text-white">Agendamiento rápido y flexible</p>
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3 text-sm text-zinc-200">
-                  <p className="font-semibold text-cyan-300">Atención personalizada</p>
+                  <p className="font-semibold text-cyan-300">ATENCIÓN PERSONALIZADA</p>
                   <p className="mt-1 text-zinc-300">Reserva en minutos y recibe un servicio de alto nivel.</p>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="text-2xl font-black text-white sm:text-3xl">SERVICIOS DISPONIBLES</h3>
+                  <div className="mt-4 space-y-3">
+                    {SERVICES.map((service) => {
+                      const isSelected = selectedService === service.name
+
+                      return (
+                        <button
+                          key={service.name}
+                          type="button"
+                          onClick={() => handleServiceSelect(service.name)}
+                          className={`w-full rounded-2xl border p-3 text-left transition ${
+                            isSelected
+                              ? 'border-cyan-400 bg-cyan-500/10 shadow-lg shadow-cyan-950/20'
+                              : 'border-zinc-800 bg-[#0F0F11] hover:border-zinc-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-base font-bold text-white">{service.name}</p>
+                              <p className="mt-1 text-xs text-zinc-400">{service.duration}</p>
+                            </div>
+                            <span className="text-sm font-bold text-cyan-300">${service.basePrice}</span>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
             </aside>
@@ -680,7 +797,7 @@ export default function Home() {
                   <p className="text-base font-semibold capitalize text-white">{activeUser.fullName}</p>
                 </div>
                 <div className="rounded-full border border-zinc-700 bg-[#0F0F11] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-                  Reservación
+                  {activeService.name}
                 </div>
               </div>
 
@@ -699,22 +816,14 @@ export default function Home() {
                 </div>
               ) : (
                 <form onSubmit={handleBookingSubmit} className="space-y-4">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Servicio</label>
-                    <select
-                      className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
-                      value={formData.service_name}
-                      onChange={(e) => {
-                        const selected = SERVICES.find((s) => s.name === e.target.value)
-                        setFormData({ ...formData, service_name: selected.name, price: selected.basePrice })
-                      }}
-                    >
-                      {SERVICES.map((s) => (
-                        <option key={s.name} value={s.name}>
-                          {s.name} (${s.basePrice}+)
-                        </option>
-                      ))}
-                    </select>
+                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">Servicio seleccionado</p>
+                    <h3 className="mt-2 text-2xl font-black text-white">{activeService.name}</h3>
+                    <p className="mt-2 text-sm leading-6 text-zinc-300">{activeService.description}</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-zinc-300">
+                      <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1">⏱ {activeService.duration}</span>
+                      <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1">💲 Desde ${activeService.basePrice}</span>
+                    </div>
                   </div>
 
                   <div>
@@ -722,7 +831,10 @@ export default function Home() {
                     <select
                       className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
                       value={formData.vehicle_type}
-                      onChange={(e) => setFormData({ ...formData, vehicle_type: e.target.value })}
+                      onChange={(e) => {
+                        const nextVehicle = e.target.value
+                        setFormData({ ...formData, vehicle_type: nextVehicle, price: getServicePrice(selectedService, nextVehicle) })
+                      }}
                     >
                       {VEHICLES.map((v) => (
                         <option key={v} value={v}>
@@ -730,6 +842,27 @@ export default function Home() {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">Precios por vehículo</p>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {VEHICLES.map((vehicle) => (
+                        <div
+                          key={vehicle}
+                          className={`rounded-xl border px-3 py-2 text-xs ${
+                            formData.vehicle_type === vehicle
+                              ? 'border-cyan-400 bg-cyan-500/10 text-cyan-200'
+                              : 'border-zinc-700 bg-zinc-950 text-zinc-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span>{vehicle}</span>
+                            <span className="font-bold">${getServicePrice(selectedService, vehicle)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -769,7 +902,7 @@ export default function Home() {
 
                   <div className="rounded-xl border border-zinc-800 bg-[#0F0F11] p-3">
                     <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
-                      Métodos de pago aceptados
+                      MÉTODOS DE PAGO ACEPTADOS
                     </span>
                     <p className="mt-2 text-[11px] text-zinc-400">El pago se realiza en persona al completar el servicio:</p>
                     <p className="mt-1 text-xs font-medium text-zinc-200">💵 Cash  💳 Visa / MC / Amex  📱 Zelle  🌆 Venmo</p>
@@ -780,7 +913,7 @@ export default function Home() {
                     disabled={loading}
                     className="w-full rounded-xl bg-cyan-500 px-4 py-3 text-sm font-bold text-black transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    {loading ? 'Procesando...' : 'Confirmar Reserva'}
+                    {loading ? 'Procesando...' : 'RESERVAR / CONFIRMAR RESERVA'}
                   </button>
                 </form>
               )}
