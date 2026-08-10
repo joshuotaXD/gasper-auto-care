@@ -726,197 +726,193 @@ export default function Home() {
         </header>
 
         <div className="mx-auto w-full max-w-6xl">
-          <div className="grid gap-6 lg:grid-cols-[0.98fr_1.3fr]">
-            <aside className="rounded-3xl border border-zinc-800 bg-[#111318] p-4 shadow-2xl shadow-cyan-950/20 sm:p-5 lg:p-6">
-              <div className="mb-5 flex justify-center lg:justify-start">
-                <div className="w-full max-w-[420px] lg:max-w-[360px]">
-                  <BrandLogo />
+          <div className="mb-6 rounded-3xl border border-zinc-800 bg-[#111318] p-4 shadow-2xl shadow-cyan-950/20 sm:p-5 lg:p-6">
+            <div className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
+              <div>
+                <div className="mb-4 flex justify-center lg:justify-start">
+                  <div className="w-full max-w-[420px] lg:max-w-[360px]">
+                    <BrandLogo />
+                  </div>
                 </div>
+
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-400">SERVICIO PREMIUM</p>
+                <h2 className="mt-3 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl">
+                  Cuidado perfecto para tu vehículo.
+                </h2>
               </div>
 
-              <div className="space-y-5">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-400">SERVICIO PREMIUM</p>
-                  <h2 className="mt-3 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl">
-                    Cuidado perfecto para tu vehículo.
-                  </h2>
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">DETALLE</p>
+                  <p className="mt-2 text-base font-semibold text-white">Lavado profundo y protección</p>
                 </div>
-
-                <div className="grid gap-3">
-                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">DETALLE</p>
-                    <p className="mt-2 text-base font-semibold text-white">Lavado profundo y protección</p>
-                  </div>
-                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">TIEMPO</p>
-                    <p className="mt-2 text-base font-semibold text-white">Agendamiento rápido y flexible</p>
-                  </div>
+                <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">TIEMPO</p>
+                  <p className="mt-2 text-base font-semibold text-white">Agendamiento rápido y flexible</p>
                 </div>
-
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3 text-sm text-zinc-200">
                   <p className="font-semibold text-cyan-300">ATENCIÓN PERSONALIZADA</p>
                   <p className="mt-1 text-zinc-300">Reserva en minutos y recibe un servicio de alto nivel.</p>
                 </div>
-
-                <div className="pt-2">
-                  <h3 className="text-2xl font-black text-white sm:text-3xl">SERVICIOS DISPONIBLES</h3>
-                  <div className="mt-4 space-y-3">
-                    {SERVICES.map((service) => {
-                      const isSelected = selectedService === service.name
-
-                      return (
-                        <button
-                          key={service.name}
-                          type="button"
-                          onClick={() => handleServiceSelect(service.name)}
-                          className={`w-full rounded-2xl border p-3 text-left transition ${
-                            isSelected
-                              ? 'border-cyan-400 bg-cyan-500/10 shadow-lg shadow-cyan-950/20'
-                              : 'border-zinc-800 bg-[#0F0F11] hover:border-zinc-700'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div>
-                              <p className="text-base font-bold text-white">{service.name}</p>
-                              <p className="mt-1 text-xs text-zinc-400">{service.duration}</p>
-                            </div>
-                            <span className="text-sm font-bold text-cyan-300">${service.basePrice}</span>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
               </div>
-            </aside>
+            </div>
+          </div>
 
-            <div className="rounded-3xl border border-zinc-800 bg-[#1A1A1E] p-4 shadow-2xl sm:p-5 lg:p-6">
-              <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-xs text-zinc-400">Cliente</p>
-                  <p className="text-base font-semibold capitalize text-white">{activeUser.fullName}</p>
-                </div>
-                <div className="rounded-full border border-zinc-700 bg-[#0F0F11] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-                  {activeService.name}
-                </div>
-              </div>
+          <div className="rounded-3xl border border-zinc-800 bg-[#1A1A1E] p-4 shadow-2xl sm:p-5 lg:p-6">
+            <div className="mb-5">
+              <h3 className="text-2xl font-black text-white sm:text-3xl">SERVICIOS DISPONIBLES</h3>
+            </div>
 
-              {success ? (
-                <div className="space-y-3 py-8 text-center">
-                  <div className="text-4xl">✅</div>
-                  <h2 className="text-xl font-bold text-white">¡Reserva enviada!</h2>
-                  <p className="text-sm text-zinc-400">Nos pondremos en contacto contigo pronto.</p>
-                  <button
-                    type="button"
-                    onClick={() => setSuccess(false)}
-                    className="mt-4 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-bold text-black transition hover:bg-cyan-400"
-                  >
-                    Hacer otra reserva
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleBookingSubmit} className="space-y-4">
-                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-4">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">Servicio seleccionado</p>
-                    <h3 className="mt-2 text-2xl font-black text-white">{activeService.name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-300">{activeService.description}</p>
-                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-zinc-300">
-                      <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1">⏱ {activeService.duration}</span>
-                      <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1">💲 Desde ${activeService.basePrice}</span>
-                    </div>
-                  </div>
+            <div className="grid gap-5 xl:grid-cols-[0.95fr_1.35fr]">
+              <div className="space-y-3">
+                {SERVICES.map((service) => {
+                  const isSelected = selectedService === service.name
 
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Tipo de Vehículo</label>
-                    <select
-                      className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
-                      value={formData.vehicle_type}
-                      onChange={(e) => {
-                        const nextVehicle = e.target.value
-                        setFormData({ ...formData, vehicle_type: nextVehicle, price: getServicePrice(selectedService, nextVehicle) })
-                      }}
+                  return (
+                    <button
+                      key={service.name}
+                      type="button"
+                      onClick={() => handleServiceSelect(service.name)}
+                      className={`w-full rounded-2xl border p-3 text-left transition ${
+                        isSelected
+                          ? 'border-cyan-400 bg-cyan-500/10 shadow-lg shadow-cyan-950/20'
+                          : 'border-zinc-800 bg-[#0F0F11] hover:border-zinc-700'
+                      }`}
                     >
-                      {VEHICLES.map((v) => (
-                        <option key={v} value={v}>
-                          {v}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">Precios por vehículo</p>
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      {VEHICLES.map((vehicle) => (
-                        <div
-                          key={vehicle}
-                          className={`rounded-xl border px-3 py-2 text-xs ${
-                            formData.vehicle_type === vehicle
-                              ? 'border-cyan-400 bg-cyan-500/10 text-cyan-200'
-                              : 'border-zinc-700 bg-zinc-950 text-zinc-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <span>{vehicle}</span>
-                            <span className="font-bold">${getServicePrice(selectedService, vehicle)}</span>
-                          </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-base font-bold text-white">{service.name}</p>
+                          <p className="mt-1 text-xs text-zinc-400">{service.duration}</p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
+                          {isSelected ? 'ABIERTO' : 'VER'}
+                        </span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Fecha</label>
-                      <input
-                        type="date"
-                        required
-                        className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
-                        value={formData.booking_date}
-                        onChange={(e) => setFormData({ ...formData, booking_date: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Hora</label>
-                      <input
-                        type="time"
-                        required
-                        className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
-                        value={formData.booking_time}
-                        onChange={(e) => setFormData({ ...formData, booking_time: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
+              <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-4 sm:p-5">
+                <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Dirección del servicio</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Calle, número, colonia..."
-                      className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    />
+                    <p className="text-xs text-zinc-400">Servicio seleccionado</p>
+                    <h4 className="text-2xl font-black text-white">{activeService.name}</h4>
                   </div>
-
-                  <div className="rounded-xl border border-zinc-800 bg-[#0F0F11] p-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
-                      MÉTODOS DE PAGO ACEPTADOS
-                    </span>
-                    <p className="mt-2 text-[11px] text-zinc-400">El pago se realiza en persona al completar el servicio:</p>
-                    <p className="mt-1 text-xs font-medium text-zinc-200">💵 Cash  💳 Visa / MC / Amex  📱 Zelle  🌆 Venmo</p>
+                  <div className="rounded-full border border-zinc-700 bg-zinc-950 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
+                    {activeService.duration}
                   </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full rounded-xl bg-cyan-500 px-4 py-3 text-sm font-bold text-black transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-70"
+                <p className="text-sm leading-6 text-zinc-300">{activeService.description}</p>
+
+                <div className="mt-5">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Tipo de Vehículo</label>
+                  <select
+                    className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                    value={formData.vehicle_type}
+                    onChange={(e) => {
+                      const nextVehicle = e.target.value
+                      setFormData({ ...formData, vehicle_type: nextVehicle, price: getServicePrice(selectedService, nextVehicle) })
+                    }}
                   >
-                    {loading ? 'Procesando...' : 'RESERVAR / CONFIRMAR RESERVA'}
-                  </button>
-                </form>
-              )}
+                    {VEHICLES.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-zinc-800 bg-[#111318] p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">PRECIOS POR VEHÍCULO</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {VEHICLES.map((vehicle) => (
+                      <div
+                        key={vehicle}
+                        className={`rounded-xl border px-3 py-2 text-xs ${
+                          formData.vehicle_type === vehicle
+                            ? 'border-cyan-400 bg-cyan-500/10 text-cyan-200'
+                            : 'border-zinc-700 bg-zinc-950 text-zinc-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span>{vehicle}</span>
+                          <span className="font-bold">${getServicePrice(selectedService, vehicle)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {success ? (
+                  <div className="mt-5 space-y-3 py-6 text-center">
+                    <div className="text-4xl">✅</div>
+                    <h2 className="text-xl font-bold text-white">¡Reserva enviada!</h2>
+                    <p className="text-sm text-zinc-400">Nos pondremos en contacto contigo pronto.</p>
+                    <button
+                      type="button"
+                      onClick={() => setSuccess(false)}
+                      className="mt-4 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-bold text-black transition hover:bg-cyan-400"
+                    >
+                      Hacer otra reserva
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleBookingSubmit} className="mt-5 space-y-4">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Fecha</label>
+                        <input
+                          type="date"
+                          required
+                          className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                          value={formData.booking_date}
+                          onChange={(e) => setFormData({ ...formData, booking_date: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Hora</label>
+                        <input
+                          type="time"
+                          required
+                          className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                          value={formData.booking_time}
+                          onChange={(e) => setFormData({ ...formData, booking_time: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Dirección del servicio</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Calle, número, colonia..."
+                        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 bg-[#111318] p-3">
+                      <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                        MÉTODOS DE PAGO
+                      </span>
+                      <p className="mt-2 text-[11px] text-zinc-400">Se confirma al finalizar el servicio:</p>
+                      <p className="mt-1 text-xs font-medium text-zinc-200">💵 Cash  💳 Visa / MC / Amex  📱 Zelle  🌆 Venmo</p>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full rounded-xl bg-cyan-500 px-4 py-3 text-sm font-bold text-black transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {loading ? 'Procesando...' : 'RESERVAR / CONFIRMAR RESERVA'}
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         </div>
