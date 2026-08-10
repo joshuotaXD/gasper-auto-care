@@ -13,6 +13,28 @@ const SERVICES = [
 
 const VEHICLES = ['Coupe / Sedan', 'Mid-Sized SUV', 'Large SUV / Truck', 'Motorcycle']
 
+function BrandLogo() {
+  return (
+    <div className="mb-6 flex justify-center">
+      <svg viewBox="0 0 720 520" className="w-full max-w-[420px] drop-shadow-[0_0_22px_rgba(34,211,238,0.35)]">
+        <circle cx="360" cy="260" r="240" fill="none" stroke="#F4F4F5" strokeWidth="12" />
+        <rect x="110" y="210" width="500" height="110" rx="18" fill="#0B0B0D" stroke="#F4F4F5" strokeWidth="6" />
+        <path d="M200 232 L265 200 L420 200 L505 232 L545 232 L545 290 L170 290 L170 232 Z" fill="#07B6D6" opacity="0.92" />
+        <path d="M225 234 L275 206 H420 L480 234" fill="none" stroke="#E5F9FF" strokeWidth="8" strokeLinecap="round" />
+        <path d="M200 286 H530" stroke="#E5F9FF" strokeWidth="8" strokeLinecap="round" />
+        <circle cx="240" cy="302" r="36" fill="#0B0B0D" stroke="#E5F9FF" strokeWidth="8" />
+        <circle cx="240" cy="302" r="14" fill="#E5F9FF" />
+        <circle cx="480" cy="302" r="36" fill="#0B0B0D" stroke="#E5F9FF" strokeWidth="8" />
+        <circle cx="480" cy="302" r="14" fill="#E5F9FF" />
+        <path d="M260 180 L280 155 L300 180" stroke="#F4F4F5" strokeWidth="6" fill="none" strokeLinecap="round" />
+        <path d="M420 180 L440 155 L460 180" stroke="#F4F4F5" strokeWidth="6" fill="none" strokeLinecap="round" />
+        <text x="360" y="175" textAnchor="middle" fontSize="90" fontWeight="900" fill="#1ED9FF" letterSpacing="4">GASPER</text>
+        <text x="360" y="420" textAnchor="middle" fontSize="56" fontWeight="800" fill="#F4F4F5" letterSpacing="6">AUTO DETAILING</text>
+      </svg>
+    </div>
+  )
+}
+
 export default function Home() {
   const [currentUser, setCurrentUser] = useState(null)
   const [authMode, setAuthMode] = useState('login') // 'login', 'register', 'forgot', 'verify_code'
@@ -36,6 +58,7 @@ export default function Home() {
   const [authLoading, setAuthLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
 
   // Formulario de Reserva
   const [formData, setFormData] = useState({
@@ -133,52 +156,22 @@ export default function Home() {
     setAuthMessage('')
     setAuthLoading(true)
 
-    const incomingValue = resetEmail.trim()
+    const cleanEmail = resetEmail.trim().toLowerCase()
 
-    if (!incomingValue) {
-      setAuthError('Ingresa tu correo o número de teléfono.')
+    if (!cleanEmail) {
+      setAuthError('Ingresa tu correo registrado.')
       setAuthLoading(false)
       return
     }
 
-    const isPhoneRecovery = !incomingValue.includes('@')
-    const normalizedPhone = incomingValue.replace(/\D/g, '')
-    const normalizedEmail = incomingValue.toLowerCase()
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('id, email')
+      .eq('email', cleanEmail)
+      .maybeSingle()
 
-    let user = null
-
-    if (isPhoneRecovery) {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, email, phone')
-        .eq('phone', normalizedPhone)
-        .maybeSingle()
-
-      user = data
-      if (error) {
-        setAuthError('Error al buscar la cuenta por teléfono: ' + error.message)
-        setAuthLoading(false)
-        return
-      }
-    } else {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, email, phone')
-        .eq('email', normalizedEmail)
-        .maybeSingle()
-
-      user = data
-      if (error) {
-        setAuthError('Error al buscar la cuenta por correo: ' + error.message)
-        setAuthLoading(false)
-        return
-      }
-    }
-
-    if (!user) {
-      setAuthError(isPhoneRecovery
-        ? 'No se encontró ninguna cuenta registrada con este número de teléfono.'
-        : 'No se encontró ninguna cuenta registrada con este correo.')
+    if (fetchError || !user) {
+      setAuthError('No se encontró ninguna cuenta registrada con este correo.')
       setAuthLoading(false)
       return
     }
@@ -196,33 +189,17 @@ export default function Home() {
       return
     }
 
-    let response
+    const res = await fetch('/api/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, code: generatedCode }),
+    })
 
-    if (isPhoneRecovery) {
-      response = await fetch('/api/send-sms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: normalizedPhone, code: generatedCode }),
-      })
-    } else {
-      response = await fetch('/api/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: normalizedEmail, code: generatedCode }),
-      })
-    }
-
-    if (response.ok) {
-      setAuthMessage(isPhoneRecovery
-        ? 'Código enviado a tu teléfono por SMS.'
-        : 'Código enviado a tu correo. Revisa tu bandeja de entrada o spam.')
+    if (res.ok) {
+      setAuthMessage('Código enviado a tu correo. Revisa tu bandeja de entrada o spam.')
       setAuthMode('verify_code')
     } else {
-      const errorText = await response.text()
-      setAuthError(isPhoneRecovery
-        ? 'Error al enviar el SMS. Revisa la configuración de Twilio.'
-        : 'Error al enviar el correo. Verifica tu configuración.')
-      console.error('Reset delivery error:', errorText)
+      setAuthError('Error al enviar el correo. Verifica tu configuración.')
     }
 
     setAuthLoading(false)
@@ -235,11 +212,11 @@ export default function Home() {
     setAuthMessage('')
     setAuthLoading(true)
 
-    const incomingValue = resetEmail.trim()
+    const cleanEmail = resetEmail.trim().toLowerCase()
     const cleanInputCode = inputCode.trim().replace(/\s+/g, '')
 
-    if (!incomingValue) {
-      setAuthError('Debes ingresar el correo o teléfono usado para recuperar la contraseña.')
+    if (!cleanEmail) {
+      setAuthError('Debes ingresar el correo usado para recuperar la contraseña.')
       setAuthLoading(false)
       return
     }
@@ -250,20 +227,14 @@ export default function Home() {
       return
     }
 
-    const isPhoneRecovery = !incomingValue.includes('@')
-    const normalizedPhone = incomingValue.replace(/\D/g, '')
-    const normalizedEmail = incomingValue.toLowerCase()
-
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('id, email, phone, reset_code')
-      .or(isPhoneRecovery ? `phone.eq.${normalizedPhone}` : `email.eq.${normalizedEmail}`)
+      .select('id, email, reset_code')
+      .eq('email', cleanEmail)
       .maybeSingle()
 
     if (fetchError || !user) {
-      setAuthError(isPhoneRecovery
-        ? 'No se encontró una cuenta con este número de teléfono.'
-        : 'No se encontró una cuenta con este correo.')
+      setAuthError('No se encontró una cuenta con este correo.')
       setAuthLoading(false)
       return
     }
@@ -304,6 +275,13 @@ export default function Home() {
     setAuthLoading(false)
   }
 
+  const activeUser = currentUser || {
+    fullName: 'Cliente',
+    firstName: 'Cliente',
+    email: '',
+    phone: '',
+  }
+
   const handleBookingSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -330,18 +308,20 @@ export default function Home() {
   }
 
   // PANTALLAS DE AUTENTICACIÓN
-  if (!currentUser) {
+  if (!currentUser && showAuth) {
     return (
       <main className="min-h-screen bg-[#0F0F11] text-white flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-[#1A1A1E] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-black tracking-wider text-cyan-400">GASPER</h1>
-            <p className="text-xs text-zinc-400 mt-1 uppercase tracking-widest">
-              {authMode === 'login' && 'Iniciar Sesión'}
-              {authMode === 'register' && 'Crear Cuenta'}
-              {authMode === 'forgot' && 'Recuperar Contraseña'}
-              {authMode === 'verify_code' && 'Restablecer Contraseña'}
-            </p>
+          <div className="mb-6">
+            <BrandLogo />
+            <div className="text-center">
+              <p className="text-xs text-zinc-400 mt-1 uppercase tracking-widest">
+                {authMode === 'login' && 'Iniciar Sesión'}
+                {authMode === 'register' && 'Crear Cuenta'}
+                {authMode === 'forgot' && 'Recuperar Contraseña'}
+                {authMode === 'verify_code' && 'Restablecer Contraseña'}
+              </p>
+            </div>
           </div>
 
           {/* MENSAJE GENERAL */}
@@ -356,12 +336,12 @@ export default function Home() {
             <form onSubmit={handleSendResetCode} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                  Correo o Teléfono Registrado
+                  Correo Electrónico Registrado
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   required
-                  placeholder="correo@ejemplo.com o +52 555 123 4567"
+                  placeholder="correo@ejemplo.com"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
@@ -617,24 +597,35 @@ export default function Home() {
     )
   }
 
-  // PANTALLA DE RESERVA (Una vez autenticado)
+  // PANTALLA DE RESERVA
   return (
     <main className="min-h-screen bg-[#0F0F11] text-white flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-[#1A1A1E] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-black text-cyan-400">GASPER</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">Auto Detailing</p>
             <p className="text-xs text-zinc-400">
-              Cliente: <span className="text-white font-semibold capitalize">{currentUser.fullName}</span>
+              Cliente: <span className="text-white font-semibold capitalize">{activeUser.fullName}</span>
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => { setCurrentUser(null); setPassword(''); setLoginIdentifier(''); }}
-            className="text-xs text-zinc-500 hover:text-red-400 underline"
-          >
-            Cerrar sesión
-          </button>
+          {currentUser ? (
+            <button
+              type="button"
+              onClick={() => { setCurrentUser(null); setPassword(''); setLoginIdentifier(''); setShowAuth(false); }}
+              className="text-xs text-zinc-500 hover:text-red-400 underline"
+            >
+              Cerrar sesión
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => { setShowAuth(true); setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold underline"
+            >
+              Iniciar sesión
+            </button>
+          )}
         </div>
 
         {success ? (
