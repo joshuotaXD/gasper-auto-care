@@ -16,20 +16,66 @@ const VEHICLES = ['Coupe / Sedan', 'Mid-Sized SUV', 'Large SUV / Truck', 'Motorc
 function BrandLogo() {
   return (
     <div className="mb-6 flex justify-center">
-      <svg viewBox="0 0 720 520" className="w-full max-w-[420px] drop-shadow-[0_0_22px_rgba(34,211,238,0.35)]">
-        <circle cx="360" cy="260" r="240" fill="none" stroke="#F4F4F5" strokeWidth="12" />
-        <rect x="110" y="210" width="500" height="110" rx="18" fill="#0B0B0D" stroke="#F4F4F5" strokeWidth="6" />
-        <path d="M200 232 L265 200 L420 200 L505 232 L545 232 L545 290 L170 290 L170 232 Z" fill="#07B6D6" opacity="0.92" />
-        <path d="M225 234 L275 206 H420 L480 234" fill="none" stroke="#E5F9FF" strokeWidth="8" strokeLinecap="round" />
-        <path d="M200 286 H530" stroke="#E5F9FF" strokeWidth="8" strokeLinecap="round" />
-        <circle cx="240" cy="302" r="36" fill="#0B0B0D" stroke="#E5F9FF" strokeWidth="8" />
-        <circle cx="240" cy="302" r="14" fill="#E5F9FF" />
-        <circle cx="480" cy="302" r="36" fill="#0B0B0D" stroke="#E5F9FF" strokeWidth="8" />
-        <circle cx="480" cy="302" r="14" fill="#E5F9FF" />
-        <path d="M260 180 L280 155 L300 180" stroke="#F4F4F5" strokeWidth="6" fill="none" strokeLinecap="round" />
-        <path d="M420 180 L440 155 L460 180" stroke="#F4F4F5" strokeWidth="6" fill="none" strokeLinecap="round" />
-        <text x="360" y="175" textAnchor="middle" fontSize="90" fontWeight="900" fill="#1ED9FF" letterSpacing="4">GASPER</text>
-        <text x="360" y="420" textAnchor="middle" fontSize="56" fontWeight="800" fill="#F4F4F5" letterSpacing="6">AUTO DETAILING</text>
+      <svg viewBox="0 0 1100 900" className="w-full max-w-[820px] drop-shadow-[0_0_28px_rgba(34,211,238,0.28)]">
+        <defs>
+          <linearGradient id="gasper-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
+            <stop offset="0%" stopColor="#3ad3ff" />
+            <stop offset="50%" stopColor="#09c1f4" />
+            <stop offset="100%" stopColor="#0e8ec9" />
+          </linearGradient>
+          <path id="auto-detailing-arc" d="M 235 620 A 315 315 0 0 1 865 620" />
+        </defs>
+
+        <circle cx="550" cy="430" r="295" fill="none" stroke="#f5f5f5" strokeWidth="16" />
+
+        <g>
+          <text
+            x="550"
+            y="230"
+            textAnchor="middle"
+            fontSize="210"
+            fontWeight="900"
+            fill="url(#gasper-gradient)"
+            letterSpacing="8"
+            style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+          >
+            GASPER
+          </text>
+
+          <path d="M196 337 L318 270 L540 270 L695 337 L820 337 L820 508 L196 508 Z" fill="#080b0d" stroke="#f5f5f5" strokeWidth="10" />
+
+          <path d="M215 343 L315 287 L536 287 L676 343 L800 343 L800 492 L215 492 Z" fill="url(#gasper-gradient)" opacity="0.98" />
+          <path d="M296 333 L390 268 H530 L610 333" fill="none" stroke="#ecfaff" strokeWidth="12" strokeLinecap="round" />
+
+          <path d="M250 440 H770" stroke="#ecfaff" strokeWidth="12" strokeLinecap="round" opacity="0.9" />
+
+          <path d="M300 340 C362 306, 432 292, 510 292 C600 292, 665 310, 742 340 L742 420 C688 435, 622 448, 555 448 H410 C348 448, 300 432, 250 420 Z" fill="#0a0f14" opacity="0.7" />
+          <path d="M330 330 L450 297 H630 L710 330" fill="none" stroke="#dff8ff" strokeWidth="11" strokeLinecap="round" />
+
+          <circle cx="345" cy="498" r="46" fill="#0a0f14" stroke="#f5f5f5" strokeWidth="10" />
+          <circle cx="345" cy="498" r="18" fill="#f5f5f5" />
+          <circle cx="690" cy="498" r="46" fill="#0a0f14" stroke="#f5f5f5" strokeWidth="10" />
+          <circle cx="690" cy="498" r="18" fill="#f5f5f5" />
+
+          <path d="M530 226 L548 190 L565 226 L606 226 L574 249 L587 286 L548 264 L509 286 L522 249 L490 226 Z" fill="#f5f5f5" />
+
+          <g transform="translate(0,0)">
+            <path d="M245 745 L270 705 L295 745 L342 745 L286 778 L310 822 L270 789 L230 822 L254 778 L198 745 Z" fill="#f5f5f5" />
+            <path d="M855 745 L880 705 L905 745 L952 745 L896 778 L920 822 L880 789 L840 822 L864 778 L808 745 Z" fill="#f5f5f5" />
+          </g>
+
+          <text
+            fontSize="80"
+            fontWeight="800"
+            fill="#f5f5f5"
+            letterSpacing="8"
+            style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+          >
+            <textPath href="#auto-detailing-arc" startOffset="50%" textAnchor="middle">
+              AUTO DETAILING
+            </textPath>
+          </text>
+        </g>
       </svg>
     </div>
   )
