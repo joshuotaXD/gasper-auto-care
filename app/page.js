@@ -660,6 +660,10 @@ export default function Home() {
 
   const [selectedService, setSelectedService] = useState(SERVICES[0].name)
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const activeService = SERVICES.find((service) => service.name === selectedService) || SERVICES[0]
 
   const getServicePrice = (serviceName, vehicleType) => {
@@ -683,13 +687,17 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6 lg:px-6">
         <header className="mx-auto mb-6 w-full rounded-2xl border border-zinc-800 bg-[#111318]/90 px-4 py-4 shadow-xl shadow-cyan-950/20 backdrop-blur-sm sm:px-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="flex flex-col items-center gap-1 text-center transition hover:opacity-90 md:items-start md:text-left"
+              aria-label="Volver al inicio"
+            >
               <h1 className="text-xl font-black tracking-[0.14em] text-cyan-400">GASPER</h1>
-              <p className="text-[9px] uppercase tracking-[0.35em] text-zinc-400">AUTO DETAILING</p>
-            </div>
+              <p className="text-[9px] uppercase tracking-[0.35em] text-zinc-400">AUTO CARE</p>
+            </button>
 
             <nav className="flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-zinc-300 sm:gap-5 sm:text-sm md:justify-start">
-              <button type="button" className="transition hover:text-cyan-300">INICIO</button>
               <button type="button" className="transition hover:text-cyan-300">CONTACTO</button>
               <button type="button" className="transition hover:text-cyan-300">GALERIA</button>
             </nav>
@@ -727,35 +735,41 @@ export default function Home() {
 
         <div className="mx-auto w-full max-w-6xl">
           <div className="mb-6 rounded-3xl border border-zinc-800 bg-[#111318] p-4 shadow-2xl shadow-cyan-950/20 sm:p-5 lg:p-6">
-            <div className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
+            <div className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
               <div>
-                <div className="mb-4 flex justify-center lg:justify-start">
-                  <div className="w-full max-w-[420px] lg:max-w-[360px]">
-                    <BrandLogo />
-                  </div>
-                </div>
-
                 <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-400">SERVICIO PREMIUM</p>
                 <h2 className="mt-3 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl">
                   Cuidado perfecto para tu vehículo.
                 </h2>
               </div>
 
-              <div className="space-y-3">
-                <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">DETALLE</p>
-                  <p className="mt-2 text-base font-semibold text-white">Lavado profundo y protección</p>
+              <div className="space-y-2 text-sm text-zinc-200 lg:pl-4">
+                <div className="flex items-center gap-3 border-b border-zinc-700 pb-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">DETALLE</span>
+                  <span className="font-medium text-white">Lavado profundo y protección</span>
                 </div>
-                <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">TIEMPO</p>
-                  <p className="mt-2 text-base font-semibold text-white">Agendamiento rápido y flexible</p>
+                <div className="flex items-center gap-3 border-b border-zinc-700 pb-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">TIEMPO</span>
+                  <span className="font-medium text-white">Agendamiento rápido y flexible</span>
                 </div>
-                <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3 text-sm text-zinc-200">
-                  <p className="font-semibold text-cyan-300">ATENCIÓN PERSONALIZADA</p>
-                  <p className="mt-1 text-zinc-300">Reserva en minutos y recibe un servicio de alto nivel.</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-cyan-300">ATENCIÓN</span>
+                  <span className="font-medium text-zinc-200">Reserva en minutos y recibe un servicio de alto nivel.</span>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="mb-6 grid gap-4 md:grid-cols-3">
+            {[
+              'Más de 9 años de experiencia',
+              'Servicios a domicilio y en taller',
+              'Atención personalizada y resultados consistentes',
+            ].map((item) => (
+              <div key={item} className="rounded-2xl border border-zinc-800 bg-[#111318] p-4 text-sm text-zinc-200 shadow-lg shadow-black/10">
+                <p className="text-base font-semibold text-white">{item}</p>
+              </div>
+            ))}
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-[#1A1A1E] p-4 shadow-2xl sm:p-5 lg:p-6">
