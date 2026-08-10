@@ -133,25 +133,58 @@ export default function Home() {
     setAuthMessage('')
     setAuthLoading(true)
 
-    const cleanEmail = resetEmail.trim().toLowerCase()
+    const incomingValue = resetEmail.trim()
 
-    // 1. Buscar usuario
-    const { data: user, error: fetchError } = await supabase
-      .from('users')
-      .select('id, email')
-      .eq('email', cleanEmail)
-      .maybeSingle()
-
-    if (fetchError || !user) {
-      setAuthError('No se encontró ninguna cuenta registrada con este correo.')
+    if (!incomingValue) {
+      setAuthError('Ingresa tu correo o número de teléfono.')
       setAuthLoading(false)
       return
     }
 
-    // 2. Generar código aleatorio de 6 dígitos
+    const isPhoneRecovery = !incomingValue.includes('@')
+    const normalizedPhone = incomingValue.replace(/\D/g, '')
+    const normalizedEmail = incomingValue.toLowerCase()
+
+    let user = null
+
+    if (isPhoneRecovery) {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, email, phone')
+        .eq('phone', normalizedPhone)
+        .maybeSingle()
+
+      user = data
+      if (error) {
+        setAuthError('Error al buscar la cuenta por teléfono: ' + error.message)
+        setAuthLoading(false)
+        return
+      }
+    } else {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, email, phone')
+        .eq('email', normalizedEmail)
+        .maybeSingle()
+
+      user = data
+      if (error) {
+        setAuthError('Error al buscar la cuenta por correo: ' + error.message)
+        setAuthLoading(false)
+        return
+      }
+    }
+
+    if (!user) {
+      setAuthError(isPhoneRecovery
+        ? 'No se encontró ninguna cuenta registrada con este número de teléfono.'
+        : 'No se encontró ninguna cuenta registrada con este correo.')
+      setAuthLoading(false)
+      return
+    }
+
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString()
 
-    // 3. Guardar el código en Supabase y asegurarnos de que se aplique
     const { error: updateError } = await supabase
       .from('users')
       .update({ reset_code: generatedCode })
@@ -163,18 +196,33 @@ export default function Home() {
       return
     }
 
-    // 4. Enviar correo mediante la API Route
-    const res = await fetch('/api/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: cleanEmail, code: generatedCode }),
-    })
+    let response
 
-    if (res.ok) {
-      setAuthMessage('Código enviado a tu correo. Revisa tu bandeja de entrada o spam.')
+    if (isPhoneRecovery) {
+      response = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: normalizedPhone, code: generatedCode }),
+      })
+    } else {
+      response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalizedEmail, code: generatedCode }),
+      })
+    }
+
+    if (response.ok) {
+      setAuthMessage(isPhoneRecovery
+        ? 'Código enviado a tu teléfono por SMS.'
+        : 'Código enviado a tu correo. Revisa tu bandeja de entrada o spam.')
       setAuthMode('verify_code')
     } else {
-      setAuthError('Error al enviar el correo. Verifica tu configuración.')
+      const errorText = await response.text()
+      setAuthError(isPhoneRecovery
+        ? 'Error al enviar el SMS. Revisa la configuración de Twilio.'
+        : 'Error al enviar el correo. Verifica tu configuración.')
+      console.error('Reset delivery error:', errorText)
     }
 
     setAuthLoading(false)
@@ -187,8 +235,14 @@ export default function Home() {
     setAuthMessage('')
     setAuthLoading(true)
 
-    const cleanEmail = resetEmail.trim().toLowerCase()
+    const incomingValue = resetEmail.trim()
     const cleanInputCode = inputCode.trim().replace(/\s+/g, '')
+
+    if (!incomingValue) {
+      setAuthError('Debes ingresar el correo o teléfono usado para recuperar la contraseña.')
+      setAuthLoading(false)
+      return
+    }
 
     if (!/^\d{6}$/.test(cleanInputCode)) {
       setAuthError('El código de verificación debe contener solo 6 números.')
@@ -196,14 +250,20 @@ export default function Home() {
       return
     }
 
+    const isPhoneRecovery = !incomingValue.includes('@')
+    const normalizedPhone = incomingValue.replace(/\D/g, '')
+    const normalizedEmail = incomingValue.toLowerCase()
+
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('id, email, reset_code')
-      .eq('email', cleanEmail)
+      .select('id, email, phone, reset_code')
+      .or(isPhoneRecovery ? `phone.eq.${normalizedPhone}` : `email.eq.${normalizedEmail}`)
       .maybeSingle()
 
     if (fetchError || !user) {
-      setAuthError('No se encontró una cuenta con este correo.')
+      setAuthError(isPhoneRecovery
+        ? 'No se encontró una cuenta con este número de teléfono.'
+        : 'No se encontró una cuenta con este correo.')
       setAuthLoading(false)
       return
     }
@@ -296,12 +356,12 @@ export default function Home() {
             <form onSubmit={handleSendResetCode} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                  Correo Electrónico Registrado
+                  Correo o Teléfono Registrado
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   required
-                  placeholder="correo@ejemplo.com"
+                  placeholder="correo@ejemplo.com o +52 555 123 4567"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
