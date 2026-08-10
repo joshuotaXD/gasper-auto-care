@@ -178,10 +178,9 @@ export default function Home() {
     const cleanEmail = resetEmail.trim().toLowerCase()
     const cleanInputCode = inputCode.trim()
 
-    // 1. Buscamos al usuario y su código en la base de datos
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('id, reset_code')
+      .select('id, email, reset_code')
       .eq('email', cleanEmail)
       .maybeSingle()
 
@@ -191,20 +190,14 @@ export default function Home() {
       return
     }
 
-    // 2. Depuración en consola para ver qué está pasando exactamente
-    console.log("Código escrito por el usuario (tipo string):", JSON.stringify(cleanInputCode))
-    console.log("Código guardado en Supabase:", JSON.stringify(user.reset_code))
-
-    // 3. Validación estricta convirtiendo ambos a string y limpiando espacios
     const dbCodeStr = user.reset_code ? String(user.reset_code).trim() : ''
-    
+
     if (!dbCodeStr || dbCodeStr !== cleanInputCode) {
       setAuthError('El código de verificación es incorrecto.')
       setAuthLoading(false)
       return
     }
 
-    // 4. Si el código es correcto, actualizamos la contraseña y borramos el código
     const { error: updateError } = await supabase
       .from('users')
       .update({ password: newPassword, reset_code: null })
@@ -215,9 +208,9 @@ export default function Home() {
     } else {
       setAuthMessage('¡Contraseña actualizada con éxito! Ya puedes iniciar sesión.')
       setAuthMode('login')
-      if (typeof setNewPassword === 'function') setNewPassword('')
-      if (typeof setInputCode === 'function') setInputCode('')
-      if (typeof setResetEmail === 'function') setResetEmail('')
+      setNewPassword('')
+      setInputCode('')
+      setResetEmail('')
     }
 
     setAuthLoading(false)
