@@ -15,68 +15,15 @@ const VEHICLES = ['Coupe / Sedan', 'Mid-Sized SUV', 'Large SUV / Truck', 'Motorc
 
 function BrandLogo() {
   return (
-    <div className="mb-6 flex justify-center">
-      <svg viewBox="0 0 1100 900" className="w-full max-w-[820px] drop-shadow-[0_0_28px_rgba(34,211,238,0.28)]">
-        <defs>
-          <linearGradient id="gasper-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
-            <stop offset="0%" stopColor="#3ad3ff" />
-            <stop offset="50%" stopColor="#09c1f4" />
-            <stop offset="100%" stopColor="#0e8ec9" />
-          </linearGradient>
-          <path id="auto-detailing-arc" d="M 235 620 A 315 315 0 0 1 865 620" />
-        </defs>
-
-        <circle cx="550" cy="430" r="295" fill="none" stroke="#f5f5f5" strokeWidth="16" />
-
-        <g>
-          <text
-            x="550"
-            y="230"
-            textAnchor="middle"
-            fontSize="210"
-            fontWeight="900"
-            fill="url(#gasper-gradient)"
-            letterSpacing="8"
-            style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
-          >
-            GASPER
-          </text>
-
-          <path d="M196 337 L318 270 L540 270 L695 337 L820 337 L820 508 L196 508 Z" fill="#080b0d" stroke="#f5f5f5" strokeWidth="10" />
-
-          <path d="M215 343 L315 287 L536 287 L676 343 L800 343 L800 492 L215 492 Z" fill="url(#gasper-gradient)" opacity="0.98" />
-          <path d="M296 333 L390 268 H530 L610 333" fill="none" stroke="#ecfaff" strokeWidth="12" strokeLinecap="round" />
-
-          <path d="M250 440 H770" stroke="#ecfaff" strokeWidth="12" strokeLinecap="round" opacity="0.9" />
-
-          <path d="M300 340 C362 306, 432 292, 510 292 C600 292, 665 310, 742 340 L742 420 C688 435, 622 448, 555 448 H410 C348 448, 300 432, 250 420 Z" fill="#0a0f14" opacity="0.7" />
-          <path d="M330 330 L450 297 H630 L710 330" fill="none" stroke="#dff8ff" strokeWidth="11" strokeLinecap="round" />
-
-          <circle cx="345" cy="498" r="46" fill="#0a0f14" stroke="#f5f5f5" strokeWidth="10" />
-          <circle cx="345" cy="498" r="18" fill="#f5f5f5" />
-          <circle cx="690" cy="498" r="46" fill="#0a0f14" stroke="#f5f5f5" strokeWidth="10" />
-          <circle cx="690" cy="498" r="18" fill="#f5f5f5" />
-
-          <path d="M530 226 L548 190 L565 226 L606 226 L574 249 L587 286 L548 264 L509 286 L522 249 L490 226 Z" fill="#f5f5f5" />
-
-          <g transform="translate(0,0)">
-            <path d="M245 745 L270 705 L295 745 L342 745 L286 778 L310 822 L270 789 L230 822 L254 778 L198 745 Z" fill="#f5f5f5" />
-            <path d="M855 745 L880 705 L905 745 L952 745 L896 778 L920 822 L880 789 L840 822 L864 778 L808 745 Z" fill="#f5f5f5" />
-          </g>
-
-          <text
-            fontSize="80"
-            fontWeight="800"
-            fill="#f5f5f5"
-            letterSpacing="8"
-            style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
-          >
-            <textPath href="#auto-detailing-arc" startOffset="50%" textAnchor="middle">
-              AUTO DETAILING
-            </textPath>
-          </text>
-        </g>
-      </svg>
+    <div className="mb-4 flex justify-center">
+      <div className="text-center">
+        <div className="text-3xl font-black tracking-[0.18em] text-cyan-400 sm:text-4xl md:text-5xl">
+          GASPER
+        </div>
+        <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.45em] text-zinc-400 sm:text-[11px]">
+          AUTO DETAILING
+        </div>
+      </div>
     </div>
   )
 }
