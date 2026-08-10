@@ -1,0 +1,3 @@
+node_modules/
+.next/
+.envgit rm -r --cached node_modules
