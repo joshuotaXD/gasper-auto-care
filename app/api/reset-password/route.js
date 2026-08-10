@@ -29,7 +29,8 @@ export async function POST(request) {
     });
 
     return NextResponse.json({ success: true, data });
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+} catch (error) {
+  console.error("Error detallado de Resend:", error);
+  return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
