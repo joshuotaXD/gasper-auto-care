@@ -34,6 +34,8 @@ export default function Home() {
   const [authError, setAuthError] = useState('')
   const [authMessage, setAuthMessage] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
 
   // Formulario de Reserva
   const [formData, setFormData] = useState({
@@ -352,14 +354,24 @@ export default function Home() {
                 <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
                   Nueva Contraseña
                 </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    placeholder="••••••••"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 uppercase"
+                    aria-label={showNewPassword ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
+                  >
+                    {showNewPassword ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                </div>
               </div>
 
               {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
@@ -480,14 +492,24 @@ export default function Home() {
                     </button>
                   )}
                 </div>
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 uppercase"
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showPassword ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                </div>
               </div>
 
               {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
