@@ -133,25 +133,35 @@ export default function Home() {
 
     const cleanEmail = resetEmail.trim().toLowerCase()
 
-    const { data: user } = await supabase
+    // 1. Buscar usuario
+    const { data: user, error: fetchError } = await supabase
       .from('users')
       .select('id, email')
       .eq('email', cleanEmail)
       .maybeSingle()
 
-    if (!user) {
+    if (fetchError || !user) {
       setAuthError('No se encontró ninguna cuenta registrada con este correo.')
       setAuthLoading(false)
       return
     }
 
-    // Generar código aleatorio de 6 dígitos
+    // 2. Generar código aleatorio de 6 dígitos
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString()
 
-    // Guardar código en Supabase
-    await supabase.from('users').update({ reset_code: generatedCode }).eq('id', user.id)
+    // 3. Guardar el código en Supabase y asegurarnos de que se aplique
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ reset_code: generatedCode })
+      .eq('id', user.id)
 
-    // Enviar correo mediante API Route
+    if (updateError) {
+      setAuthError('Error al guardar el código: ' + updateError.message)
+      setAuthLoading(false)
+      return
+    }
+
+    // 4. Enviar correo mediante la API Route
     const res = await fetch('/api/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -162,7 +172,7 @@ export default function Home() {
       setAuthMessage('Código enviado a tu correo. Revisa tu bandeja de entrada o spam.')
       setAuthMode('verify_code')
     } else {
-      setAuthError('Error al enviar el correo. Verifica tu configuración de Resend.')
+      setAuthError('Error al enviar el correo. Verifica tu configuración.')
     }
 
     setAuthLoading(false)
@@ -176,7 +186,13 @@ export default function Home() {
     setAuthLoading(true)
 
     const cleanEmail = resetEmail.trim().toLowerCase()
-    const cleanInputCode = inputCode.trim()
+    const cleanInputCode = inputCode.trim().replace(/\s+/g, '')
+
+    if (!/^\d{6}$/.test(cleanInputCode)) {
+      setAuthError('El código de verificación debe contener solo 6 números.')
+      setAuthLoading(false)
+      return
+    }
 
     const { data: user, error: fetchError } = await supabase
       .from('users')
@@ -190,10 +206,20 @@ export default function Home() {
       return
     }
 
-    const dbCodeStr = user.reset_code ? String(user.reset_code).trim() : ''
+    const savedCode = user.reset_code == null ? '' : String(user.reset_code).trim().replace(/\s+/g, '')
+    const inputCodeNormalized = cleanInputCode
 
-    if (!dbCodeStr || dbCodeStr !== cleanInputCode) {
+    console.log('DEBUG RESET:', {
+      savedCode,
+      inputCodeNormalized,
+      rawSavedCode: user.reset_code,
+      rawInputCode: inputCode,
+      typeSavedCode: typeof user.reset_code,
+    })
+
+    if (!savedCode || savedCode !== inputCodeNormalized) {
       setAuthError('El código de verificación es incorrecto.')
+      console.log('JSON DEBUG:', JSON.stringify({ savedCode, inputCodeNormalized, userId: user.id, email: cleanEmail }, null, 2))
       setAuthLoading(false)
       return
     }
@@ -311,11 +337,13 @@ export default function Home() {
                 </label>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   required
                   placeholder="123456"
                   maxLength={6}
                   value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value)}
+                  onChange={(e) => setInputCode(e.target.value.replace(/[^0-9]/g, ''))}
                   className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-center font-mono tracking-widest text-cyan-400 focus:outline-none focus:border-cyan-400"
                 />
               </div>
