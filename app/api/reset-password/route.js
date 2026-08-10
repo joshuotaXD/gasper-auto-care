@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Inicializa Resend con tu API Key (debes obtenerla en resend.com)
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request) {
   try {
+    // Inicializamos Resend aquí adentro para que lea la variable cuando la API reciba una petición real
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const { email, code } = await request.json();
 
     if (!email || !code) {
       return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
     }
 
-    // Envía el correo usando Resend
     const data = await resend.emails.send({
-      from: 'Gasper <onboarding@resend.dev>', // Puedes cambiarlo por tu dominio verificado después
+      from: 'Gasper <onboarding@resend.dev>',
       to: [email],
       subject: 'Código de recuperación de contraseña - Gasper',
       html: `
