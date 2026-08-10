@@ -307,452 +307,502 @@ export default function Home() {
     }
   }
 
-  // PANTALLAS DE AUTENTICACIÓN
-  if (!currentUser && showAuth) {
-    return (
-      <main className="min-h-screen bg-[#0F0F11] text-white flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[#1A1A1E] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
-          <div className="mb-6">
+  const renderAuthCard = () => (
+    <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg bg-[#1A1A1E] border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-2xl">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <div className="mb-2">
             <BrandLogo />
-            <div className="text-center">
-              <p className="text-xs text-zinc-400 mt-1 uppercase tracking-widest">
-                {authMode === 'login' && 'Iniciar Sesión'}
-                {authMode === 'register' && 'Crear Cuenta'}
-                {authMode === 'forgot' && 'Recuperar Contraseña'}
-                {authMode === 'verify_code' && 'Restablecer Contraseña'}
-              </p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-zinc-400 mt-1 uppercase tracking-widest">
+              {authMode === 'login' && 'Iniciar Sesión'}
+              {authMode === 'register' && 'Crear Cuenta'}
+              {authMode === 'forgot' && 'Recuperar Contraseña'}
+              {authMode === 'verify_code' && 'Restablecer Contraseña'}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAuth(false)}
+          className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-300 hover:border-cyan-400 hover:text-cyan-300"
+          aria-label="Volver a la página anterior"
+        >
+          ✕
+        </button>
+      </div>
+
+      {authMessage && (
+        <div className="mb-4 p-3 bg-emerald-950/40 border border-emerald-800 text-emerald-400 rounded-lg text-xs">
+          {authMessage}
+        </div>
+      )}
+
+      {authMode === 'forgot' && (
+        <form onSubmit={handleSendResetCode} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
+              Correo Electrónico Registrado
+            </label>
+            <input
+              type="email"
+              required
+              placeholder="correo@ejemplo.com"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
+            />
+          </div>
+
+          {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
+
+          <button
+            type="submit"
+            disabled={authLoading}
+            className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200"
+          >
+            {authLoading ? 'Enviando código...' : 'Enviar Código de Verificación'}
+          </button>
+
+          <div className="text-center text-xs mt-4">
+            <button
+              type="button"
+              onClick={() => { setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
+              className="text-zinc-400 hover:text-white underline"
+            >
+              Volver al Inicio de Sesión
+            </button>
+          </div>
+        </form>
+      )}
+
+      {authMode === 'verify_code' && (
+        <form onSubmit={handleVerifyAndReset} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
+              Código de 6 dígitos
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              required
+              placeholder="123456"
+              maxLength={6}
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value.replace(/[^0-9]/g, ''))}
+              className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-center font-mono tracking-widest text-cyan-400 focus:outline-none focus:border-cyan-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
+              Nueva Contraseña
+            </label>
+            <div className="relative">
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                required
+                placeholder="••••••••"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 uppercase"
+                aria-label={showNewPassword ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
+              >
+                {showNewPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
             </div>
           </div>
 
-          {/* MENSAJE GENERAL */}
-          {authMessage && (
-            <div className="mb-4 p-3 bg-emerald-950/40 border border-emerald-800 text-emerald-400 rounded-lg text-xs">
-              {authMessage}
-            </div>
-          )}
+          {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
 
-          {/* VISTA 1: RECUPERAR CONTRASEÑA (Paso 1: Solicitar Correo) */}
-          {authMode === 'forgot' && (
-            <form onSubmit={handleSendResetCode} className="space-y-4">
+          <button
+            type="submit"
+            disabled={authLoading}
+            className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200"
+          >
+            {authLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
+          </button>
+
+          <div className="text-center text-xs mt-4">
+            <button
+              type="button"
+              onClick={() => { setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
+              className="text-zinc-400 hover:text-white underline"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+
+      {(authMode === 'login' || authMode === 'register') && (
+        <form onSubmit={handleAuthSubmit} className="space-y-4">
+          {authMode === 'register' ? (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Nombre</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. Juan"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
+                    Segundo Nombre <span className="text-[10px] text-zinc-500 font-normal">(opcional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej. Carlos"
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                  Correo Electrónico Registrado
-                </label>
+                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Apellidos</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Pérez Gómez"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Correo Electrónico</label>
                 <input
                   type="email"
                   required
                   placeholder="correo@ejemplo.com"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
                 />
               </div>
 
-              {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200"
-              >
-                {authLoading ? 'Enviando código...' : 'Enviar Código de Verificación'}
-              </button>
-
-              <div className="text-center text-xs mt-4">
-                <button
-                  type="button"
-                  onClick={() => { setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
-                  className="text-zinc-400 hover:text-white underline"
-                >
-                  Volver al Inicio de Sesión
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* VISTA 2: RESTABLECER CONTRASEÑA (Paso 2: Código + Nueva Contraseña) */}
-          {authMode === 'verify_code' && (
-            <form onSubmit={handleVerifyAndReset} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                  Código de 6 dígitos
-                </label>
+                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Teléfono</label>
                 <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
+                  type="tel"
                   required
-                  placeholder="123456"
-                  maxLength={6}
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-center font-mono tracking-widest text-cyan-400 focus:outline-none focus:border-cyan-400"
+                  placeholder="Número de teléfono"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
                 />
               </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                  Nueva Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 uppercase"
-                    aria-label={showNewPassword ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
-                  >
-                    {showNewPassword ? 'Ocultar' : 'Mostrar'}
-                  </button>
-                </div>
-              </div>
-
-              {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200"
-              >
-                {authLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
-              </button>
-
-              <div className="text-center text-xs mt-4">
-                <button
-                  type="button"
-                  onClick={() => { setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
-                  className="text-zinc-400 hover:text-white underline"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* VISTA 3: LOGIN / REGISTRO */}
-          {(authMode === 'login' || authMode === 'register') && (
-            <form onSubmit={handleAuthSubmit} className="space-y-4">
-              {authMode === 'register' ? (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Nombre</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Ej. Juan"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                        Segundo Nombre <span className="text-[10px] text-zinc-500 font-normal">(opcional)</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ej. Carlos"
-                        value={middleName}
-                        onChange={(e) => setMiddleName(e.target.value)}
-                        className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Apellidos</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ej. Pérez Gómez"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Correo Electrónico</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="correo@ejemplo.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Teléfono</label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="Número de teléfono"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                    />
-                  </div>
-                </>
-              ) : (
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
-                    Nombre, Correo o Teléfono
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Tu nombre, correo o teléfono"
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-              )}
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase">Contraseña</label>
-                  {authMode === 'login' && (
-                    <button
-                      type="button"
-                      onClick={() => { setAuthMode('forgot'); setAuthError(''); setAuthMessage(''); }}
-                      className="text-[11px] text-cyan-400 hover:underline"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </button>
-                  )}
-                </div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 uppercase"
-                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  >
-                    {showPassword ? 'Ocultar' : 'Mostrar'}
-                  </button>
-                </div>
-              </div>
-
-              {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200 mt-2 disabled:opacity-50"
-              >
-                {authLoading ? 'Verificando...' : authMode === 'login' ? 'Entrar' : 'Registrarse'}
-              </button>
-            </form>
-          )}
-
-          {/* CAMBIAR ENTRE LOGIN Y REGISTRO */}
-          {(authMode === 'login' || authMode === 'register') && (
-            <div className="mt-6 text-center text-xs text-zinc-400">
-              {authMode === 'login' ? (
-                <p>
-                  ¿No tienes cuenta?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('register'); setAuthError(''); setAuthMessage(''); }}
-                    className="text-cyan-400 underline font-semibold ml-1"
-                  >
-                    Regístrate aquí
-                  </button>
-                </p>
-              ) : (
-                <p>
-                  ¿Ya tienes una cuenta?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
-                    className="text-cyan-400 underline font-semibold ml-1"
-                  >
-                    Inicia sesión
-                  </button>
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-      </main>
-    )
-  }
-
-  // PANTALLA DE RESERVA
-  return (
-    <main className="min-h-screen bg-[#0F0F11] text-white p-4">
-      <header className="mx-auto mb-6 flex w-full max-w-6xl items-center justify-between rounded-2xl border border-zinc-800 bg-[#111318]/90 px-5 py-4 shadow-xl shadow-cyan-950/20 backdrop-blur-sm">
-        <div className="flex items-center gap-8">
-          <div>
-            <h1 className="text-xl font-black tracking-[0.14em] text-cyan-400">GASPER</h1>
-            <p className="text-[9px] uppercase tracking-[0.35em] text-zinc-400">AUTO DETAILING</p>
-          </div>
-
-          <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-300 md:flex">
-            <button type="button" className="transition hover:text-cyan-300">INICIO</button>
-            <button type="button" className="transition hover:text-cyan-300">CONTACTO</button>
-            <button type="button" className="transition hover:text-cyan-300">GALERIA</button>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {currentUser ? (
-            <button
-              type="button"
-              onClick={() => { setCurrentUser(null); setPassword(''); setLoginIdentifier(''); setShowAuth(false); }}
-              className="text-xs text-zinc-400 hover:text-red-400 underline"
-            >
-              Cerrar sesión
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => { setShowAuth(true); setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
-                className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-semibold text-zinc-200 transition hover:border-cyan-400 hover:text-cyan-300"
-              >
-                Iniciar sesión
-              </button>
-              <button
-                type="button"
-                onClick={() => { setShowAuth(true); setAuthMode('register'); setAuthError(''); setAuthMessage(''); }}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-bold text-black transition hover:bg-cyan-400"
-              >
-                Crear cuenta
-              </button>
             </>
-          )}
-        </div>
-      </header>
-
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-zinc-800 bg-[#1A1A1E] p-6 shadow-2xl">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <p className="text-xs text-zinc-400">Cliente</p>
-            <p className="text-base font-semibold capitalize text-white">{activeUser.fullName}</p>
-          </div>
-        </div>
-
-        {success ? (
-          <div className="text-center py-8 space-y-3">
-            <div className="text-4xl">✅</div>
-            <h2 className="text-xl font-bold text-white">¡Reserva enviada!</h2>
-            <p className="text-sm text-zinc-400">Nos pondremos en contacto contigo pronto.</p>
-            <button
-              type="button"
-              onClick={() => setSuccess(false)}
-              className="mt-4 bg-cyan-500 text-black font-bold px-4 py-2 rounded-xl text-sm"
-            >
-              Hacer otra reserva
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleBookingSubmit} className="space-y-4">
+          ) : (
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Servicio</label>
-              <select
-                className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                value={formData.service_name}
-                onChange={(e) => {
-                  const selected = SERVICES.find((s) => s.name === e.target.value)
-                  setFormData({ ...formData, service_name: selected.name, price: selected.basePrice })
-                }}
-              >
-                {SERVICES.map((s) => (
-                  <option key={s.name} value={s.name}>
-                    {s.name} (${s.basePrice}+)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Tipo de Vehículo</label>
-              <select
-                className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                value={formData.vehicle_type}
-                onChange={(e) => setFormData({ ...formData, vehicle_type: e.target.value })}
-              >
-                {VEHICLES.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Fecha</label>
-                <input
-                  type="date"
-                  required
-                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  value={formData.booking_date}
-                  onChange={(e) => setFormData({ ...formData, booking_date: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Hora</label>
-                <input
-                  type="time"
-                  required
-                  className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                  value={formData.booking_time}
-                  onChange={(e) => setFormData({ ...formData, booking_time: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">Dirección del servicio</label>
+              <label className="block text-xs font-semibold text-zinc-400 mb-1 uppercase">
+                Nombre, Correo o Teléfono
+              </label>
               <input
                 type="text"
                 required
-                placeholder="Calle, número, colonia..."
+                placeholder="Tu nombre, correo o teléfono"
+                value={loginIdentifier}
+                onChange={(e) => setLoginIdentifier(e.target.value)}
                 className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               />
             </div>
+          )}
 
-            <div className="p-3 bg-[#0F0F11] border border-zinc-800 rounded-xl space-y-1">
-              <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block">
-                Métodos de pago aceptados
-              </span>
-              <p className="text-[11px] text-zinc-400">El pago se realiza en persona al completar el servicio:</p>
-              <p className="text-xs font-medium text-zinc-200">💵 Cash  💳 Visa / MC / Amex  📱 Zelle  🌆 Venmo</p>
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-xs font-semibold text-zinc-400 uppercase">Contraseña</label>
+              {authMode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('forgot'); setAuthError(''); setAuthMessage(''); }}
+                  className="text-[11px] text-cyan-400 hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-[#0F0F11] border border-zinc-800 rounded-lg px-3 py-2 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 uppercase"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
+            </div>
+          </div>
+
+          {authError && <p className="text-xs text-red-400 font-medium">{authError}</p>}
+
+          <button
+            type="submit"
+            disabled={authLoading}
+            className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200 mt-2 disabled:opacity-50"
+          >
+            {authLoading ? 'Verificando...' : authMode === 'login' ? 'Entrar' : 'Registrarse'}
+          </button>
+        </form>
+      )}
+
+      {(authMode === 'login' || authMode === 'register') && (
+        <div className="mt-6 text-center text-xs text-zinc-400">
+          {authMode === 'login' ? (
+            <p>
+              ¿No tienes cuenta?{' '}
+              <button
+                type="button"
+                onClick={() => { setAuthMode('register'); setAuthError(''); setAuthMessage(''); }}
+                className="text-cyan-400 underline font-semibold ml-1"
+              >
+                Regístrate aquí
+              </button>
+            </p>
+          ) : (
+            <p>
+              ¿Ya tienes una cuenta?{' '}
+              <button
+                type="button"
+                onClick={() => { setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
+                className="text-cyan-400 underline font-semibold ml-1"
+              >
+                Inicia sesión
+              </button>
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+
+  // PANTALLA DE RESERVA
+  return (
+    <main className="min-h-screen bg-[#0F0F11] text-white">
+      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6 lg:px-6">
+        <header className="mx-auto mb-6 w-full rounded-2xl border border-zinc-800 bg-[#111318]/90 px-4 py-4 shadow-xl shadow-cyan-950/20 backdrop-blur-sm sm:px-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
+              <h1 className="text-xl font-black tracking-[0.14em] text-cyan-400">GASPER</h1>
+              <p className="text-[9px] uppercase tracking-[0.35em] text-zinc-400">AUTO DETAILING</p>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition duration-200"
-            >
-              {loading ? 'Procesando...' : 'Confirmar Reserva'}
-            </button>
-          </form>
-        )}
+            <nav className="flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-zinc-300 sm:gap-5 sm:text-sm md:justify-start">
+              <button type="button" className="transition hover:text-cyan-300">INICIO</button>
+              <button type="button" className="transition hover:text-cyan-300">CONTACTO</button>
+              <button type="button" className="transition hover:text-cyan-300">GALERIA</button>
+            </nav>
+
+            <div className="flex items-center justify-center gap-2 sm:gap-3 md:justify-end">
+              {currentUser ? (
+                <button
+                  type="button"
+                  onClick={() => { setCurrentUser(null); setPassword(''); setLoginIdentifier(''); setShowAuth(false); }}
+                  className="text-xs text-zinc-400 hover:text-red-400 underline"
+                >
+                  Cerrar sesión
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => { setShowAuth(true); setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
+                    className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-[11px] font-semibold text-zinc-200 transition hover:border-cyan-400 hover:text-cyan-300 sm:px-4 sm:text-xs"
+                  >
+                    Iniciar sesión
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowAuth(true); setAuthMode('register'); setAuthError(''); setAuthMessage(''); }}
+                    className="rounded-lg bg-cyan-500 px-3 py-2 text-[11px] font-bold text-black transition hover:bg-cyan-400 sm:px-4 sm:text-xs"
+                  >
+                    Crear cuenta
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <div className="mx-auto w-full max-w-6xl">
+          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.35fr]">
+            <aside className="rounded-3xl border border-zinc-800 bg-[#111318] p-4 shadow-2xl shadow-cyan-950/20 sm:p-5 lg:p-6">
+              <div className="mb-5 flex justify-center lg:justify-start">
+                <div className="w-full max-w-[420px] lg:max-w-[360px]">
+                  <BrandLogo />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-400">Servicio premium</p>
+                  <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Cuidado perfecto para tu vehículo.</h2>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Detalle</p>
+                    <p className="mt-2 text-sm font-semibold text-white">Lavado profundo y protección</p>
+                  </div>
+                  <div className="rounded-2xl border border-zinc-800 bg-[#0F0F11] p-3">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Tiempo</p>
+                    <p className="mt-2 text-sm font-semibold text-white">Agendamiento rápido y flexible</p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3 text-sm text-zinc-200">
+                  <p className="font-semibold text-cyan-300">Atención personalizada</p>
+                  <p className="mt-1 text-zinc-300">Reserva en minutos y recibe un servicio de alto nivel.</p>
+                </div>
+              </div>
+            </aside>
+
+            <div className="rounded-3xl border border-zinc-800 bg-[#1A1A1E] p-4 shadow-2xl sm:p-5 lg:p-6">
+              <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs text-zinc-400">Cliente</p>
+                  <p className="text-base font-semibold capitalize text-white">{activeUser.fullName}</p>
+                </div>
+                <div className="rounded-full border border-zinc-700 bg-[#0F0F11] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
+                  Reservación
+                </div>
+              </div>
+
+              {success ? (
+                <div className="space-y-3 py-8 text-center">
+                  <div className="text-4xl">✅</div>
+                  <h2 className="text-xl font-bold text-white">¡Reserva enviada!</h2>
+                  <p className="text-sm text-zinc-400">Nos pondremos en contacto contigo pronto.</p>
+                  <button
+                    type="button"
+                    onClick={() => setSuccess(false)}
+                    className="mt-4 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-bold text-black transition hover:bg-cyan-400"
+                  >
+                    Hacer otra reserva
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleBookingSubmit} className="space-y-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Servicio</label>
+                    <select
+                      className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                      value={formData.service_name}
+                      onChange={(e) => {
+                        const selected = SERVICES.find((s) => s.name === e.target.value)
+                        setFormData({ ...formData, service_name: selected.name, price: selected.basePrice })
+                      }}
+                    >
+                      {SERVICES.map((s) => (
+                        <option key={s.name} value={s.name}>
+                          {s.name} (${s.basePrice}+)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Tipo de Vehículo</label>
+                    <select
+                      className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                      value={formData.vehicle_type}
+                      onChange={(e) => setFormData({ ...formData, vehicle_type: e.target.value })}
+                    >
+                      {VEHICLES.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Fecha</label>
+                      <input
+                        type="date"
+                        required
+                        className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                        value={formData.booking_date}
+                        onChange={(e) => setFormData({ ...formData, booking_date: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Hora</label>
+                      <input
+                        type="time"
+                        required
+                        className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                        value={formData.booking_time}
+                        onChange={(e) => setFormData({ ...formData, booking_time: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400">Dirección del servicio</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Calle, número, colonia..."
+                      className="w-full rounded-lg border border-zinc-800 bg-[#0F0F11] px-3 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="rounded-xl border border-zinc-800 bg-[#0F0F11] p-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                      Métodos de pago aceptados
+                    </span>
+                    <p className="mt-2 text-[11px] text-zinc-400">El pago se realiza en persona al completar el servicio:</p>
+                    <p className="mt-1 text-xs font-medium text-zinc-200">💵 Cash  💳 Visa / MC / Amex  📱 Zelle  🌆 Venmo</p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-xl bg-cyan-500 px-4 py-3 text-sm font-bold text-black transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {loading ? 'Procesando...' : 'Confirmar Reserva'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {!currentUser && showAuth && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-3 py-6 backdrop-blur-sm">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl p-2 sm:p-3">
+            {renderAuthCard()}
+          </div>
+        </div>
+      )}
     </main>
   )
 }
