@@ -287,8 +287,8 @@ export default function Home() {
     setLoading(true)
 
     const payload = {
-      customer_name: currentUser.fullName,
-      customer_phone: currentUser.phone,
+      customer_name: activeUser.fullName,
+      customer_phone: activeUser.phone,
       address: formData.address,
       vehicle_type: formData.vehicle_type,
       service_name: formData.service_name,
@@ -599,33 +599,57 @@ export default function Home() {
 
   // PANTALLA DE RESERVA
   return (
-    <main className="min-h-screen bg-[#0F0F11] text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#1A1A1E] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
-        <div className="flex justify-between items-center mb-6">
+    <main className="min-h-screen bg-[#0F0F11] text-white p-4">
+      <header className="mx-auto mb-6 flex w-full max-w-6xl items-center justify-between rounded-2xl border border-zinc-800 bg-[#111318]/90 px-5 py-4 shadow-xl shadow-cyan-950/20 backdrop-blur-sm">
+        <div className="flex items-center gap-8">
           <div>
-            <h1 className="text-2xl font-black text-cyan-400">GASPER</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">Auto Detailing</p>
-            <p className="text-xs text-zinc-400">
-              Cliente: <span className="text-white font-semibold capitalize">{activeUser.fullName}</span>
-            </p>
+            <h1 className="text-xl font-black tracking-[0.14em] text-cyan-400">GASPER</h1>
+            <p className="text-[9px] uppercase tracking-[0.35em] text-zinc-400">AUTO DETAILING</p>
           </div>
+
+          <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-300 md:flex">
+            <button type="button" className="transition hover:text-cyan-300">INICIO</button>
+            <button type="button" className="transition hover:text-cyan-300">CONTACTO</button>
+            <button type="button" className="transition hover:text-cyan-300">GALERIA</button>
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-3">
           {currentUser ? (
             <button
               type="button"
               onClick={() => { setCurrentUser(null); setPassword(''); setLoginIdentifier(''); setShowAuth(false); }}
-              className="text-xs text-zinc-500 hover:text-red-400 underline"
+              className="text-xs text-zinc-400 hover:text-red-400 underline"
             >
               Cerrar sesión
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => { setShowAuth(true); setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold underline"
-            >
-              Iniciar sesión
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => { setShowAuth(true); setAuthMode('login'); setAuthError(''); setAuthMessage(''); }}
+                className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-semibold text-zinc-200 transition hover:border-cyan-400 hover:text-cyan-300"
+              >
+                Iniciar sesión
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowAuth(true); setAuthMode('register'); setAuthError(''); setAuthMessage(''); }}
+                className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-bold text-black transition hover:bg-cyan-400"
+              >
+                Crear cuenta
+              </button>
+            </>
           )}
+        </div>
+      </header>
+
+      <div className="mx-auto w-full max-w-md rounded-2xl border border-zinc-800 bg-[#1A1A1E] p-6 shadow-2xl">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-zinc-400">Cliente</p>
+            <p className="text-base font-semibold capitalize text-white">{activeUser.fullName}</p>
+          </div>
         </div>
 
         {success ? (
