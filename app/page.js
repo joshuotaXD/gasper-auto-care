@@ -253,7 +253,7 @@ export default function Home() {
                                       {vType}
                                     </button>
                                   ))}
-                               <div className="flex justify-center w-full mt-6 pt-4 border-t border-zinc-800">
+                              <div className="w-full flex justify-center mt-6 pt-4 border-t border-zinc-800">
   <button 
     onClick={(e) => {
       e.stopPropagation();
