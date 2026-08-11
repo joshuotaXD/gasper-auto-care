@@ -21,7 +21,7 @@ export default function Home() {
 }
 
 
-export default function Home() {
+
   // Estados para el modal de autenticación
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' o 'signup'
@@ -620,4 +620,3 @@ export default function Home() {
       </main>
     </div>
   );
-}
