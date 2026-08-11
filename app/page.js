@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import Gallery from './components/Gallery';
+
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
