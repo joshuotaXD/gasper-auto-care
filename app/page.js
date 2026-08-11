@@ -43,7 +43,7 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Iniciar sesión con Correo o Número de Teléfono (mapeando a un formato de correo ficticio si es teléfono)
+  // Iniciar sesión con Correo o Número de Teléfono
   const handleLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -51,7 +51,6 @@ export default function Home() {
 
     let loginEmail = identifier.trim();
     
-    // Si el usuario ingresó un número de teléfono en lugar de un correo (@), lo convertimos al formato interno
     if (!loginEmail.includes('@')) {
       loginEmail = `phone_${loginEmail}@gasper.com`;
     }
@@ -77,12 +76,10 @@ export default function Home() {
     setAuthError('');
     setAuthLoading(true);
 
-    // Si el campo de identificador contiene '@' lo usamos como correo principal, si no, generamos un correo interno basado en su teléfono
     let signupEmail = identifier.trim();
     let userPhone = phone.trim();
 
     if (!signupEmail.includes('@')) {
-      // Si el usuario puso su teléfono en el campo de identificador y dejó vacío el de teléfono
       userPhone = signupEmail;
       signupEmail = `phone_${userPhone}@gasper.com`;
     }
@@ -201,22 +198,26 @@ export default function Home() {
             </span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Menú de navegación reorganizado: Contáctanos a la izquierda, Galería llamativa más al centro */}
+          <nav className="hidden md:flex items-center gap-8">
             <button 
-              onClick={() => setActiveSection('inicio')}
+              onClick={() => setActiveSection('contacto')}
               className={`transition font-bold text-sm tracking-widest uppercase ${
-                activeSection === 'inicio' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
+                activeSection === 'contacto' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
               }`}
             >
-              Servicios
+              Contáctanos
             </button>
+
             <button 
               onClick={() => setActiveSection('galeria')}
-              className={`transition font-bold text-sm tracking-widest uppercase ${
-                activeSection === 'galeria' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
+              className={`relative px-4 py-1.5 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg animate-pulse ${
+                activeSection === 'galeria' 
+                  ? 'bg-cyan-500 text-black shadow-cyan-500/50 scale-105' 
+                  : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/50 hover:border-cyan-400 hover:scale-105 shadow-cyan-500/20'
               }`}
             >
-              Galería
+              ✨ Galería
             </button>
           </nav>
 
@@ -255,7 +256,7 @@ export default function Home() {
         {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
 
         {activeSection === 'login' ? (
-          /* APARTADO DE INICIAR SESIÓN (CORREO O TELÉFONO + VER CONTRASEÑA) */
+          /* APARTADO DE INICIAR SESIÓN */
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -326,7 +327,7 @@ export default function Home() {
             </div>
           </section>
         ) : activeSection === 'register' ? (
-          /* APARTADO DE REGISTRO (CON TELÉFONO Y VER CONTRASEÑA) */
+          /* APARTADO DE REGISTRO */
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -512,8 +513,29 @@ export default function Home() {
               Volver a Servicios
             </button>
           </section>
+        ) : activeSection === 'contacto' ? (
+          /* APARTADO DE CONTACTO */
+          <section className="px-6 py-20 max-w-xl mx-auto text-center">
+            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+                Ponte en contacto
+              </span>
+              <h2 className="text-3xl font-bold mt-4 text-white">Contáctanos</h2>
+              <p className="text-zinc-400 mt-2 text-sm">¿Tienes dudas o necesitas atención personalizada? Escríbenos o visítanos.</p>
+              
+              <div className="mt-6 space-y-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
+                <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +52 998 123 4567</p>
+                <p className="text-sm text-zinc-300">📧 <strong className="text-white">Correo:</strong> contacto@gasperdetailing.com</p>
+                <p className="text-sm text-zinc-300">📍 <strong className="text-white">Ubicación:</strong> Cancún, Q.R., México</p>
+              </div>
+
+              <button onClick={() => setActiveSection('inicio')} className="mt-6 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 rounded-xl transition w-full">
+                Volver a Servicios
+              </button>
+            </div>
+          </section>
         ) : (
-          /* APARTADO PRINCIPAL (BIENVENIDA + SERVICIOS) */
+          /* APARTADO PRINCIPAL (BIENVENIDA + SERVICIOS ABAJO) */
           <>
             <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
               <div className="max-w-4xl mx-auto">
