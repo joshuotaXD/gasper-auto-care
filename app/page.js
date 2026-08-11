@@ -9,6 +9,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);git
   
   // State to toggle between "services" and "contact" view on the main page
   const [mainView, setMainView] = useState('servicios'); // 'servicios' or 'contacto'
