@@ -194,6 +194,7 @@ export default function Home() {
                 {servicesList.map((service, index) => {
                   const isOpen = openServices[service.name];
                   return (
+                    
                     <div 
                       key={index}
                       className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 transition hover:border-zinc-700"
@@ -221,9 +222,20 @@ export default function Home() {
                         <div className="mt-4 pt-4 border-t border-zinc-800 space-y-4 text-sm text-zinc-300">
 
                           <div className="w-full flex justify-center mt-6 pt-4 border-t border-zinc-800">
+                            <button 
+    onClick={(e) => {
+      e.stopPropagation();
+      alert("Servicio de " + service.name + " confirmado con éxito.");
+    }}
+    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg mx-auto"
+  >
+    Confirmar Servicio
+  </button>
+</div>
  
   
-</div>
+                       
+
                           {/* ENGINE WASH */}
                           {service.isEngineWash && (
                             <div className="space-y-2">
@@ -254,16 +266,7 @@ export default function Home() {
                                     </button>
                                   ))}
                             <div className="w-full flex justify-center items-center mt-6 pt-4 border-t border-zinc-800">
-  <button 
-    type="button"
-    onClick={(e) => {
-      e.stopPropagation();
-      alert("Servicio de " + service.name + " confirmado con éxito.");
-    }}
-    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg mx-auto block"
-  >
-    Confirmar Servicio
-  </button>
+ 
 </div>
             </div>
           </div>
