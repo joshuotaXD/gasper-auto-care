@@ -737,7 +737,7 @@ export default function Home() {
                   </span>
                   <h2 className="text-3xl font-bold mt-4 text-white">Contáctanos</h2>
                   <p className="text-zinc-400 mt-2 text-sm max-w-md mx-auto">
-                    ¿Tienes dudas o necesitas atención personalizada? Escanea el código QR o haz clic abajo para chatear directamente por WhatsApp.
+                    ¿Tienes dudas o necesitas atención personalizada? Escanea el código QR o haz clic abajo para chatear directamente por WhatsApp o visitar nuestras redes sociales.
                   </p>
                   
                   {/* Tarjeta estilo tarjeta de presentación del QR de WhatsApp */}
@@ -771,7 +771,7 @@ export default function Home() {
                     </p>
 
                     {/* Botón directo de enlace */}
-                    <div className="mt-6 w-full">
+                    <div className="mt-6 w-full flex flex-col gap-3">
                       <a 
                         href="https://wa.me/message/OCXKMD5ZYESIE1" 
                         target="_blank" 
@@ -779,6 +779,15 @@ export default function Home() {
                         className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
                       >
                         <span>💬</span> Enviar mensaje por WhatsApp
+                      </a>
+                      
+                      <a 
+                        href="https://www.facebook.com/share/1GHdrJniWm/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
+                      >
+                        <span>👥</span> Visítanos en Facebook
                       </a>
                     </div>
                   </div>
