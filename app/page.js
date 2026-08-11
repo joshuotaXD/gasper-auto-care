@@ -93,7 +93,7 @@ export default function Home() {
       ],
       conclusion: 'The result: Vibrant color, intense shine, and months of protection. Ideal for getting rid of imperfections and turning heads wherever you go!'
     },
-   { 
+    { 
       name: 'CERAMIC COATING', 
       duration: '300-600 min', 
       isCeramic: true,
@@ -123,7 +123,7 @@ export default function Home() {
       {/* HEADER / MENÚ DE NAVEGACIÓN */}
       <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
         
-        {/* Izquierda: Logo y Nombre (Actúa como botón de Inicio) */}
+        {/* Izquierda: Logo y Nombre */}
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveSection('inicio')}>
           <div className="relative w-10 h-10 overflow-hidden rounded-full border border-cyan-500/40 group-hover:border-cyan-400 transition">
             <Image 
@@ -138,7 +138,7 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Centro: Navegación (Solo Galería y Contacto) */}
+        {/* Centro: Navegación */}
         <nav className="hidden md:flex items-center gap-8">
           <button
             onClick={() => setActiveSection('galeria')}
@@ -173,7 +173,6 @@ export default function Home() {
             Crear Cuenta
           </button>
         </div>
-
       </header>
 
       {/* CONTENIDO DE LAS SECCIONES */}
@@ -216,6 +215,7 @@ export default function Home() {
                           {isOpen ? '▲ Ocultar' : '▼ Ver detalle'}
                         </span>
                       </div>
+                      
 
                       {isOpen && (
                         <div className="mt-4 pt-4 border-t border-zinc-800 space-y-4 text-sm text-zinc-300">
@@ -248,52 +248,68 @@ export default function Home() {
                                       {vType}
                                     </button>
                                   ))}
+                                  <button 
+  onClick={(e) => {
+    e.stopPropagation();
+    alert("Servicio confirmado con éxito.");
+  }}
+  className="w-full bg-white hover:bg-zinc-200 text-black font-bold py-3 rounded-xl transition duration-200 text-sm shadow-lg mt-3"
+>
+  Confirmar Servicio
+</button>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            
+
+                            
+                          )}
+
+                          {/* CERAMIC COATING */}
+                          {service.isCeramic && (
+                            <div className="space-y-3">
+                              <p className="font-bold text-white text-lg">{service.title}</p>
+                              <p className="text-cyan-400">{service.intro}</p>
+                              <p className="text-zinc-300">{service.description}</p>
+
+                              <ul className="list-disc list-inside space-y-1 text-zinc-300">
+                                {service.benefits.map((bItem, bIndex) => (
+                                  <li key={bIndex}>{bItem}</li>
+                                ))}
+                              </ul>
+
+                              <div className="pt-2 border-t border-zinc-800/80 space-y-2">
+                                <p className="text-zinc-300 font-medium">{service.note}</p>
+                                <p className="text-white font-bold">{service.includes}</p>
+                                <p className="text-zinc-400 text-sm italic">{service.durability}</p>
+                              </div>
+
+                              <div className="mt-4 pt-3 border-t border-zinc-800/80">
+                                <p className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2">
+                                  PRICE/TIME for each vehicle type:
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                  {vehicleTypes.map((vType, vIndex) => (
+                                    <button
+                                      key={vIndex}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedVehicleTypeCeramic(vType);
+                                      }}
+                                      className={`px-3 py-2 rounded-xl text-xs font-semibold border transition text-center ${
+                                        selectedVehicleTypeCeramic === vType
+                                          ? 'bg-cyan-500 text-black border-cyan-400 shadow-md shadow-cyan-500/20'
+                                          : 'bg-[#111318] text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
+                                      }`}
+                                    >
+                                      {vType}
+                                    </button>
+                                  ))}
                                 </div>
                               </div>
                             </div>
                           )}
-
-                          {/* CERAMIC COATING */}
-{service.isCeramic && (
-  <div className="space-y-3">
-    <p className="font-bold text-white text-lg">{service.title}</p>
-    <p className="text-cyan-400">{service.intro}</p>
-    <p className="text-zinc-300">{service.description}</p>
-
-    <ul className="list-disc list-inside space-y-1 text-zinc-300">
-      {service.benefits.map((bItem, bIndex) => (
-        <li key={bIndex}>{bItem}</li>
-      ))}
-    </ul>
-
-    <div className="pt-2 border-t border-zinc-800/80 space-y-2">
-      <p className="text-zinc-300 font-medium">{service.note}</p>
-      <p className="text-white font-bold">{service.includes}</p>
-      <p className="text-zinc-400 text-sm italic">{service.durability}</p>
-    </div>
-
-    {/* Selector de tipo de vehículo para Ceramic Coating */}
-    <div className="mt-4 pt-3 border-t border-zinc-800/80">
-      <p className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2">
-        PRICE/TIME for each vehicle type:
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        {vehicleTypes.map((vType, vIndex) => (
-          <button
-            key={vIndex}
-            onClick={(e) => {
-              e.stopPropagation();
-              // Aquí puedes manejar el estado de selección del tipo de vehículo si lo deseas
-            }}
-            className="px-3 py-2 rounded-xl text-xs font-semibold border bg-[#111318] text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white transition text-center"
-          >
-            {vType}
-          </button>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
 
                           {/* HEADLIGHT RESTORATION */}
                           {service.isHeadlight && (
@@ -476,10 +492,6 @@ export default function Home() {
                               </div>
                             </div>
                           )}
-
-                          {!service.isEngineWash && !service.isHeadlight && !service.isStandard && !service.isDeep && !service.isPolish && (
-                            <p>{service.description}</p>
-                          )}
                         </div>
                       )}
                     </div>
@@ -489,9 +501,6 @@ export default function Home() {
             </div>
           </section>
         )}
-
-    
-                       
 
         {activeSection === 'galeria' && (
           <section className="space-y-6">
@@ -516,7 +525,7 @@ export default function Home() {
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Mensaje</label>
-                <textarea rows="4" required className="w-full rounded-xl border border-zinc-800 bg-[#111318] px-4 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                <textarea rows={4} required className="w-full rounded-xl border border-zinc-800 bg-[#111318] px-4 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none" placeholder="¿En qué podemos ayudarte?"></textarea>
               </div>
               <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition">
                 Enviar Mensaje
