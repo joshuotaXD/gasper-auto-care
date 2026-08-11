@@ -1,11 +1,12 @@
 'use client';
 export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 
-
 export default function Home() {
+  // Todos los estados dentro del componente
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
   const [selectedVehicleTypeEngine, setSelectedVehicleTypeEngine] = useState('Coupe/Sedan');
@@ -14,16 +15,14 @@ export default function Home() {
   const [selectedVehicleTypeDeep, setSelectedVehicleTypeDeep] = useState('Coupe/Sedan');
   const [selectedVehicleTypePolish, setSelectedVehicleTypePolish] = useState('Coupe/Sedan');
   const [selectedVehicleTypeCeramic, setSelectedVehicleTypeCeramic] = useState('Coupe/Sedan');
-
+  
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
-   const handleAuthSubmit = async (e) => {
-  // Estados para el modal de autenticación
-  // Función para manejar el envío del formulario (Login o Registro)
+  const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (authMode === 'signup') {
       const { data, error } = await supabase.auth.signUp({ email, password });
@@ -38,21 +37,26 @@ export default function Home() {
       if (error) {
         alert("Error al iniciar sesión: " + error.message);
       } else {
-        alert("¡Bienvenido de vuelta!");
-        setUser(data.user);
+        alert("¡Bienvenido!");
         setIsAuthModalOpen(false);
       }
     }
   };
-return (
+
+  return (
     <main className="min-h-screen bg-[#090a0f] text-white">
-      {/* Aquí va todo tu diseño, botones, secciones, etc. */}
+      {/* Tu botón de la galería que usa activeSection */}
+      <button 
+        onClick={() => setActiveSection('galeria')}
+        className={`transition font-medium text-sm ${
+          activeSection === 'galeria' ? 'text-cyan-400' : 'text-zinc-400 hover:text-white'
+        }`}
+      >
+        Galería
+      </button>
     </main>
   );
-} // <--- Esta es la ÚNICA llave que cierra Home al final de
-  // ... (aquí sigue todo el código de tus servicios y acordeones)
-
-
+}
 
 
 
