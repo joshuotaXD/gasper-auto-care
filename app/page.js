@@ -367,7 +367,7 @@ export default function Home() {
     setLoading(false)
     if (error) {
       alert('Error al enviar la reserva: ' + error.message)
-    } else {
+    } else {  
       setSuccess(true)
     }
   }
@@ -665,6 +665,8 @@ export default function Home() {
   )
 
   const [selectedService, setSelectedService] = useState(SERVICES[0].name)
+  // Estado para manejar los formularios dentro de los acordeones
+const [bookingData, setBookingData] = useState({});
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -790,6 +792,101 @@ export default function Home() {
               <h3 className="text-2xl font-black text-white sm:text-3xl">SERVICIOS DISPONIBLES</h3>
               <p className="text-xs text-zinc-400 mt-1">Haz clic en cada servicio para ver su descripción detallada o esconderla.</p>
             </div>
+
+            {SERVICES.map((service) => {
+  const isOpen = !!openServices[service.name];
+
+  // ... dentro del map, en el form:
+<form onSubmit={(e) => handleBookingSubmit(e, service)} className="space-y-4">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo de Vehículo</label>
+      <select 
+        value={bookingData[service.name]?.vehicle_type || VEHICLES[0]}
+        onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], vehicle_type: e.target.value } }))}
+        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white"
+      >
+        {VEHICLES.map((v) => <option key={v} value={v}>{v}</option>)}
+      </select>
+    </div>
+    <div className="flex gap-4">
+      <input 
+        type="date" 
+        required 
+        onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], booking_date: e.target.value } }))}
+        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" 
+      />
+      <input 
+        type="time" 
+        required 
+        onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], booking_time: e.target.value } }))}
+        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" 
+      />
+    </div>
+  </div>
+
+  <input 
+    type="text" 
+    placeholder="Tu dirección completa" 
+    required 
+    onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], address: e.target.value } }))}
+    className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" 
+  />
+
+  <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition">
+    Confirmar reserva de {service.name}
+  </button>
+</form>
+  
+  return (
+    <div key={service.name} className={`rounded-2xl border transition overflow-hidden ${
+      isOpen ? 'border-cyan-400 bg-cyan-500/10' : 'border-zinc-800 bg-[#0F0F11]'
+    }`}>
+      {/* Botón de cabecera (Acordeón) */}
+      <button onClick={() => toggleServiceAccordion(service.name)} className="w-full p-4 flex items-center justify-between">
+        <div>
+          <p className="text-base font-bold text-white">{service.name}</p>
+          <p className="text-xs text-zinc-400">{service.duration}</p>
+        </div>
+        <span className="text-xs font-bold text-cyan-300">{isOpen ? 'OCULTAR ▲' : 'VER ▼'}</span>
+      </button>
+
+      {/* Contenido desplegable con el Formulario Integrado */}
+      {isOpen && (
+        <div className="px-4 pb-6 pt-1 border-t border-zinc-800/60 bg-[#111318]/40 animate-fade-in">
+          <p className="text-sm text-zinc-300 mb-4">{service.description}</p>
+          
+          <form onSubmit={(e) => handleBookingSubmit(e, service)} className="space-y-4">
+            {/* Tipo de Vehículo */}
+            <div>
+              <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo de Vehículo</label>
+              <select 
+                className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white"
+                onChange={(e) => {/* Lógica para actualizar estado específico de este servicio */}}
+              >
+                {VEHICLES.map((v) => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </div>
+
+            {/* Fecha y Hora */}
+            <div className="grid grid-cols-2 gap-4">
+              <input type="date" required className="rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" />
+              <input type="time" required className="rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" />
+            </div>
+
+            {/* Dirección */}
+            <input type="text" placeholder="Tu dirección completa" required className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" />
+
+            {/* Botón de Confirmación */}
+            <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition">
+              Confirmar reserva de {service.name}
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+})}
 
             <div className="space-y-3">
               {SERVICES.map((service) => {
