@@ -20,17 +20,10 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-  return (
-    <main className="min-h-screen bg-[#090a0f] text-white"></main>
-  );
-}
 
-
-
+   const handleAuthSubmit = async (e) => {
   // Estados para el modal de autenticación
-
   // Función para manejar el envío del formulario (Login o Registro)
-  const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (authMode === 'signup') {
       const { data, error } = await supabase.auth.signUp({ email, password });
@@ -51,7 +44,12 @@ export default function Home() {
       }
     }
   };
-
+return (
+    <main className="min-h-screen bg-[#090a0f] text-white">
+      {/* Aquí va todo tu diseño, botones, secciones, etc. */}
+    </main>
+  );
+} // <--- Esta es la ÚNICA llave que cierra Home al final de
   // ... (aquí sigue todo el código de tus servicios y acordeones)
 
 
