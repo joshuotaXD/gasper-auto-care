@@ -6,6 +6,7 @@ import Image from 'next/image';
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
+  const [selectedVehicleType, setSelectedVehicleType] = useState('Coupe/Sedan');
 
   const toggleServiceAccordion = (serviceName) => {
     setOpenServices(prev => ({
@@ -15,12 +16,24 @@ export default function Home() {
   };
 
   const servicesList = [
-    { name: 'Engine wash', duration: '40 min', description: 'Lavado detallado y desengrasado profundo del compartimiento del motor.' },
+    { 
+      name: 'Engine wash', 
+      duration: '40 min', 
+      isEngineWash: true,
+      bullet1: 'We protect the delicate parts of the engine by covering them.',
+      bullet2: 'We use a degreaser and finish with a glossy look.'
+    },
     { name: 'Headlight restoration', duration: '60 min', description: 'Pulido y restauración de faros para recuperar la claridad y visibilidad nocturna.' },
     { name: 'Standard Wash - Regular Cleaning', duration: '60-120 min', description: 'Lavado exterior completo y aspirado interior básico de mantenimiento.' },
-    { name: 'Deep cleaning. Toyota RAV4 (0...)', duration: '120-180 min', description: 'Limpieza profunda de vestiduras, alfombras, tableros y desinfección a vapor.' },
+    { name: 'Deep Cleaning', duration: '120-180 min', description: 'Limpieza profunda de vestiduras, alfombras, tableros y desinfección a vapor.' },
     { name: 'Polishing and waxing', duration: '300-540 min', description: 'Corrección de pintura en varias etapas y aplicación de cera protectora de alto brillo.' },
     { name: 'CERAMIC COATING', duration: '300-600 min', description: 'Aplicación de recubrimiento cerámico avanzado para máxima protección de la pintura.' }
+  ];
+
+  const vehicleTypes = [
+    'Coupe/Sedan',
+    'Mid-Sized SUV',
+    'Large- SUV/Truck'
   ];
 
   return (
@@ -102,10 +115,12 @@ export default function Home() {
                   return (
                     <div 
                       key={index}
-                      onClick={() => toggleServiceAccordion(service.name)}
-                      className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 cursor-pointer hover:border-zinc-700 transition"
+                      className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 transition hover:border-zinc-700"
                     >
-                      <div className="flex items-center justify-between">
+                      <div 
+                        onClick={() => toggleServiceAccordion(service.name)}
+                        className="flex items-center justify-between cursor-pointer"
+                      >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                             🚗
@@ -121,8 +136,42 @@ export default function Home() {
                       </div>
 
                       {isOpen && (
-                        <div className="mt-4 pt-3 border-t border-zinc-800 text-sm text-zinc-300 animate-fadeIn">
-                          <p>{service.description}</p>
+                        <div className="mt-4 pt-4 border-t border-zinc-800 space-y-4 text-sm text-zinc-300">
+                          {service.isEngineWash ? (
+                            <div className="space-y-2">
+                              <ul className="list-disc list-inside space-y-1 text-zinc-300">
+                                <li>{service.bullet1}</li>
+                                <li>{service.bullet2}</li>
+                              </ul>
+
+                              {/* SELECTOR DE TIPO DE VEHICULO */}
+                              <div className="mt-4 pt-3 border-t border-zinc-800/80">
+                                <p className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2">
+                                  PRICE/TIME for each vehicle type:
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                  {vehicleTypes.map((vType, vIndex) => (
+                                    <button
+                                      key={vIndex}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedVehicleType(vType);
+                                      }}
+                                      className={`px-3 py-2 rounded-xl text-xs font-semibold border transition text-center ${
+                                        selectedVehicleType === vType
+                                          ? 'bg-cyan-500 text-black border-cyan-400 shadow-md shadow-cyan-500/20'
+                                          : 'bg-[#111318] text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
+                                      }`}
+                                    >
+                                      {vType}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <p>{service.description}</p>
+                          )}
                         </div>
                       )}
                     </div>
