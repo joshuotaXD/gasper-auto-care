@@ -178,7 +178,7 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-[#0F0F11] text-white">
         
-        {/* HEADER Y NAVEGACIÓN */}
+        {/* HEADER Y NAVEGACIÓN (Solo Galería al centro) */}
         <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
@@ -198,20 +198,10 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Menú de navegación reorganizado: Contáctanos a la izquierda, Galería llamativa más al centro */}
-          <nav className="hidden md:flex items-center gap-8">
-            <button 
-              onClick={() => setActiveSection('contacto')}
-              className={`transition font-bold text-sm tracking-widest uppercase ${
-                activeSection === 'contacto' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
-              }`}
-            >
-              Contáctanos
-            </button>
-
+          <nav className="hidden md:flex items-center">
             <button 
               onClick={() => setActiveSection('galeria')}
-              className={`relative px-4 py-1.5 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg animate-pulse ${
+              className={`relative px-5 py-2 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg animate-pulse ${
                 activeSection === 'galeria' 
                   ? 'bg-cyan-500 text-black shadow-cyan-500/50 scale-105' 
                   : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/50 hover:border-cyan-400 hover:scale-105 shadow-cyan-500/20'
@@ -535,7 +525,7 @@ export default function Home() {
             </div>
           </section>
         ) : (
-          /* APARTADO PRINCIPAL (BIENVENIDA + SERVICIOS ABAJO) */
+          /* APARTADO PRINCIPAL (BIENVENIDA + BOTONES "SERVICES" Y "CONTÁCTANOS" JUNTOS + LISTA DE SERVICIOS) */
           <>
             <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
               <div className="max-w-4xl mx-auto">
@@ -548,10 +538,26 @@ export default function Home() {
                 <p className="mt-6 text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                   Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
                 </p>
+
+                {/* BOTONES "SERVICES" Y "CONTÁCTANOS" JUNTOS AL MEDIO */}
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  <a 
+                    href="#services-section"
+                    className="bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold px-6 py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 text-sm tracking-wider uppercase"
+                  >
+                    Services ↓
+                  </a>
+                  <button 
+                    onClick={() => setActiveSection('contacto')}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-extrabold px-6 py-3 rounded-xl transition border border-zinc-700 text-sm tracking-wider uppercase shadow-md"
+                  >
+                    Contáctanos
+                  </button>
+                </div>
               </div>
             </section>
 
-            <section className="px-6 py-20 max-w-3xl mx-auto">
+            <section id="services-section" className="px-6 py-20 max-w-3xl mx-auto scroll-mt-20">
               <div className="text-center mb-10">
                 <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
                 <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
