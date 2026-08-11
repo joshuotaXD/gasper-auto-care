@@ -777,28 +777,24 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {/* Dynamic Content Card according to socialTab */}
-                  {socialTab === 'whatsapp' ? (
-                    <div className="mt-6 bg-[#111318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-2 border-cyan-400/60 flex items-center justify-center shadow-md mb-4">
-                        <span className="text-2xl">👤</span>
-                      </div>
+               {/* Dynamic Content Card according to socialTab */}
+{socialTab === 'whatsapp' ? (
+    <div className="mt-6 bg-[#11318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-2 border-cyan-400/60 flex items-center justify-center shadow-md mb-4">
+            <span className="text-2xl">👤</span>
+        </div>
 
-                      <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Care</h3>
-                      <p className="text-xs text-zinc-400 mt-1 mb-6">WhatsApp Business Account</p>
+        <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Care</h3>
+        <p className="text-xs text-zinc-400 mt-1 mb-6">WhatsApp Business Account</p>
 
-                      <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
-                        <div className="w-44 h-44 relative bg-white flex items-center justify-center border-4 border-black/90 rounded-lg p-2">
-                          <div className="absolute inset-2 grid grid-cols-6 grid-rows-6 gap-1 opacity-90">
-                            {Array.from({ length: 36 }).map((_, i) => (
-                              <div key={i} className={`bg-black rounded-[2px] ${i % 2 === 0 && i % 3 === 0 ? 'bg-transparent' : ''}`}></div>
-                            ))}
-                          </div>
-                          <div className="absolute w-12 h-12 bg-white rounded-full border-2 border-black flex items-center justify-center shadow-md">
-                            <span className="text-xl">💬</span>
-                          </div>
-                        </div>
-                      </div>
+        {/* --- REEMPLAZA DESDE AQUÍ --- */}
+        <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+            <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/16154292253" 
+                alt="QR WhatsApp Gasper Auto Care" 
+                className="w-36 h-36 object-contain rounded-lg"
+            />
+        </div>
 
                       <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
                         Scan this code to start a WhatsApp chat with Gasper Auto Care.
