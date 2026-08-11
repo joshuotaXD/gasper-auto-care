@@ -11,9 +11,9 @@ export default function Home() {
       {/* HEADER / MENÚ DE NAVEGACIÓN */}
       <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
         
-        {/* Izquierda: Logo y Nombre de la empresa */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveSection('inicio')}>
-          <div className="relative w-10 h-10 overflow-hidden rounded-full border border-cyan-500/40">
+        {/* Izquierda: Logo y Nombre (Actúa como botón de Inicio) */}
+        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveSection('inicio')}>
+          <div className="relative w-10 h-10 overflow-hidden rounded-full border border-cyan-500/40 group-hover:border-cyan-400 transition">
             <Image 
               src="/logo.png" 
               alt="Gasper Auto Detailing Logo" 
@@ -21,21 +21,13 @@ export default function Home() {
               className="object-cover"
             />
           </div>
-          <span className="font-extrabold text-lg tracking-wider text-white">
+          <span className="font-extrabold text-lg tracking-wider text-white group-hover:text-cyan-400 transition">
             GASPER <span className="text-cyan-400 text-xs block font-normal tracking-widest">AUTO DETAILING</span>
           </span>
         </div>
 
-        {/* Centro: Navegación (Galería, Contacto, etc.) */}
+        {/* Centro: Navegación (Solo Galería y Contacto) */}
         <nav className="hidden md:flex items-center gap-8">
-          <button
-            onClick={() => setActiveSection('inicio')}
-            className={`transition font-medium text-sm ${
-              activeSection === 'inicio' ? 'text-cyan-400' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            Inicio
-          </button>
           <button
             onClick={() => setActiveSection('galeria')}
             className={`transition font-medium text-sm ${
