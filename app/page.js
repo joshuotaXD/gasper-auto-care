@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
+  const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
   
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -19,7 +20,11 @@ export default function Home() {
     setOpenServices(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Servicios actualizados tal cual la imagen (con sus precios, tiempos y logo integrado)
+  const handleQuoteClick = (serviceTitle) => {
+    setSelectedServiceToQuote(serviceTitle);
+    setActiveSection('cotizar'); // Cambia al apartado de cotización
+  };
+
   const servicesList = [
     {
       id: 'engine',
@@ -77,8 +82,6 @@ export default function Home() {
         
         {/* HEADER Y NAVEGACIÓN */}
         <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
-          
-          {/* LOGO REDONDO + TEXTO */}
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => setActiveSection('inicio')}
@@ -97,8 +100,15 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Menú de Navegación central (SOLO GALERÍA) */}
-          <nav className="hidden md:flex items-center">
+          <nav className="hidden md:flex items-center gap-6">
+            <button 
+              onClick={() => setActiveSection('inicio')}
+              className={`transition font-bold text-sm tracking-widest uppercase ${
+                activeSection === 'inicio' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
+              }`}
+            >
+              Servicios
+            </button>
             <button 
               onClick={() => setActiveSection('galeria')}
               className={`transition font-bold text-sm tracking-widest uppercase ${
@@ -109,7 +119,6 @@ export default function Home() {
             </button>
           </nav>
 
-          {/* Botones de Sesión */}
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setActiveSection('login')}
@@ -126,108 +135,137 @@ export default function Home() {
           </div>
         </header>
 
-        {/* 1. SECCIÓN DE BIENVENIDA */}
-        <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
-          <div className="max-w-4xl mx-auto">
-            <span className="text-cyan-400 font-semibold tracking-widest text-xs uppercase bg-cyan-950/50 px-3 py-1.5 rounded-full border border-cyan-800/50">
-              Excelencia en estética automotriz
-            </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mt-6">
-              Devuélvele el brillo y la elegancia a tu <span className="text-cyan-400">vehículo</span>
-            </h1>
-            <p className="mt-6 text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
-            </p>
-            <div className="mt-10 flex justify-center gap-4">
-              <button 
-                onClick={() => setActiveSection('servicios')}
-                className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-8 py-3.5 rounded-xl transition shadow-lg shadow-cyan-500/20"
-              >
-                Ver Servicios
-              </button>
-              <button 
-                onClick={() => setActiveSection('contacto')}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-8 py-3.5 rounded-xl transition border border-zinc-700"
-              >
-                Contáctanos
-              </button>
-            </div>
-          </div>
-        </section>
+        {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
 
-        {/* 2. SECCIÓN DE SERVICIOS (Estilo Tarjetas Preview con Logo y Tiempos) */}
-        <section className="px-6 py-20 max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
-            <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
-          </div>
+        {activeSection === 'cotizar' ? (
+          /* APARTADO DE COTIZACIÓN */
+          <section className="px-6 py-20 max-w-xl mx-auto">
+            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+                Solicitud de Cita / Cotización
+              </span>
+              <h2 className="text-2xl font-bold mt-4 text-white">Cotizar: {selectedServiceToQuote || 'Servicio General'}</h2>
+              <p className="text-zinc-400 text-sm mt-1">Completa los datos de tu vehículo y nos pondremos en contacto contigo.</p>
 
-          <div className="space-y-4">
-            {servicesList.map((service) => (
-              <div 
-                key={service.id}
-                className={`bg-[#16181d] border-2 ${service.borderColor} rounded-2xl overflow-hidden transition shadow-lg`}
-              >
-                {/* Cabecera / Tarjeta Principal del Servicio */}
-                <div className="px-5 py-4 flex items-center justify-between">
-                  
-                  {/* Izquierda: Mini Logo circular + Título y Precio */}
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-400/50 flex-shrink-0 bg-black">
-                      <Image
-                        src="/logo.png"
-                        alt="Service Logo"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white text-base md:text-lg">{service.title}</h3>
-                      <div className="flex items-center gap-1.5 text-cyan-400 text-sm font-bold mt-0.5">
-                        <span className="text-xs">💲</span>
-                        <span>{service.price}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Derecha: Tiempo estimado + Botón Desplegable */}
-                  <div className="flex items-center gap-4">
-                    <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
-                      <span>⏱️</span>
-                      <span>{service.time}</span>
-                    </div>
-
-                    <button
-                      onClick={() => toggleService(service.id)}
-                      className="text-zinc-400 hover:text-white p-1 rounded-lg transition"
-                      aria-label="Opciones"
-                    >
-                      <span className={`transform inline-block transition-transform duration-300 text-lg font-bold ${openServices[service.id] ? 'rotate-180' : ''}`}>
-                        ⋮
-                      </span>
-                    </button>
-                  </div>
-
+              <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre</label>
+                  <input type="text" required placeholder="Ej. Juan Pérez" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Modelo de tu Vehículo</label>
+                  <input type="text" required placeholder="Ej. Toyota RAV4" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Teléfono / WhatsApp</label>
+                  <input type="tel" required placeholder="Ej. +52 998..." className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
                 </div>
 
-                {/* Contenido desplegable con la descripción detallada */}
-                {openServices[service.id] && (
-                  <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
-                    <p>{service.description}</p>
-                    <div className="mt-3 flex justify-end">
-                      <button 
-                        onClick={() => setActiveSection('contacto')}
-                        className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
-                      >
-                        Cotizar este servicio →
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <div className="pt-4 flex gap-3">
+                  <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
+                    Enviar Cotización
+                  </button>
+                  <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
+                    Volver
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        ) : activeSection === 'galeria' ? (
+          /* APARTADO DE GALERÍA */
+          <section className="px-6 py-20 max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold">Galería de Trabajos</h2>
+            <p className="text-zinc-400 mt-2">Pronto verás aquí las fotos de nuestros mejores detallados.</p>
+            <button onClick={() => setActiveSection('inicio')} className="mt-6 bg-cyan-500 text-black font-bold px-6 py-2.5 rounded-xl">
+              Volver a Servicios
+            </button>
+          </section>
+        ) : (
+          /* APARTADO PRINCIPAL (BIENVENIDA + SERVICIOS) */
+          <>
+            <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
+              <div className="max-w-4xl mx-auto">
+                <span className="text-cyan-400 font-semibold tracking-widest text-xs uppercase bg-cyan-950/50 px-3 py-1.5 rounded-full border border-cyan-800/50">
+                  Excelencia en estética automotriz
+                </span>
+                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mt-6">
+                  Devuélvele el brillo y la elegancia a tu <span className="text-cyan-400">vehículo</span>
+                </h1>
+                <p className="mt-6 text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                  Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
+                </p>
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+
+            <section className="px-6 py-20 max-w-3xl mx-auto">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
+                <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
+              </div>
+
+              <div className="space-y-4">
+                {servicesList.map((service) => (
+                  <div 
+                    key={service.id}
+                    className={`bg-[#16181d] border-2 ${service.borderColor} rounded-2xl overflow-hidden transition shadow-lg`}
+                  >
+                    <div className="px-5 py-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-400/50 flex-shrink-0 bg-black">
+                          <Image
+                            src="/logo.png"
+                            alt="Service Logo"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-white text-base md:text-lg">{service.title}</h3>
+                          <div className="flex items-center gap-1.5 text-cyan-400 text-sm font-bold mt-0.5">
+                            <span className="text-xs">💲</span>
+                            <span>{service.price}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
+                          <span>⏱️</span>
+                          <span>{service.time}</span>
+                        </div>
+
+                        <button
+                          onClick={() => toggleService(service.id)}
+                          className="text-zinc-400 hover:text-white p-1 rounded-lg transition"
+                          aria-label="Opciones"
+                        >
+                          <span className={`transform inline-block transition-transform duration-300 text-lg font-bold ${openServices[service.id] ? 'rotate-180' : ''}`}>
+                            ⋮
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {openServices[service.id] && (
+                      <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
+                        <p>{service.description}</p>
+                        <div className="mt-3 flex justify-end">
+                          <button 
+                            onClick={() => handleQuoteClick(service.title)}
+                            className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
+                          >
+                            Cotizar este servicio →
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
 
       </main>
     </>
