@@ -20,8 +20,8 @@ export default function Home() {
   const [vehicleType, setVehicleType] = useState('Mid-Sized SUV');
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
 
-  // Authentication states (Supabase)
-  const [identifier, setIdentifier] = useState(''); // Can be email or phone number
+  // Estados de autenticación (Supabase)
+  const [identifier, setIdentifier] = useState(''); // Puede ser correo o número de teléfono
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -29,6 +29,80 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setMessage('');
+
+    if (isSignUp) {
+      // Registro de nuevo usuario
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        setMessage(`Error in sign up: ${error.message}`);
+      } else {
+        setMessage('Registration successful! Check your email to confirm if required.');
+      }
+    } else {
+      // Inicio de sesión
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setMessage(`Error in login: ${error.message}`);
+      } else {
+        setMessage('Login successful! Welcome back.');
+      }
+    }
+  };
+
+ return (
+    <div style={{ marginTop: "2rem", padding: "1.5rem", border: "1px solid #ddd", borderRadius: "8px", textAlign: "center" }}>
+      <h1>{isSignUp ? 'Create an Account' : 'Log In'}</h1>
+      
+      <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1rem" }}>
+        <input 
+          type="email" 
+          placeholder="Email" 
+          required 
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
+          style={{ padding: "0.5rem" }} 
+        />
+        
+        <input 
+          type="password" 
+          placeholder="Password" 
+          required 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ padding: "0.5rem" }} 
+        />
+        
+        <button type="submit" style={{ padding: "0.75rem", background: "#0070F3", color: "#fff", border: "none", cursor: "pointer" }}>
+          {isSignUp ? 'Sign Up' : 'Log In'}
+        </button>
+      </form>
+
+      {message && <p style={{ marginTop: "1rem", color: "#333" }}>{message}</p>}
+
+      <button 
+        onClick={() => setIsSignUp(!isSignUp)} 
+        style={{ background: "none", border: "none", color: "#0070F3", marginTop: "1rem", cursor: "pointer", textDecoration: "underline" }}
+      >
+        {isSignUp ? 'Already have an account? Log In' : "Don't have an account? Sign Up"}
+      </button>
+    </div>
+  );
+};
+
 
   // State for gallery modal (Lightbox)
   const [selectedImage, setSelectedImage] = useState(null);
@@ -894,4 +968,3 @@ export default function Home() {
       </main>
     </>
   );
-}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cotización y Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        button {
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            font-size: 14px;
+        }
+
+        /* Estilos para el apartado de Cotización */
+        #seccionCotizacion select {
+            padding: 8px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+            display: block;
+        }
+
+        #btnIrABooking {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #btnIrABooking:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos para el Calendario Anual */
+        .grid-anual-meses {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .mes-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .mes-card h4 {
+            margin-top: 0;
+            text-align: center;
+            color: #007bff;
+        }
+
+        .dias-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .dias-grid button {
+            padding: 6px 0;
+            font-size: 11px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .dia-valido:hover {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        /* Estilos para Horarios */
+        #contenedorHorarios {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .grilla-horas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .btn-hora {
+            border: 1px solid #28a745;
+            background: #fff;
+            color: #28a745;
+        }
+
+        .btn-hora.seleccionado, .btn-hora:hover {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .btn-volver {
+            background-color: #6c757d;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .btn-confirmar {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SECCIÓN 1: Cotización -->
+    <div id="seccionCotizacion">
+        <h2>Cotizador de Vehículos</h2>
+        <label for="tipoVehiculo">Seleccione el tipo de vehículo:</label>
+        <select id="tipoVehiculo">
+            <option value="sedan">Sedán</option>
+            <option value="suv">SUV / Camioneta</option>
+            <option value="deportivo">Deportivo</option>
+            <option value="moto">Motocicleta</option>
+        </select>
+        
+        <!-- Botón modificado que reemplaza a "Send Quote Request" -->
+        <button type="button" id="btnIrABooking" onclick="mostrarApartadoBooking()">Booking</button>
+    </div>
+
+    <!-- SECCIÓN 2: Apartado de Booking (Oculto al inicio) -->
+    <div id="seccionBooking" style="display: none;">
+        <button type="button" class="btn-volver" onclick="regresarACotizacion()">← Volver a Cotización</button>
+        <h2>Agenda tu Cita - Calendario Anual</h2>
+        <p>Selecciona cualquier día del año (incluyendo domingos) para ver los horarios disponibles de <strong>6:00 am a 5:00 pm</strong>.</p>
+        
+        <!-- Aquí se dibujarán los 12 meses -->
+        <div id="calendarioAnualContainer" class="grid-anual-meses"></div>
+        
+        <!-- Sección de Horarios -->
+        <div id="contenedorHorarios" style="display: none;">
+            <h4 id="fechaSeleccionadaTitulo">Horarios para el día: <span></span></h4>
+            <div id="listaHorariosDisponibles" class="grilla-horas"></div>
+            <button type="button" class="btn-confirmar" onclick="confirmarCitaBooking()">Confirmar Reserva</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function mostrarApartadoBooking() {
+    document.getElementById('seccionCotizacion').style.display = 'none';
+    document.getElementById('seccionBooking').style.display = 'block';
+    generarCalendarioAnual(new Date().getFullYear());
+}
+
+function regresarACotizacion() {
+    document.getElementById('seccionBooking').style.display = 'none';
+    document.getElementById('seccionCotizacion').style.display = 'block';
+    document.getElementById('contenedorHorarios').style.display = 'none';
+}
+
+function generarCalendarioAnual(anio) {
+    const contenedorAnio = document.getElementById('calendarioAnualContainer');
+    contenedorAnio.innerHTML = '';
+    
+    const meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    meses.forEach((nombreMes, indexMes) => {
+        let mesDiv = document.createElement('div');
+        mesDiv.className = 'mes-card';
+        mesDiv.innerHTML = `<h4>${nombreMes} ${anio}</h4>`;
+        
+        let diasGrid = document.createElement('div');
+        diasGrid.className = 'dias-grid';
+        
+        let totalDias = new Date(anio, indexMes + 1, 0).getDate();
+        
+        for (let dia = 1; dia <= totalDias; dia++) {
+            let fechaActual = new Date(anio, indexMes, dia);
+            
+            let btnDia = document.createElement('button');
+            btnDia.type = 'button';
+            btnDia.innerText = dia;
+            btnDia.className = 'dia-valido';
+            btnDia.onclick = () => seleccionarDiaCalendario(fechaActual);
+            
+            diasGrid.appendChild(btnDia);
+        }
+        
+        mesDiv.appendChild(diasGrid);
+        contenedorAnio.appendChild(mesDiv);
+    });
+}
+
+function seleccionarDiaCalendario(fecha) {
+    let fechaFormato = fecha.toISOString().split('T')[0];
+    document.querySelector('#fechaSeleccionadaTitulo span').innerText = fechaFormato;
+    
+    let contenedorHoras = document.getElementById('listaHorariosDisponibles');
+    contenedorHoras.innerHTML = '';
+    
+    document.getElementById('contenedorHorarios').style.display = 'block';
+    
+    // Generar horarios de 6:00 am (6) a 5:00 pm (17) para todos los días
+    for (let hora = 6; hora <= 17; hora++) {
+        let formatoHora = "";
+        if (hora === 12) {
+            formatoHora = "12:00 PM";
+        } else if (hora > 12) {
+            formatoHora = `${hora - 12}:00 PM`;
+        } else {
+            formatoHora = `${hora}:00 AM`;
+        }
+        
+        let btnHora = document.createElement('button');
+        btnHora.type = 'button';
+        btnHora.className = 'btn-hora';
+        btnHora.innerText = formatoHora;
+        btnHora.onclick = (e) => seleccionarBloqueHora(e);
+        
+        contenedorHoras.appendChild(btnHora);
+    }
+}
+
+function seleccionarBloqueHora(evento) {
+    let botones = document.querySelectorAll('.btn-hora');
+    botones.forEach(b => b.classList.remove('seleccionado'));
+    evento.target.classList.add('seleccionado');
+}
+
+function confirmarCitaBooking() {
+    alert("¡Cita reservada con éxito!");
+}
+</script>
+
+</body>
+</html>
