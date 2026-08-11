@@ -8,12 +8,6 @@ import { supabase } from '@/lib/supabase';
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
-  const [selectedVehicleTypeEngine, setSelectedVehicleTypeEngine] = useState('Coupe/Sedan');
-  const [selectedVehicleTypeHeadlight, setSelectedVehicleTypeHeadlight] = useState('Coupe/Sedan');
-  const [selectedVehicleTypeStandard, setSelectedVehicleTypeStandard] = useState('Coupe/Sedan');
-  const [selectedVehicleTypeDeep, setSelectedVehicleTypeDeep] = useState('Coupe/Sedan');
-  const [selectedVehicleTypePolish, setSelectedVehicleTypePolish] = useState('Coupe/Sedan');
-  const [selectedVehicleTypeCeramic, setSelectedVehicleTypeCeramic] = useState('Coupe/Sedan');
   
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -25,31 +19,55 @@ export default function Home() {
     setOpenServices(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  // Servicios actualizados tal cual la imagen (con sus precios, tiempos y logo integrado)
   const servicesList = [
     {
-      id: 'motor',
-      title: 'Limpieza y Detallado de Motor',
-      description: 'Lavado especializado, desengrasado profundo y protección de componentes plásticos y gomas del vano motor.',
+      id: 'engine',
+      title: 'Engine wash',
+      price: '$60',
+      time: '40 min',
+      description: 'Lavado especializado y desengrasado profundo del motor.',
+      borderColor: 'border-cyan-400/40',
     },
     {
-      id: 'faros',
-      title: 'Restauración de Faros',
-      description: 'Pulido, lijado y aplicación de capa protectora UV para recuperar la transparencia y mejorar la visibilidad nocturna.',
+      id: 'headlight',
+      title: 'Headlight restoration',
+      price: '$90 - $120',
+      time: '60 min',
+      description: 'Pulido, lijado y aplicación de capa protectora UV para recuperar la transparencia de los faros.',
+      borderColor: 'border-yellow-400/40',
     },
     {
-      id: 'interior',
-      title: 'Lavado de Interior Profundo',
-      description: 'Extracción de suciedad en asientos de tela, limpieza y acondicionamiento de piel, tableros y aspirado a fondo.',
+      id: 'standard',
+      title: 'Standard Wash – Regular Cleaning',
+      price: '$120 - $200',
+      time: '60-120 min',
+      description: 'Lavado exterior detallado y limpieza interior regular.',
+      borderColor: 'border-red-400/40',
     },
     {
-      id: 'pintura',
-      title: 'Corrección de Pintura y Pulido',
-      description: 'Eliminación de rayones superficiales, remoción de remolinos (swirl marks) y devolución de brillo espejo a la carrocería.',
+      id: 'deep',
+      title: 'Deep cleaning',
+      price: '$220 - $310',
+      time: '120-180 min',
+      description: 'Limpieza profunda integral de tapicería, alfombras y rincones difíciles.',
+      borderColor: 'border-zinc-400/40',
     },
     {
-      id: 'ceramico',
-      title: 'Protección Cerámica',
-      description: 'Aplicación de recubrimiento cerámico de alta durabilidad para repeler agua, polvo y proteger la pintura contra los rayos UV.',
+      id: 'polishing',
+      title: 'Polishing and waxing',
+      price: '$550 - $1300',
+      time: '300-540 min',
+      description: 'Corrección de pintura, remoción de remolinos y encerado de alta durabilidad.',
+      borderColor: 'border-purple-400/40',
+    },
+    {
+      id: 'ceramic',
+      title: 'CERAMIC COATING',
+      price: '$1100 - $1800',
+      time: '300-600 min',
+      description: 'Aplicación de recubrimiento cerámico profesional para máxima protección y brillo espejo.',
+      borderColor: 'border-amber-400/40',
     },
   ];
 
@@ -60,7 +78,7 @@ export default function Home() {
         {/* HEADER Y NAVEGACIÓN */}
         <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
           
-          {/* LOGO REDONDO + TEXTO AL LADO */}
+          {/* LOGO REDONDO + TEXTO */}
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => setActiveSection('inicio')}
@@ -137,33 +155,66 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 2. SECCIÓN DE SERVICIOS (Desplegables / Acordeón) */}
-        <section className="px-6 py-20 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-white">Nuestros Servicios</h2>
-            <p className="text-zinc-400 mt-2">Haz clic en cualquier servicio para conocer los detalles</p>
+        {/* 2. SECCIÓN DE SERVICIOS (Estilo Tarjetas Preview con Logo y Tiempos) */}
+        <section className="px-6 py-20 max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
+            <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
           </div>
 
           <div className="space-y-4">
             {servicesList.map((service) => (
               <div 
                 key={service.id}
-                className="bg-[#16181d] border border-zinc-800 rounded-2xl overflow-hidden transition"
+                className={`bg-[#16181d] border-2 ${service.borderColor} rounded-2xl overflow-hidden transition shadow-lg`}
               >
-                <button
-                  onClick={() => toggleService(service.id)}
-                  className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-zinc-800/40 transition"
-                >
-                  <span className="font-semibold text-lg text-white">{service.title}</span>
-                  <span className={`transform transition-transform duration-300 text-cyan-400 font-bold text-xl ${openServices[service.id] ? 'rotate-180' : ''}`}>
-                    ↓
-                  </span>
-                </button>
+                {/* Cabecera / Tarjeta Principal del Servicio */}
+                <div className="px-5 py-4 flex items-center justify-between">
+                  
+                  {/* Izquierda: Mini Logo circular + Título y Precio */}
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-400/50 flex-shrink-0 bg-black">
+                      <Image
+                        src="/logo.png"
+                        alt="Service Logo"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-base md:text-lg">{service.title}</h3>
+                      <div className="flex items-center gap-1.5 text-cyan-400 text-sm font-bold mt-0.5">
+                        <span className="text-xs">💲</span>
+                        <span>{service.price}</span>
+                      </div>
+                    </div>
+                  </div>
 
+                  {/* Derecha: Tiempo estimado + Botón Desplegable */}
+                  <div className="flex items-center gap-4">
+                    <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
+                      <span>⏱️</span>
+                      <span>{service.time}</span>
+                    </div>
+
+                    <button
+                      onClick={() => toggleService(service.id)}
+                      className="text-zinc-400 hover:text-white p-1 rounded-lg transition"
+                      aria-label="Opciones"
+                    >
+                      <span className={`transform inline-block transition-transform duration-300 text-lg font-bold ${openServices[service.id] ? 'rotate-180' : ''}`}>
+                        ⋮
+                      </span>
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Contenido desplegable con la descripción detallada */}
                 {openServices[service.id] && (
-                  <div className="px-6 pb-6 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm md:text-base leading-relaxed">
+                  <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
                     <p>{service.description}</p>
-                    <div className="mt-4">
+                    <div className="mt-3 flex justify-end">
                       <button 
                         onClick={() => setActiveSection('contacto')}
                         className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
