@@ -10,15 +10,18 @@ export default function Home() {
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
   
-  // Estado para alternar entre la vista de "servicios" y "contacto" en la página principal
-  const [mainView, setMainView] = useState('servicios'); // 'servicios' o 'contacto'
+  // State to toggle between "services" and "contact" view on the main page
+  const [mainView, setMainView] = useState('servicios'); // 'servicios' or 'contacto'
   
-  // Estados para el formulario de cotización
+  // State to toggle between social media cards in the contact view
+  const [socialTab, setSocialTab] = useState('whatsapp'); // 'whatsapp' or 'instagram'
+
+  // States for the quote form
   const [vehicleType, setVehicleType] = useState('Mid-Sized SUV');
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
 
-  // Estados de autenticación (Supabase)
-  const [identifier, setIdentifier] = useState(''); // Puede ser correo o número de teléfono
+  // Authentication states (Supabase)
+  const [identifier, setIdentifier] = useState(''); // Can be email or phone number
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -27,7 +30,7 @@ export default function Home() {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
 
-  // Estado para el modal de la galería (Lightbox)
+  // State for gallery modal (Lightbox)
   const [selectedImage, setSelectedImage] = useState(null);
 
   const vehicleOptions = [
@@ -36,21 +39,21 @@ export default function Home() {
     { label: 'Large SUV/Truck', icon: '🚐' },
   ];
 
-  // Lista de imágenes de la galería basadas en los archivos proporcionados
+  // List of gallery images based on provided files
   const galleryImages = [
-    { src: '/gallery/cybertruck.jpeg', title: 'Cybertruck Detailing', category: 'Protección y Estética' },
-    { src: '/gallery/corvette_back.jpeg', title: 'Corvette C8 - Vista Trasera', category: 'Lavado y Brillo' },
-    { src: '/gallery/corvette_front.jpeg', title: 'Corvette C8 - Vista Frontal', category: 'Corrección de Pintura' },
-    { src: '/gallery/corvette_emblem.jpeg', title: 'Detalle de Emblema Corvette', category: 'Acabado Meticuloso' },
-    { src: '/gallery/corvette_foam.jpeg', title: 'Proceso de Espumado Activo', category: 'Lavado Pro' },
-    { src: '/gallery/interior.jpeg', title: 'Limpieza Profunda de Interiores', category: 'Interior Detailing' },
-    { src: '/gallery/wheels.jpeg', title: 'Restauración y Brillo de Rines', category: 'Rines y Neumáticos' },
-    { src: '/gallery/tesla_red_front.jpeg', title: 'Tesla Model Y - Frente', category: 'Ceramic Coating' },
-    { src: '/gallery/tesla_red_back.jpeg', title: 'Tesla Model Y - Trasera', category: 'Protección UV' },
-    { src: '/gallery/tesla_red_side.jpeg', title: 'Tesla Model Y - Perfil', category: 'Brillo Espejo' },
+    { src: '/gallery/cybertruck.jpeg', title: 'Cybertruck Detailing', category: 'Protection & Aesthetics' },
+    { src: '/gallery/corvette_back.jpeg', title: 'Corvette C8 - Rear View', category: 'Wash & Shine' },
+    { src: '/gallery/corvette_front.jpeg', title: 'Corvette C8 - Front View', category: 'Paint Correction' },
+    { src: '/gallery/corvette_emblem.jpeg', title: 'Corvette Emblem Detail', category: 'Meticulous Finish' },
+    { src: '/gallery/corvette_foam.jpeg', title: 'Active Foaming Process', category: 'Pro Wash' },
+    { src: '/gallery/interior.jpeg', title: 'Deep Interior Cleaning', category: 'Interior Detailing' },
+    { src: '/gallery/wheels.jpeg', title: 'Wheel Restoration & Shine', category: 'Wheels & Tires' },
+    { src: '/gallery/tesla_red_front.jpeg', title: 'Tesla Model Y - Front', category: 'Ceramic Coating' },
+    { src: '/gallery/tesla_red_back.jpeg', title: 'Tesla Model Y - Rear', category: 'UV Protection' },
+    { src: '/gallery/tesla_red_side.jpeg', title: 'Tesla Model Y - Profile', category: 'Mirror Shine' },
   ];
 
-  // Comprobar sesión activa al cargar
+  // Check active session on load
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -63,7 +66,7 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Iniciar sesión con Correo o Número de Teléfono
+  // Sign in with Email or Phone Number
   const handleLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -81,7 +84,7 @@ export default function Home() {
     });
     
     if (error) {
-      setAuthError('Credenciales incorrectas o usuario no registrado.');
+      setAuthError('Incorrect credentials or unregistered user.');
     } else {
       setActiveSection('inicio');
       setIdentifier('');
@@ -90,7 +93,7 @@ export default function Home() {
     setAuthLoading(false);
   };
 
-  // Registrarse pidiendo teléfono y guardándolo en la metadata de Supabase
+  // Sign up asking for phone and saving it in Supabase metadata
   const handleRegister = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -118,7 +121,7 @@ export default function Home() {
     if (error) {
       setAuthError(error.message);
     } else {
-      alert('¡Cuenta creada con éxito! Ya puedes iniciar sesión.');
+      alert('Account created successfully! You can now sign in.');
       setActiveSection('login');
       setIdentifier('');
       setPassword('');
@@ -224,7 +227,7 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-[#0F0F11] text-white">
         
-        {/* HEADER Y NAVEGACIÓN */}
+        {/* HEADER AND NAVIGATION */}
         <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
@@ -253,7 +256,7 @@ export default function Home() {
                   : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/50 hover:border-cyan-400 hover:scale-105 shadow-cyan-500/20'
               }`}
             >
-              ✨ Galería
+              ✨ Gallery
             </button>
           </nav>
 
@@ -261,13 +264,13 @@ export default function Home() {
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-cyan-400 hidden md:inline">
-                  Hola, {user.user_metadata?.full_name || 'Usuario'}
+                  Hello, {user.user_metadata?.full_name || 'User'}
                 </span>
                 <button 
                   onClick={handleLogout}
                   className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition border border-zinc-700"
                 >
-                  Cerrar Sesión
+                  Sign Out
                 </button>
               </div>
             ) : (
@@ -276,28 +279,28 @@ export default function Home() {
                   onClick={() => setActiveSection('login')}
                   className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-xl transition hover:bg-zinc-800/50"
                 >
-                  Iniciar Sesión
+                  Sign In
                 </button>
                 <button 
                   onClick={() => setActiveSection('register')}
                   className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-5 py-2 rounded-xl transition shadow-md shadow-cyan-500/20"
                 >
-                  Crear Cuenta
+                  Create Account
                 </button>
               </>
             )}
           </div>
         </header>
 
-        {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
+        {/* CONDITIONAL CONTENT ACCORDING TO activeSection */}
 
         {activeSection === 'login' ? (
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-                Acceso a tu cuenta
+                Account Access
               </span>
-              <h2 className="text-2xl font-bold mt-4 text-white">Iniciar Sesión</h2>
+              <h2 className="text-2xl font-bold mt-4 text-white">Sign In</h2>
               
               {authError && (
                 <div className="mt-4 bg-red-950/50 border border-red-800 text-red-400 text-xs p-3 rounded-xl">
@@ -307,19 +310,19 @@ export default function Home() {
 
               <form onSubmit={handleLogin} className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Correo Electrónico o Número de Teléfono</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Email or Phone Number</label>
                   <input 
                     type="text" 
                     required 
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="correo@ejemplo.com o 9981234567" 
+                    placeholder="email@example.com or +16154292253" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Password</label>
                   <div className="relative">
                     <input 
                       type={showPassword ? "text" : "password"} 
@@ -334,7 +337,7 @@ export default function Home() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
                     >
-                      {showPassword ? 'Ocultar' : 'Ver'}
+                      {showPassword ? 'Hide' : 'Show'}
                     </button>
                   </div>
                 </div>
@@ -345,18 +348,18 @@ export default function Home() {
                     disabled={authLoading}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
                   >
-                    {authLoading ? 'Iniciando sesión...' : 'Entrar'}
+                    {authLoading ? 'Signing in...' : 'Enter'}
                   </button>
                 </div>
               </form>
 
               <div className="mt-6 text-center text-xs text-zinc-400">
-                ¿No tienes cuenta?{' '}
+                Don't have an account?{' '}
                 <button 
                   onClick={() => { setActiveSection('register'); setAuthError(''); }}
                   className="text-cyan-400 font-bold hover:underline ml-1"
                 >
-                  Registrarse
+                  Register
                 </button>
               </div>
             </div>
@@ -365,9 +368,9 @@ export default function Home() {
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-                Únete a Gasper
+                Join Gasper
               </span>
-              <h2 className="text-2xl font-bold mt-4 text-white">Crear Cuenta</h2>
+              <h2 className="text-2xl font-bold mt-4 text-white">Create Account</h2>
               
               {authError && (
                 <div className="mt-4 bg-red-950/50 border border-red-800 text-red-400 text-xs p-3 rounded-xl">
@@ -377,40 +380,40 @@ export default function Home() {
 
               <form onSubmit={handleRegister} className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Nombre Completo</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Full Name</label>
                   <input 
                     type="text" 
                     required 
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ej. Juan Pérez" 
+                    placeholder="E.g. John Smith" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Correo Electrónico</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Email</label>
                   <input 
                     type="email" 
                     required 
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="correo@ejemplo.com" 
+                    placeholder="email@example.com" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number</label>
                   <input 
                     type="tel" 
                     required 
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ej. 9981234567" 
+                    placeholder="E.g. +1 615 429 2253" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Password</label>
                   <div className="relative">
                     <input 
                       type={showPassword ? "text" : "password"} 
@@ -425,7 +428,7 @@ export default function Home() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
                     >
-                      {showPassword ? 'Ocultar' : 'Ver'}
+                      {showPassword ? 'Hide' : 'Show'}
                     </button>
                   </div>
                 </div>
@@ -436,18 +439,18 @@ export default function Home() {
                     disabled={authLoading}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
                   >
-                    {authLoading ? 'Registrando...' : 'Registrar Cuenta'}
+                    {authLoading ? 'Registering...' : 'Register Account'}
                   </button>
                 </div>
               </form>
 
               <div className="mt-6 text-center text-xs text-zinc-400">
-                ¿Ya tienes cuenta?{' '}
+                Already have an account?{' '}
                 <button 
                   onClick={() => { setActiveSection('login'); setAuthError(''); }}
                   className="text-cyan-400 font-bold hover:underline ml-1"
                 >
-                  Iniciar Sesión
+                  Sign In
                 </button>
               </div>
             </div>
@@ -456,11 +459,11 @@ export default function Home() {
           <section className="px-6 py-20 max-w-xl mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-                Solicitud de Cita / Cotización
+                Appointment / Quote Request
               </span>
-              <h2 className="text-2xl font-bold mt-4 text-white">Cotizar: {selectedServiceToQuote || 'Servicio General'}</h2>
+              <h2 className="text-2xl font-bold mt-4 text-white">Quote: {selectedServiceToQuote || 'General Service'}</h2>
               
-              <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
+              <form onSubmit={(e) => { e.preventDefault(); alert('Request sent successfully!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
                 
                 <div className="relative">
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
@@ -502,33 +505,33 @@ export default function Home() {
 
                 {user ? (
                   <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
-                    <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Datos de tu cuenta:</p>
-                    <p className="text-sm font-bold text-white mt-1">👤 {user.user_metadata?.full_name || 'Usuario'}</p>
-                    <p className="text-sm text-zinc-300">📧 {user.email?.startsWith('phone_') ? 'Teléfono registrado' : user.email}</p>
+                    <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Your account details:</p>
+                    <p className="text-sm font-bold text-white mt-1">👤 {user.user_metadata?.full_name || 'User'}</p>
+                    <p className="text-sm text-zinc-300">📧 {user.email?.startsWith('phone_') ? 'Registered phone' : user.email}</p>
                     {user.user_metadata?.phone && (
                       <p className="text-sm text-zinc-300">📞 {user.user_metadata.phone}</p>
                     )}
-                    <p className="text-xs text-cyan-400 mt-2">✓ Tus datos se usarán automáticamente para esta cita.</p>
+                    <p className="text-xs text-cyan-400 mt-2">✓ Your details will be used automatically for this appointment.</p>
                   </div>
                 ) : (
                   <>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre *</label>
-                      <input type="text" required placeholder="Ej. Juan Pérez" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Your Name *</label>
+                      <input type="text" required placeholder="E.g. John Smith" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono o Correo electrónico *</label>
-                      <input type="text" required placeholder="Ej. 9981234567 o correo@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number or Email *</label>
+                      <input type="text" required placeholder="E.g. +1 615 429 2253 or email@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
                     </div>
                   </>
                 )}
 
                 <div className="pt-4 flex gap-3">
                   <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
-                    Enviar Cotización
+                    Send Quote Request
                   </button>
                   <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
-                    Volver
+                    Back
                   </button>
                 </div>
               </form>
@@ -538,13 +541,13 @@ export default function Home() {
           <section className="px-6 py-20 max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="text-cyan-400 font-semibold tracking-widest text-xs uppercase bg-cyan-950/50 px-3 py-1.5 rounded-full border border-cyan-800/50">
-                Portafolio Visual
+                Visual Portfolio
               </span>
               <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mt-4">
-                Nuestra <span className="text-cyan-400">Galería</span> de Trabajos
+                Our Work <span className="text-cyan-400">Gallery</span>
               </h2>
               <p className="text-zinc-400 mt-4 text-base md:text-lg">
-                Explora el nivel de detalle, acabado espejo y protección profesional que aplicamos en cada vehículo.
+                Explore the level of detail, mirror finish, and professional protection we apply to every vehicle.
               </p>
             </div>
 
@@ -582,7 +585,7 @@ export default function Home() {
                 onClick={() => setActiveSection('inicio')} 
                 className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-bold px-8 py-3 rounded-2xl transition border border-zinc-700 shadow-xl"
               >
-                ← Volver a Servicios
+                ← Back to Services
               </button>
             </div>
 
@@ -624,13 +627,13 @@ export default function Home() {
             <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
               <div className="max-w-4xl mx-auto">
                 <span className="text-cyan-400 font-semibold tracking-widest text-xs uppercase bg-cyan-950/50 px-3 py-1.5 rounded-full border border-cyan-800/50">
-                  Excelencia en estética automotriz
+                  Automotive detailing excellence
                 </span>
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mt-6">
-                  Devuélvele el brillo y la elegancia a tu <span className="text-cyan-400">vehículo</span>
+                  Bring back the shine and elegance to your <span className="text-cyan-400">vehicle</span>
                 </h1>
                 <p className="mt-6 text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                  Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
+                  High-level professional care with specialized products, ceramic protection, and meticulous detailing in every corner.
                 </p>
 
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -652,7 +655,7 @@ export default function Home() {
                         : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700'
                     }`}
                   >
-                    Contáctanos
+                    Contact Us
                   </button>
                 </div>
               </div>
@@ -699,7 +702,7 @@ export default function Home() {
                           <button
                             onClick={() => toggleService(service.id)}
                             className="text-zinc-400 hover:text-white p-1 rounded-lg transition"
-                            aria-label="Opciones"
+                            aria-label="Options"
                           >
                             <span className={`transform inline-block transition-transform duration-300 text-lg font-bold ${openServices[service.id] ? 'rotate-180' : ''}`}>
                               ⋮
@@ -720,7 +723,7 @@ export default function Home() {
                               onClick={() => handleQuoteClick(service.title)}
                               className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
                             >
-                              Cotizar este servicio →
+                              Quote this service →
                             </button>
                           </div>
                         </div>
@@ -733,68 +736,154 @@ export default function Home() {
               <section className="px-6 py-20 max-w-2xl mx-auto">
                 <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 md:p-10 shadow-2xl text-center">
                   <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3.5 py-1.5 rounded-full border border-cyan-800/40">
-                    Ponte en contacto
+                    Get in touch
                   </span>
-                  <h2 className="text-3xl font-bold mt-4 text-white">Contáctanos</h2>
+                  <h2 className="text-3xl font-bold mt-4 text-white">Contact Us</h2>
                   <p className="text-zinc-400 mt-2 text-sm max-w-md mx-auto">
-                    ¿Tienes dudas o necesitas atención personalizada? Escanea el código QR o haz clic abajo para chatear directamente por WhatsApp o visitar nuestras redes sociales.
+                    Have questions or need personalized assistance? Scan the QR code or click the buttons to connect directly with us.
                   </p>
                   
-                  {/* Tarjeta estilo tarjeta de presentación del QR de WhatsApp */}
-                  <div className="mt-8 bg-[#111318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
-                    
-                    {/* Insignia / Círculo de perfil superior como la imagen */}
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-2 border-cyan-400/60 flex items-center justify-center shadow-md mb-4">
-                      <span className="text-2xl">👤</span>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Care</h3>
-                    <p className="text-xs text-zinc-400 mt-1 mb-6">Cuenta de empresa de WhatsApp</p>
-
-                    {/* Contenedor del Código QR simulado con diseño elegante y limpio */}
-                    <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
-                      <div className="w-44 h-44 relative bg-white flex items-center justify-center border-4 border-black/90 rounded-lg p-2">
-                        <div className="absolute inset-2 grid grid-cols-6 grid-rows-6 gap-1 opacity-90">
-                          {Array.from({ length: 36 }).map((_, i) => (
-                            <div key={i} className={`bg-black rounded-[2px] ${i % 2 === 0 && i % 3 === 0 ? 'bg-transparent' : ''}`}></div>
-                          ))}
-                        </div>
-                        {/* Logo o ícono central de WhatsApp en el QR */}
-                        <div className="absolute w-12 h-12 bg-white rounded-full border-2 border-black flex items-center justify-center shadow-md">
-                          <span className="text-xl">💬</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
-                      Escanea este código para iniciar un chat de WhatsApp con Gasper Auto Care.
-                    </p>
-
-                    {/* Botón directo de enlace */}
-                    <div className="mt-6 w-full flex flex-col gap-3">
-                      <a 
-                        href="https://wa.me/message/OCXKMD5ZYESIE1" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
-                      >
-                        <span>💬</span> Enviar mensaje por WhatsApp
-                      </a>
-                      
-                      <a 
-                        href="https://www.facebook.com/share/1GHdrJniWm/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
-                      >
-                        <span>👥</span> Visítanos en Facebook
-                      </a>
-                    </div>
+                  {/* Tab selector for Social Media / Contact Channels */}
+                  <div className="mt-8 flex justify-center gap-2">
+                    <button
+                      onClick={() => setSocialTab('whatsapp')}
+                      className={`px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 ${
+                        socialTab === 'whatsapp'
+                          ? 'bg-[#25D366] text-black shadow-lg shadow-green-500/20'
+                          : 'bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700'
+                      }`}
+                    >
+                      <span>💬</span> WhatsApp
+                    </button>
+                    <button
+                      onClick={() => setSocialTab('instagram')}
+                      className={`px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 ${
+                        socialTab === 'instagram'
+                          ? 'bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white shadow-lg shadow-pink-500/20'
+                          : 'bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700'
+                      }`}
+                    >
+                      <span>📸</span> Instagram
+                    </button>
+                    <button
+                      onClick={() => setSocialTab('facebook')}
+                      className={`px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 ${
+                        socialTab === 'facebook'
+                          ? 'bg-[#1877F2] text-white shadow-lg shadow-blue-500/20'
+                          : 'bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700'
+                      }`}
+                    >
+                      <span>👥</span> Facebook
+                    </button>
                   </div>
 
+                  {/* Dynamic Content Card according to socialTab */}
+                  {socialTab === 'whatsapp' ? (
+                    <div className="mt-6 bg-[#111318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-2 border-cyan-400/60 flex items-center justify-center shadow-md mb-4">
+                        <span className="text-2xl">👤</span>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Care</h3>
+                      <p className="text-xs text-zinc-400 mt-1 mb-6">WhatsApp Business Account</p>
+
+                      <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-44 h-44 relative bg-white flex items-center justify-center border-4 border-black/90 rounded-lg p-2">
+                          <div className="absolute inset-2 grid grid-cols-6 grid-rows-6 gap-1 opacity-90">
+                            {Array.from({ length: 36 }).map((_, i) => (
+                              <div key={i} className={`bg-black rounded-[2px] ${i % 2 === 0 && i % 3 === 0 ? 'bg-transparent' : ''}`}></div>
+                            ))}
+                          </div>
+                          <div className="absolute w-12 h-12 bg-white rounded-full border-2 border-black flex items-center justify-center shadow-md">
+                            <span className="text-xl">💬</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
+                        Scan this code to start a WhatsApp chat with Gasper Auto Care.
+                      </p>
+
+                      <div className="mt-6 w-full">
+                        <a 
+                          href="https://wa.me/16154292253" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
+                        >
+                          <span>💬</span> Send message via WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  ) : socialTab === 'instagram' ? (
+                    <div className="mt-6 bg-[#111318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#833ab4]/20 via-[#fd1d1d]/20 to-[#fcb045]/20 border-2 border-pink-500/60 flex items-center justify-center shadow-md mb-4">
+                        <span className="text-2xl">📸</span>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-white tracking-wide">@gasper.auto.detailing</h3>
+                      <p className="text-xs text-zinc-400 mt-1 mb-6">Follow us on Instagram</p>
+
+                      <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-44 h-44 relative rounded-lg overflow-hidden border-4 border-black/90 shadow-md">
+                          <Image
+                            src="/image_81acd9.jpg"
+                            alt="QR Instagram Gasper Auto Detailing"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
+                        Scan the QR code to check out our stories, reels, and recent work on Instagram.
+                      </p>
+
+                      <div className="mt-6 w-full">
+                        <a 
+                          href="https://www.instagram.com/gasper.auto.detailing?utm_source=qr&igsh=bnZ6MmM3YWQwaHds" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-full bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 text-white font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-pink-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
+                        >
+                          <span>✨</span> Visit Instagram
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 bg-[#111318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-500/20 to-blue-700/20 border-2 border-blue-500/60 flex items-center justify-center shadow-md mb-4">
+                        <span className="text-2xl">👥</span>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Detailing</h3>
+                      <p className="text-xs text-zinc-400 mt-1 mb-6">Facebook Community</p>
+
+                      <div className="bg-zinc-900 p-8 rounded-2xl shadow-inner border border-zinc-800 flex flex-col items-center justify-center relative w-full h-44">
+                        <span className="text-5xl">📘</span>
+                        <p className="text-xs text-zinc-400 mt-4 text-center">Connect with us on Facebook</p>
+                      </div>
+
+                      <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
+                        Visit our Facebook page to check out promotions and reviews.
+                      </p>
+
+                      <div className="mt-6 w-full">
+                        <a 
+                          href="https://www.facebook.com/share/1GHdrJniWm/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
+                        >
+                          <span>👥</span> Visit us on Facebook
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
-                    <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +52 998 123 4567</p>
-                    <p className="text-sm text-zinc-300">📧 <strong className="text-white">Correo:</strong> contacto@gasperdetailing.com</p>
+                    <p className="text-sm text-zinc-300">📞 <strong className="text-white">Phone:</strong> +1 (615) 429-2253</p>
+                    <p className="text-sm text-zinc-300">📧 <strong className="text-white">Email:</strong> contacto@gasperdetailing.com</p>
                   </div>
                 </div>
               </section>
