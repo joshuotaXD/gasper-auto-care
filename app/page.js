@@ -856,7 +856,7 @@ export default function Home() {
 
                      <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
     <img 
-        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.facebook.com/share/1GHdrJniwm/" 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.facebook.com/share/1Bqg4ox7YS/"
         alt="QR Facebook Gasper Auto Detailing" 
         className="w-36 h-36 object-contain rounded-lg"
     />
@@ -867,7 +867,7 @@ export default function Home() {
 
                       <div className="mt-6 w-full">
                         <a 
-                          href="https://www.facebook.com/share/1GHdrJniWm/" 
+                          href="https://www.facebook.com/share/1Bqg4ox7YS/"
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
