@@ -12,6 +12,7 @@ export default function Home() {
   const [selectedVehicleTypeStandard, setSelectedVehicleTypeStandard] = useState('Coupe/Sedan');
   const [selectedVehicleTypeDeep, setSelectedVehicleTypeDeep] = useState('Coupe/Sedan');
   const [selectedVehicleTypePolish, setSelectedVehicleTypePolish] = useState('Coupe/Sedan');
+  const [selectedVehicleTypeCeramic, setSelectedVehicleTypeCeramic] = useState('Coupe/Sedan');
 
   const toggleServiceAccordion = (serviceName) => {
     setOpenServices(prev => ({
@@ -231,22 +232,22 @@ export default function Home() {
                                   PRICE/TIME for each vehicle type:
                                 </p>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                  {vehicleTypes.map((vType, vIndex) => (
-                                    <button
-                                      key={vIndex}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedVehicleTypeEngine(vType);
-                                      }}
-                                      className={`px-3 py-2 rounded-xl text-xs font-semibold border transition text-center ${
-                                        selectedVehicleTypeEngine === vType
-                                          ? 'bg-cyan-500 text-black border-cyan-400 shadow-md shadow-cyan-500/20'
-                                          : 'bg-[#111318] text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
-                                      }`}
-                                    >
-                                      {vType}
-                                    </button>
-                                  ))}
+                                 {vehicleTypes.map((vType, vIndex) => (
+  <button
+    key={vIndex}
+    onClick={(e) => {
+      e.stopPropagation();
+      setSelectedVehicleTypeCeramic(vType); // Actualiza el estado específico de Ceramic
+    }}
+    className={`px-3 py-2 rounded-xl text-xs font-semibold border transition text-center ${
+      selectedVehicleTypeCeramic === vType 
+        ? 'bg-cyan-500 text-black border-cyan-400 font-bold' 
+        : 'bg-[#111318] text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
+    }`}
+  >
+    {vType}
+  </button>
+))}
                                 </div>
                               </div>
                             </div>
