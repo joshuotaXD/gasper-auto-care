@@ -14,7 +14,7 @@ export default function Home() {
   const [authMode, setAuthMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // Simula el usuario logueado o registrado
 
   const toggleService = (id) => {
     setOpenServices(prev => ({ ...prev, [id]: !prev[id] }));
@@ -22,7 +22,7 @@ export default function Home() {
 
   const handleQuoteClick = (serviceTitle) => {
     setSelectedServiceToQuote(serviceTitle);
-    setActiveSection('cotizar'); // Cambia al apartado de cotización
+    setActiveSection('cotizar');
   };
 
   const servicesList = [
@@ -120,56 +120,92 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setActiveSection('login')}
-              className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-xl transition hover:bg-zinc-800/50"
-            >
-              Iniciar Sesión
-            </button>
-            <button 
-              onClick={() => setActiveSection('register')}
-              className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-5 py-2 rounded-xl transition shadow-md shadow-cyan-500/20"
-            >
-              Crear Cuenta
-            </button>
+            {user ? (
+              <span className="text-sm font-semibold text-cyan-400 px-3 py-2">
+                Hola, {user.name || 'Usuario'}
+              </span>
+            ) : (
+              <>
+                <button 
+                  onClick={() => setActiveSection('login')}
+                  className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-xl transition hover:bg-zinc-800/50"
+                >
+                  Iniciar Sesión
+                </button>
+                <button 
+                  onClick={() => setActiveSection('register')}
+                  className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-5 py-2 rounded-xl transition shadow-md shadow-cyan-500/20"
+                >
+                  Crear Cuenta
+                </button>
+              </>
+            )}
           </div>
         </header>
 
         {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
 
         {activeSection === 'cotizar' ? (
-          /* APARTADO DE COTIZACIÓN */
+          /* APARTADO DE COTIZACIÓN INTELIGENTE */
           <section className="px-6 py-20 max-w-xl mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
                 Solicitud de Cita / Cotización
               </span>
               <h2 className="text-2xl font-bold mt-4 text-white">Cotizar: {selectedServiceToQuote || 'Servicio General'}</h2>
-              <p className="text-zinc-400 text-sm mt-1">Completa los datos de tu vehículo y nos pondremos en contacto contigo.</p>
+              
+              {user ? (
+                /* SI ESTÁ REGISTRADO/LOGUEADO: Muestra sus datos precargados automáticamente */
+                <div className="mt-6 space-y-4">
+                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
+                    <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Datos de tu cuenta:</p>
+                    <p className="text-sm font-bold text-white mt-1">👤 {user.name || 'Usuario Registrado'}</p>
+                    <p className="text-sm text-zinc-300">📧 {user.email || 'correo@registrado.com'}</p>
+                    <p className="text-xs text-cyan-400 mt-2">✓ Tus datos se usarán automáticamente para esta cita.</p>
+                  </div>
 
-              <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre</label>
-                  <input type="text" required placeholder="Ej. Juan Pérez" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Modelo de tu Vehículo</label>
-                  <input type="text" required placeholder="Ej. Toyota RAV4" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Teléfono / WhatsApp</label>
-                  <input type="tel" required placeholder="Ej. +52 998..." className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                </div>
+                  <form onSubmit={(e) => { e.preventDefault(); alert('¡Cotización enviada con éxito usando tus datos de cuenta!'); setActiveSection('inicio'); }} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Modelo de tu Vehículo (Opcional)</label>
+                      <input type="text" placeholder="Ej. Toyota RAV4" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                    </div>
 
-                <div className="pt-4 flex gap-3">
-                  <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
-                    Enviar Cotización
-                  </button>
-                  <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
-                    Volver
-                  </button>
+                    <div className="pt-4 flex gap-3">
+                      <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
+                        Enviar Cotización
+                      </button>
+                      <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
+                        Volver
+                      </button>
+                    </div>
+                  </form>
                 </div>
-              </form>
+              ) : (
+                /* SI NO ESTÁ REGISTRADO: Pide obligatoriamente nombre y número de teléfono o correo */
+                <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre *</label>
+                    <input type="text" required placeholder="Ej. Juan Pérez" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono o Correo electrónico *</label>
+                    <input type="text" required placeholder="Ej. 9981234567 o correo@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1">Modelo de tu Vehículo</label>
+                    <input type="text" placeholder="Ej. Toyota RAV4" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
+                      Enviar Cotización
+                    </button>
+                    <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
+                      Volver
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </section>
         ) : activeSection === 'galeria' ? (
