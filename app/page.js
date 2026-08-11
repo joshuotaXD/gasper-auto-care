@@ -14,6 +14,12 @@ export default function Home() {
   const [selectedVehicleTypeDeep, setSelectedVehicleTypeDeep] = useState('Coupe/Sedan');
   const [selectedVehicleTypePolish, setSelectedVehicleTypePolish] = useState('Coupe/Sedan');
   const [selectedVehicleTypeCeramic, setSelectedVehicleTypeCeramic] = useState('Coupe/Sedan');
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
   return (
     <main className="min-h-screen bg-[#090a0f] text-white"></main>
   );
@@ -22,11 +28,6 @@ export default function Home() {
 
 
   // Estados para el modal de autenticación
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login'); // 'login' o 'signup'
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null); // Opcional: para rastrear si hay sesión activa
 
   // Función para manejar el envío del formulario (Login o Registro)
   const handleAuthSubmit = async (e) => {
