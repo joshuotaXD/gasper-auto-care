@@ -10,6 +10,9 @@ export default function Home() {
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
   
+  // Estado para alternar entre la vista de "servicios" y "contacto" en la página principal
+  const [mainView, setMainView] = useState('servicios'); // 'servicios' o 'contacto'
+  
   // Estados para el formulario de cotización
   const [vehicleType, setVehicleType] = useState('Mid-Sized SUV');
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
@@ -178,11 +181,11 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-[#0F0F11] text-white">
         
-        {/* HEADER Y NAVEGACIÓN (Solo Galería al centro) */}
+        {/* HEADER Y NAVEGACIÓN */}
         <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
-            onClick={() => setActiveSection('inicio')}
+            onClick={() => { setActiveSection('inicio'); setMainView('servicios'); }}
           >
             <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-cyan-500/40 group-hover:border-cyan-400 transition shadow-md shadow-cyan-500/10">
               <Image
@@ -503,29 +506,8 @@ export default function Home() {
               Volver a Servicios
             </button>
           </section>
-        ) : activeSection === 'contacto' ? (
-          /* APARTADO DE CONTACTO */
-          <section className="px-6 py-20 max-w-xl mx-auto text-center">
-            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-                Ponte en contacto
-              </span>
-              <h2 className="text-3xl font-bold mt-4 text-white">Contáctanos</h2>
-              <p className="text-zinc-400 mt-2 text-sm">¿Tienes dudas o necesitas atención personalizada? Escríbenos o visítanos.</p>
-              
-              <div className="mt-6 space-y-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
-                <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +52 998 123 4567</p>
-                <p className="text-sm text-zinc-300">📧 <strong className="text-white">Correo:</strong> contacto@gasperdetailing.com</p>
-                <p className="text-sm text-zinc-300">📍 <strong className="text-white">Ubicación:</strong> Cancún, Q.R., México</p>
-              </div>
-
-              <button onClick={() => setActiveSection('inicio')} className="mt-6 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 rounded-xl transition w-full">
-                Volver a Servicios
-              </button>
-            </div>
-          </section>
         ) : (
-          /* APARTADO PRINCIPAL (BIENVENIDA + BOTONES "SERVICES" Y "CONTÁCTANOS" JUNTOS + LISTA DE SERVICIOS) */
+          /* APARTADO PRINCIPAL (BIENVENIDA + BOTONES JUNTOS QUE ALTERNAN ENTRE SERVICIOS Y CONTACTO) */
           <>
             <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
               <div className="max-w-4xl mx-auto">
@@ -539,17 +521,25 @@ export default function Home() {
                   Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
                 </p>
 
-                {/* BOTONES "SERVICES" Y "CONTÁCTANOS" JUNTOS AL MEDIO */}
+                {/* BOTONES JUNTOS QUE ALTERNAN EL CONTENIDO DE ABAJO (SERVICIOS / CONTÁCTANOS) */}
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                  <a 
-                    href="#services-section"
-                    className="bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold px-6 py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 text-sm tracking-wider uppercase"
+                  <button 
+                    onClick={() => setMainView('servicios')}
+                    className={`font-extrabold px-6 py-3 rounded-xl transition text-sm tracking-wider uppercase shadow-lg ${
+                      mainView === 'servicios'
+                        ? 'bg-cyan-500 text-black shadow-cyan-500/20'
+                        : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700'
+                    }`}
                   >
                     Services ↓
-                  </a>
+                  </button>
                   <button 
-                    onClick={() => setActiveSection('contacto')}
-                    className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-extrabold px-6 py-3 rounded-xl transition border border-zinc-700 text-sm tracking-wider uppercase shadow-md"
+                    onClick={() => setMainView('contacto')}
+                    className={`font-extrabold px-6 py-3 rounded-xl transition text-sm tracking-wider uppercase shadow-lg ${
+                      mainView === 'contacto'
+                        ? 'bg-cyan-500 text-black shadow-cyan-500/20'
+                        : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700'
+                    }`}
                   >
                     Contáctanos
                   </button>
@@ -557,72 +547,91 @@ export default function Home() {
               </div>
             </section>
 
-            <section id="services-section" className="px-6 py-20 max-w-3xl mx-auto scroll-mt-20">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
-                <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
-              </div>
+            {/* SECCIÓN CONDICIONAL INFERIOR: MUESTRA SERVICIOS O CONTACTO SEGÚN EL BOTÓN CLICKEADO */}
+            {mainView === 'servicios' ? (
+              <section id="services-section" className="px-6 py-20 max-w-3xl mx-auto scroll-mt-20">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
+                  <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
+                </div>
 
-              <div className="space-y-4">
-                {servicesList.map((service) => (
-                  <div 
-                    key={service.id}
-                    className={`bg-[#16181d] border-2 ${service.borderColor} rounded-2xl overflow-hidden transition shadow-lg`}
-                  >
-                    <div className="px-5 py-4 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-400/50 flex-shrink-0 bg-black">
-                          <Image
-                            src="/logo.png"
-                            alt="Service Logo"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-white text-base md:text-lg">{service.title}</h3>
-                          <div className="flex items-center gap-1.5 text-cyan-400 text-sm font-bold mt-0.5">
-                            <span className="text-xs">💲</span>
-                            <span>{service.price}</span>
+                <div className="space-y-4">
+                  {servicesList.map((service) => (
+                    <div 
+                      key={service.id}
+                      className={`bg-[#16181d] border-2 ${service.borderColor} rounded-2xl overflow-hidden transition shadow-lg`}
+                    >
+                      <div className="px-5 py-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-400/50 flex-shrink-0 bg-black">
+                            <Image
+                              src="/logo.png"
+                              alt="Service Logo"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-white text-base md:text-lg">{service.title}</h3>
+                            <div className="flex items-center gap-1.5 text-cyan-400 text-sm font-bold mt-0.5">
+                              <span className="text-xs">💲</span>
+                              <span>{service.price}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-4">
-                        <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
-                          <span>⏱️</span>
-                          <span>{service.time}</span>
-                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
+                            <span>⏱️</span>
+                            <span>{service.time}</span>
+                          </div>
 
-                        <button
-                          onClick={() => toggleService(service.id)}
-                          className="text-zinc-400 hover:text-white p-1 rounded-lg transition"
-                          aria-label="Opciones"
-                        >
-                          <span className={`transform inline-block transition-transform duration-300 text-lg font-bold ${openServices[service.id] ? 'rotate-180' : ''}`}>
-                            ⋮
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {openServices[service.id] && (
-                      <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
-                        <p>{service.description}</p>
-                        <div className="mt-3 flex justify-end">
-                          <button 
-                            onClick={() => handleQuoteClick(service.title)}
-                            className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
+                          <button
+                            onClick={() => toggleService(service.id)}
+                            className="text-zinc-400 hover:text-white p-1 rounded-lg transition"
+                            aria-label="Opciones"
                           >
-                            Cotizar este servicio →
+                            <span className={`transform inline-block transition-transform duration-300 text-lg font-bold ${openServices[service.id] ? 'rotate-180' : ''}`}>
+                              ⋮
+                            </span>
                           </button>
                         </div>
                       </div>
-                    )}
+
+                      {openServices[service.id] && (
+                        <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
+                          <p>{service.description}</p>
+                          <div className="mt-3 flex justify-end">
+                            <button 
+                              onClick={() => handleQuoteClick(service.title)}
+                              className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
+                            >
+                              Cotizar este servicio →
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : (
+              <section className="px-6 py-20 max-w-xl mx-auto">
+                <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl text-center">
+                  <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+                    Ponte en contacto
+                  </span>
+                  <h2 className="text-3xl font-bold mt-4 text-white">Contáctanos</h2>
+                  <p className="text-zinc-400 mt-2 text-sm">¿Tienes dudas o necesitas atención personalizada? Escríbenos o visítanos.</p>
+                  
+                  <div className="mt-6 space-y-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
+                    <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +52 998 123 4567</p>
+                    <p className="text-sm text-zinc-300">📧 <strong className="text-white">Correo:</strong> contacto@gasperdetailing.com</p>
+                    <p className="text-sm text-zinc-300">📍 <strong className="text-white">Ubicación:</strong> Cancún, Q.R., México</p>
                   </div>
-                ))}
-              </div>
-            </section>
+                </div>
+              </section>
+            )}
           </>
         )}
 
