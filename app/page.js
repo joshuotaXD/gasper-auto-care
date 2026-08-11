@@ -854,11 +854,13 @@ export default function Home() {
                       <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Detailing</h3>
                       <p className="text-xs text-zinc-400 mt-1 mb-6">Facebook Community</p>
 
-                      <div className="bg-zinc-900 p-8 rounded-2xl shadow-inner border border-zinc-800 flex flex-col items-center justify-center relative w-full h-44">
-                        <span className="text-5xl">📘</span>
-                        <p className="text-xs text-zinc-400 mt-4 text-center">Connect with us on Facebook</p>
-                      </div>
-
+                     <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+    <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.facebook.com/share/1GHdrJniwm/" 
+        alt="QR Facebook Gasper Auto Detailing" 
+        className="w-36 h-36 object-contain rounded-lg"
+    />
+</div>
                       <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
                         Visit our Facebook page to check out promotions and reviews.
                       </p>
