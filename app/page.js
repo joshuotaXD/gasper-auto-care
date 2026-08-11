@@ -793,50 +793,7 @@ const [bookingData, setBookingData] = useState({});
               <p className="text-xs text-zinc-400 mt-1">Haz clic en cada servicio para ver su descripción detallada o esconderla.</p>
             </div>
 
-            {SERVICES.map((service) => {
-  const isOpen = !!openServices[service.name];
-
-  // ... dentro del map, en el form:
-<form onSubmit={(e) => handleBookingSubmit(e, service)} className="space-y-4">
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo de Vehículo</label>
-      <select 
-        value={bookingData[service.name]?.vehicle_type || VEHICLES[0]}
-        onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], vehicle_type: e.target.value } }))}
-        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white"
-      >
-        {VEHICLES.map((v) => <option key={v} value={v}>{v}</option>)}
-      </select>
-    </div>
-    <div className="flex gap-4">
-      <input 
-        type="date" 
-        required 
-        onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], booking_date: e.target.value } }))}
-        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" 
-      />
-      <input 
-        type="time" 
-        required 
-        onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], booking_time: e.target.value } }))}
-        className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" 
-      />
-    </div>
-  </div>
-
-  <input 
-    type="text" 
-    placeholder="Tu dirección completa" 
-    required 
-    onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], address: e.target.value } }))}
-    className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white" 
-  />
-
-  <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition">
-    Confirmar reserva de {service.name}
-  </button>
-</form>
+       
   
   return (
     <div key={service.name} className={`rounded-2xl border transition overflow-hidden ${
@@ -886,61 +843,7 @@ const [bookingData, setBookingData] = useState({});
       )}
     </div>
   );
-})}
 
-            <div className="space-y-3">
-              {SERVICES.map((service) => {
-                const isOpen = !!openServices[service.name]
-                const isSelected = selectedService === service.name
-
-                return (
-                  <div
-                    key={service.name}
-                    className={`rounded-2xl border transition overflow-hidden ${
-                      isSelected
-                        ? 'border-cyan-400 bg-cyan-500/10 shadow-lg shadow-cyan-950/20'
-                        : 'border-zinc-800 bg-[#0F0F11]'
-                    }`}
-                  >
-                    {/* Botón de cabecera del acordeón */}
-                    <button
-                      type="button"
-                      onClick={() => toggleServiceAccordion(service.name)}
-                      className="w-full p-4 flex items-center justify-between gap-3 text-left transition hover:bg-zinc-900/50"
-                    >
-                      <div>
-                        <p className="text-base font-bold text-white">{service.name}</p>
-                        <p className="mt-1 text-xs text-zinc-400">{service.duration}</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
-                          {isOpen ? 'OCULTAR ▲' : 'VER ▼'}
-                        </span>
-                      </div>
-                    </button>
-
-                    {/* Contenido desplegable (se esconde o se muestra dinámicamente) */}
-                    {isOpen && (
-                      <div className="px-4 pb-4 pt-1 border-t border-zinc-800/60 bg-[#111318]/40 animate-fadeIn">
-                        <p className="text-sm leading-6 text-zinc-300 mt-2">{service.description}</p>
-                        
-                        <div className="mt-4 flex items-center justify-between">
-                          <span className="text-xs text-zinc-400">Precio base: <strong className="text-cyan-400">${service.basePrice}</strong></span>
-                          <span className="text-[11px] font-semibold text-cyan-300 bg-cyan-950/50 border border-cyan-800 px-2.5 py-1 rounded-full">
-                            {isSelected ? 'Servicio seleccionado para reserva' : 'Haz clic para seleccionarlo'}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* SECCIÓN DE FORMULARIO DE RESERVA (MANTIENE TUS INPUTS EXACTOS) */}
-          <div className="rounded-3xl border border-zinc-800 bg-[#1A1A1E] p-4 shadow-2xl sm:p-5 lg:p-6">
-            <h3 className="text-2xl font-black text-white sm:text-3xl mb-4">RESERVA TU TURNO</h3>
             
             {success ? (
               <div className="p-6 bg-emerald-950/40 border border-emerald-800 text-emerald-400 rounded-2xl text-center">
@@ -948,7 +851,7 @@ const [bookingData, setBookingData] = useState({});
                 <p className="text-sm text-zinc-300 mb-4">Hemos guardado tu solicitud en la base de datos.</p>
                 <button
                   onClick={() => setSuccess(false)}
-                  className="bg-emerald-500 text-black font-bold px-4 py-2 rounded-xl text-xs"
+                  className="bg-emerald-500 text-black font-bold px-4 py-2 rounded-xl text-xs"  
                 >
                   Hacer otra reserva
                 </button>
