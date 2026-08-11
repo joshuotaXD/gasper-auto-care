@@ -447,47 +447,8 @@ export default function Home() {
           </section>
         )}
 
-        {/* CERAMIC COATING */}
-                          {service.isCeramic && (
-                            <div className="space-y-3">
-                              <p className="font-bold text-white text-lg">{service.title}</p>
-                              <p className="text-cyan-400 font-semibold">{service.intro}</p>
-                              <p className="text-zinc-300">{service.description}</p>
-                              
-                              <ul className="list-disc list-inside space-y-1 text-zinc-300">
-                                {service.benefits.map((bItem, bIndex) => (
-                                  <li key={bIndex}>{bItem}</li>
-                                ))}
-                              </ul>
-
-                              <div className="pt-2 border-t border-zinc-800/80 space-y-2">
-                                <p className="text-zinc-300 font-medium">{service.note}</p>
-                                <p className="text-white font-bold">{service.includes}</p>
-                                <p className="text-zinc-400 text-sm italic">{service.durability}</p>
-                              </div>
-
-                              <div className="mt-4 pt-3 border-t border-zinc-800/80">
-                                <p className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2">
-                                  PRICE/TIME for each vehicle type:
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                  {vehicleTypes.map((vType, vIndex) => (
-                                    <button
-                                      key={vIndex}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Asegúrate de tener un estado para ceramic si quieres control independiente
-                                        // setSelectedVehicleTypeCeramic(vType); 
-                                      }}
-                                      className="px-3 py-2 rounded-xl text-xs font-semibold border bg-[#111318] text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white transition text-center"
-                                    >
-                                      {vType}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          )}
+    
+                       
 
         {activeSection === 'galeria' && (
           <section className="space-y-6">
