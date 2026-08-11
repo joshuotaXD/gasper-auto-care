@@ -20,8 +20,6 @@ export default function Home() {
   );
 }
 
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase'; // Asegúrate que la ruta coincida con tu archivo supabase.js
 
 export default function Home() {
   // Estados para el modal de autenticación
