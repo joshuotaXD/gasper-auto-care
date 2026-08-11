@@ -2,14 +2,19 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const VEHICLES = ['Coupe / Sedan', 'Mid-Sized SUV', 'Large SUV / Truck', 'Motorcycle']
-const [openServices, setOpenServices] = useState({});
-const toggleServiceAccordion = (serviceName) => {
-  setOpenServices(prev => ({
-    ...prev,
-    [serviceName]: !prev[serviceName]
-  }));
-};
+
+export default function Home() {
+  const [openServices, setOpenServices] = useState({});
+
+  const toggleServiceAccordion = (serviceName) => {
+    setOpenServices(prev => ({
+      ...prev,
+      [serviceName]: !prev[serviceName]
+    }));
+  };
+
+  // ... el resto de tu código y el return
+}
 
 const SERVICES = [
   {
