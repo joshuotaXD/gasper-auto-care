@@ -3,6 +3,8 @@
 export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase';
+
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
@@ -13,6 +15,50 @@ export default function Home() {
   const [selectedVehicleTypeDeep, setSelectedVehicleTypeDeep] = useState('Coupe/Sedan');
   const [selectedVehicleTypePolish, setSelectedVehicleTypePolish] = useState('Coupe/Sedan');
   const [selectedVehicleTypeCeramic, setSelectedVehicleTypeCeramic] = useState('Coupe/Sedan');
+  return (
+    <main className="min-h-screen bg-[#090a0f] text-white"></main>
+  );
+}
+
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase'; // Asegúrate que la ruta coincida con tu archivo supabase.js
+
+export default function Home() {
+  // Estados para el modal de autenticación
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' o 'signup'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null); // Opcional: para rastrear si hay sesión activa
+
+  // Función para manejar el envío del formulario (Login o Registro)
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    if (authMode === 'signup') {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        alert("Error al registrarse: " + error.message);
+      } else {
+        alert("¡Registro exitoso! Revisa tu correo o inicia sesión.");
+        setIsAuthModalOpen(false);
+      }
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert("Error al iniciar sesión: " + error.message);
+      } else {
+        alert("¡Bienvenido de vuelta!");
+        setUser(data.user);
+        setIsAuthModalOpen(false);
+      }
+    }
+  };
+
+  // ... (aquí sigue todo el código de tus servicios y acordeones)
+
+
+
+
 
   const toggleServiceAccordion = (serviceName) => {
     setOpenServices(prev => ({
