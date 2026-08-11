@@ -253,13 +253,14 @@ export default function Home() {
                                       {vType}
                                     </button>
                                   ))}
-                              <div className="w-full flex justify-center mt-6 pt-4 border-t border-zinc-800">
+                            <div className="w-full flex justify-center items-center mt-6 pt-4 border-t border-zinc-800">
   <button 
+    type="button"
     onClick={(e) => {
       e.stopPropagation();
       alert("Servicio de " + service.name + " confirmado con éxito.");
     }}
-    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg"
+    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg mx-auto block"
   >
     Confirmar Servicio
   </button>
