@@ -21,7 +21,6 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
-  // Función para alternar el despliegue de cada servicio
   const toggleService = (id) => {
     setOpenServices(prev => ({ ...prev, [id]: !prev[id] }));
   };
@@ -59,60 +58,50 @@ export default function Home() {
       <main className="min-h-screen bg-[#0F0F11] text-white">
         
         {/* HEADER Y NAVEGACIÓN */}
-        <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-2 flex items-center justify-between shadow-xl">
+        <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
+          
+          {/* LOGO REDONDO + TEXTO AL LADO */}
           <div 
-            className="flex items-center gap-3 cursor-pointer group py-1" 
+            className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => setActiveSection('inicio')}
           >
-            <div className="relative w-16 h-16 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-cyan-500/40 group-hover:border-cyan-400 transition shadow-md shadow-cyan-500/10">
               <Image
                 src="/logo.png"
                 alt="Gasper Auto Detailing Logo"
                 fill
-                className="object-contain"
+                className="object-cover"
                 priority
               />
             </div>
-            <span className="sr-only">Gasper Auto Detailing</span>
+            <span className="font-extrabold text-base md:text-lg tracking-wider text-white group-hover:text-cyan-400 transition">
+              GASPER <span className="text-cyan-400 text-[10px] block font-normal tracking-widest uppercase">Auto Detailing</span>
+            </span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-10">
+          {/* Menú de Navegación central (SOLO GALERÍA) */}
+          <nav className="hidden md:flex items-center">
             <button 
               onClick={() => setActiveSection('galeria')}
-              className={`transition font-medium text-sm tracking-wide ${
+              className={`transition font-bold text-sm tracking-widest uppercase ${
                 activeSection === 'galeria' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
               }`}
             >
               Galería
             </button>
-            <button 
-              onClick={() => setActiveSection('servicios')}
-              className={`transition font-medium text-sm tracking-wide ${
-                activeSection === 'servicios' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
-              }`}
-            >
-              Servicios
-            </button>
-            <button 
-              onClick={() => setActiveSection('contacto')}
-              className={`transition font-medium text-sm tracking-wide ${
-                activeSection === 'contacto' ? 'text-cyan-400' : 'text-zinc-300 hover:text-white'
-              }`}
-            >
-              Contacto
-            </button>
           </nav>
 
-          <div className="flex items-center gap-4">
+          {/* Botones de Sesión */}
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setActiveSection('login')}
-              className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2.5 rounded-xl transition duration-200 hover:bg-zinc-800/50"
+              className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-xl transition hover:bg-zinc-800/50"
             >
               Iniciar Sesión
             </button>
             <button 
               onClick={() => setActiveSection('register')}
-              className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-6 py-2.5 rounded-xl transition duration-200 shadow-md shadow-cyan-500/20 hover:shadow-cyan-500/30"
+              className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-5 py-2 rounded-xl transition shadow-md shadow-cyan-500/20"
             >
               Crear Cuenta
             </button>
@@ -161,7 +150,6 @@ export default function Home() {
                 key={service.id}
                 className="bg-[#16181d] border border-zinc-800 rounded-2xl overflow-hidden transition"
               >
-                {/* Cabecera del Acordeón (Botón) */}
                 <button
                   onClick={() => toggleService(service.id)}
                   className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-zinc-800/40 transition"
@@ -172,7 +160,6 @@ export default function Home() {
                   </span>
                 </button>
 
-                {/* Contenido Oculto / Visible */}
                 {openServices[service.id] && (
                   <div className="px-6 pb-6 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm md:text-base leading-relaxed">
                     <p>{service.description}</p>
