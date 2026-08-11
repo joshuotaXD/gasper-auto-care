@@ -15,9 +15,11 @@ export default function Home() {
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
 
   // Estados de autenticación (Supabase)
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Puede ser correo o número de teléfono
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
@@ -41,44 +43,70 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Iniciar sesión con Correo o Número de Teléfono (mapeando a un formato de correo ficticio si es teléfono)
   const handleLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
     setAuthLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    let loginEmail = identifier.trim();
+    
+    // Si el usuario ingresó un número de teléfono en lugar de un correo (@), lo convertimos al formato interno
+    if (!loginEmail.includes('@')) {
+      loginEmail = `phone_${loginEmail}@gasper.com`;
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({ 
+      email: loginEmail, 
+      password 
+    });
     
     if (error) {
-      setAuthError(error.message);
+      setAuthError('Credenciales incorrectas o usuario no registrado.');
     } else {
       setActiveSection('inicio');
-      setEmail('');
+      setIdentifier('');
       setPassword('');
     }
     setAuthLoading(false);
   };
 
+  // Registrarse pidiendo teléfono y guardándolo en la metadata de Supabase
   const handleRegister = async (e) => {
     e.preventDefault();
     setAuthError('');
     setAuthLoading(true);
 
+    // Si el campo de identificador contiene '@' lo usamos como correo principal, si no, generamos un correo interno basado en su teléfono
+    let signupEmail = identifier.trim();
+    let userPhone = phone.trim();
+
+    if (!signupEmail.includes('@')) {
+      // Si el usuario puso su teléfono en el campo de identificador y dejó vacío el de teléfono
+      userPhone = signupEmail;
+      signupEmail = `phone_${userPhone}@gasper.com`;
+    }
+
     const { error } = await supabase.auth.signUp({
-      email,
+      email: signupEmail,
       password,
       options: {
-        data: { full_name: fullName }
+        data: { 
+          full_name: fullName,
+          phone: userPhone 
+        }
       }
     });
 
     if (error) {
       setAuthError(error.message);
     } else {
-      alert('¡Cuenta creada con éxito! Ya puedes iniciar sesión o has sido logueado.');
-      setActiveSection('inicio');
-      setEmail('');
+      alert('¡Cuenta creada con éxito! Ya puedes iniciar sesión.');
+      setActiveSection('login');
+      setIdentifier('');
       setPassword('');
       setFullName('');
+      setPhone('');
     }
     setAuthLoading(false);
   };
@@ -196,7 +224,7 @@ export default function Home() {
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-cyan-400 hidden md:inline">
-                  Hola, {user.user_metadata?.full_name || user.email}
+                  Hola, {user.user_metadata?.full_name || 'Usuario'}
                 </span>
                 <button 
                   onClick={handleLogout}
@@ -227,7 +255,7 @@ export default function Home() {
         {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
 
         {activeSection === 'login' ? (
-          /* APARTADO DE INICIAR SESIÓN */
+          /* APARTADO DE INICIAR SESIÓN (CORREO O TELÉFONO + VER CONTRASEÑA) */
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -243,26 +271,36 @@ export default function Home() {
 
               <form onSubmit={handleLogin} className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Correo Electrónico</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Correo Electrónico o Número de Teléfono</label>
                   <input 
-                    type="email" 
+                    type="text" 
                     required 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="correo@ejemplo.com" 
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="correo@ejemplo.com o 9981234567" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
-                  <input 
-                    type="password" 
-                    required 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••" 
-                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
-                  />
+                  <div className="relative">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••" 
+                      className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
+                    >
+                      {showPassword ? 'Ocultar' : 'Ver'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="pt-2">
@@ -288,7 +326,7 @@ export default function Home() {
             </div>
           </section>
         ) : activeSection === 'register' ? (
-          /* APARTADO DE REGISTRO */
+          /* APARTADO DE REGISTRO (CON TELÉFONO Y VER CONTRASEÑA) */
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -319,22 +357,42 @@ export default function Home() {
                   <input 
                     type="email" 
                     required 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="correo@ejemplo.com" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono</label>
                   <input 
-                    type="password" 
+                    type="tel" 
                     required 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Ej. 9981234567" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
+                  <div className="relative">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••" 
+                      className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
+                    >
+                      {showPassword ? 'Ocultar' : 'Ver'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="pt-2">
@@ -414,7 +472,10 @@ export default function Home() {
                   <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
                     <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Datos de tu cuenta:</p>
                     <p className="text-sm font-bold text-white mt-1">👤 {user.user_metadata?.full_name || 'Usuario'}</p>
-                    <p className="text-sm text-zinc-300">📧 {user.email}</p>
+                    <p className="text-sm text-zinc-300">📧 {user.email?.startsWith('phone_') ? 'Teléfono registrado' : user.email}</p>
+                    {user.user_metadata?.phone && (
+                      <p className="text-sm text-zinc-300">📞 {user.user_metadata.phone}</p>
+                    )}
                     <p className="text-xs text-cyan-400 mt-2">✓ Tus datos se usarán automáticamente para esta cita.</p>
                   </div>
                 ) : (
