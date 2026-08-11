@@ -945,3 +945,84 @@ const [bookingData, setBookingData] = useState({});
     </main>
   )
 }
+
+<div className="space-y-4">
+  {SERVICES.map((service) => {
+    const isOpen = !!openServices[service.name];
+
+    return (
+      <div key={service.name} className={`rounded-2xl border transition overflow-hidden ${
+        isOpen ? 'border-cyan-400 bg-cyan-500/10' : 'border-zinc-800 bg-[#0F0F11]'
+      }`}>
+        <button 
+          type="button"
+          onClick={() => toggleServiceAccordion(service.name)} 
+          className="w-full p-4 flex items-center justify-between text-left"
+        >
+          <div>
+            <p className="text-base font-bold text-white">{service.name}</p>
+            <p className="text-xs text-zinc-400">{service.duration}</p>
+          </div>
+          <span className="text-xs font-bold text-cyan-300">{isOpen ? 'OCULTAR ▲' : 'VER ▼'}</span>
+        </button>
+
+        {isOpen && (
+          <div className="px-4 pb-6 pt-1 border-t border-zinc-800/60 bg-[#111318]/40">
+            <p className="text-sm text-zinc-300 mb-4">{service.description}</p>
+            
+            <form onSubmit={(e) => handleBookingSubmit(e, service)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Tipo de Vehículo</label>
+                  <select 
+                    value={bookingData[service.name]?.vehicle_type || VEHICLES[0]}
+                    onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], vehicle_type: e.target.value } }))}
+                    className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                  >
+                    {VEHICLES.map((v) => <option key={v} value={v}>{v}</option>)}
+                  </select>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-1/2">
+                    <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Fecha</label>
+                    <input 
+                      type="date" 
+                      required 
+                      onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], booking_date: e.target.value } }))}
+                      className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none" 
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Hora</label>
+                    <input 
+                      type="time" 
+                      required 
+                      onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], booking_time: e.target.value } }))}
+                      className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none" 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-zinc-400 mb-1">Dirección / Ubicación</label>
+                <input 
+                  type="text" 
+                  placeholder="Ingresa tu dirección completa" 
+                  required 
+                  onChange={(e) => setBookingData(prev => ({ ...prev, [service.name]: { ...prev[service.name], address: e.target.value } }))}
+                  className="w-full rounded-lg border border-zinc-800 bg-[#111318] px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none" 
+                />
+              </div>
+
+              <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition">
+                Confirmar reserva de {service.name}
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
