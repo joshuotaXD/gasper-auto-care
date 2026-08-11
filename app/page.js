@@ -5,6 +5,23 @@ import Image from 'next/image';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
+  const [openServices, setOpenServices] = useState({});
+
+  const toggleServiceAccordion = (serviceName) => {
+    setOpenServices(prev => ({
+      ...prev,
+      [serviceName]: !prev[serviceName]
+    }));
+  };
+
+  const servicesList = [
+    { name: 'Engine wash', duration: '40 min', description: 'Lavado detallado y desengrasado profundo del compartimiento del motor.' },
+    { name: 'Headlight restoration', duration: '60 min', description: 'Pulido y restauración de faros para recuperar la claridad y visibilidad nocturna.' },
+    { name: 'Standard Wash - Regular Cleaning', duration: '60-120 min', description: 'Lavado exterior completo y aspirado interior básico de mantenimiento.' },
+    { name: 'Deep cleaning. Toyota RAV4 (0...)', duration: '120-180 min', description: 'Limpieza profunda de vestiduras, alfombras, tableros y desinfección a vapor.' },
+    { name: 'Polishing and waxing', duration: '300-540 min', description: 'Corrección de pintura en varias etapas y aplicación de cera protectora de alto brillo.' },
+    { name: 'CERAMIC COATING', duration: '300-600 min', description: 'Aplicación de recubrimiento cerámico avanzado para máxima protección de la pintura.' }
+  ];
 
   return (
     <div className="min-h-screen bg-[#0F0F11] text-white">
@@ -67,11 +84,52 @@ export default function Home() {
       {/* CONTENIDO DE LAS SECCIONES */}
       <main className="max-w-5xl mx-auto p-8 mt-6">
         {activeSection === 'inicio' && (
-          <section className="space-y-6">
-            <h1 className="text-4xl font-extrabold text-white">Servicios Profesionales de Detailing</h1>
-            <p className="text-zinc-400 text-lg">
-              Bienvenido a Gasper Auto Detailing. Cuidamos cada detalle de tu vehículo con los mejores estándares de calidad.
-            </p>
+          <section className="space-y-8">
+            <div className="space-y-3">
+              <h1 className="text-4xl font-extrabold text-white">Servicios Profesionales de Detailing</h1>
+              <p className="text-zinc-400 text-lg">
+                Bienvenido a Gasper Auto Detailing. Cuidamos cada detalle de tu vehículo con los mejores estándares de calidad.
+              </p>
+            </div>
+
+            {/* APARTADO DE SERVICIOS DISPONIBLES (ACORDEÓN) */}
+            <div className="space-y-4 pt-2">
+              <h2 className="text-2xl font-bold text-white border-b border-zinc-800 pb-3">Servicios Disponibles</h2>
+              
+              <div className="grid gap-3">
+                {servicesList.map((service, index) => {
+                  const isOpen = openServices[service.name];
+                  return (
+                    <div 
+                      key={index}
+                      onClick={() => toggleServiceAccordion(service.name)}
+                      className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 cursor-pointer hover:border-zinc-700 transition"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                            🚗
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-white text-base">{service.name}</h3>
+                            <p className="text-xs text-zinc-400">⏱️ Duración aproximada: {service.duration}</p>
+                          </div>
+                        </div>
+                        <span className="text-zinc-400 text-sm font-semibold">
+                          {isOpen ? '▲ Ocultar' : '▼ Ver detalle'}
+                        </span>
+                      </div>
+
+                      {isOpen && (
+                        <div className="mt-4 pt-3 border-t border-zinc-800 text-sm text-zinc-300 animate-fadeIn">
+                          <p>{service.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </section>
         )}
 
