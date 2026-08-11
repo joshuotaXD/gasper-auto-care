@@ -250,14 +250,14 @@ export default function Home() {
                                   ))}
                                   <button
                                   ></button> 
-  /* El div contenedor del botón centrado */                              
- <div className="flex justify-center mt-4">
+                               
+ <div className="flex justify-center mt-5">
   <button   
     onClick={(e) => {
       e.stopPropagation();
       alert("Servicio confirmado con éxito.");
     }}
-    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-8 rounded-xl transition duration-200 text-sm shadow-lg"
+    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg"
   >
     Confirmar Servicio
 </button>
