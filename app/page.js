@@ -27,10 +27,27 @@ export default function Home() {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
 
+  // Estado para el modal de la galería (Lightbox)
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const vehicleOptions = [
     { label: 'Coupe/Sedan', icon: '🚗' },
     { label: 'Mid-Sized SUV', icon: '🚙' },
     { label: 'Large SUV/Truck', icon: '🚐' },
+  ];
+
+  // Lista de imágenes de la galería basadas en los archivos proporcionados
+  const galleryImages = [
+    { src: '/gallery/cybertruck.jpeg', title: 'Cybertruck Detailing', category: 'Protección y Estética' },
+    { src: '/gallery/corvette_back.jpeg', title: 'Corvette C8 - Vista Trasera', category: 'Lavado y Brillo' },
+    { src: '/gallery/corvette_front.jpeg', title: 'Corvette C8 - Vista Frontal', category: 'Corrección de Pintura' },
+    { src: '/gallery/corvette_emblem.jpeg', title: 'Detalle de Emblema Corvette', category: 'Acabado Meticuloso' },
+    { src: '/gallery/corvette_foam.jpeg', title: 'Proceso de Espumado Activo', category: 'Lavado Pro' },
+    { src: '/gallery/interior.jpeg', title: 'Limpieza Profunda de Interiores', category: 'Interior Detailing' },
+    { src: '/gallery/wheels.jpeg', title: 'Restauración y Brillo de Rines', category: 'Rines y Neumáticos' },
+    { src: '/gallery/tesla_red_front.jpeg', title: 'Tesla Model Y - Frente', category: 'Ceramic Coating' },
+    { src: '/gallery/tesla_red_back.jpeg', title: 'Tesla Model Y - Trasera', category: 'Protección UV' },
+    { src: '/gallery/tesla_red_side.jpeg', title: 'Tesla Model Y - Perfil', category: 'Brillo Espejo' },
   ];
 
   // Comprobar sesión activa al cargar
@@ -201,8 +218,8 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Botón de galería desplazado hacia la derecha mediante pl-12 md:pl-24 */}
-          <nav className="hidden md:flex items-center pl-12 md:pl-24">
+          {/* Botón de galería centrado un poco más a la derecha mediante ml-8 md:ml-16 */}
+          <nav className="hidden md:flex items-center pl-12 md:pl-24 ml-8 md:ml-16">
             <button 
               onClick={() => setActiveSection('galeria')}
               className={`relative px-5 py-2 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg animate-pulse ${
@@ -499,13 +516,92 @@ export default function Home() {
             </div>
           </section>
         ) : activeSection === 'galeria' ? (
-          /* APARTADO DE GALERÍA */
-          <section className="px-6 py-20 max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold">Galería de Trabajos</h2>
-            <p className="text-zinc-400 mt-2">Pronto verás aquí las fotos de nuestros mejores detallados.</p>
-            <button onClick={() => setActiveSection('inicio')} className="mt-6 bg-cyan-500 text-black font-bold px-6 py-2.5 rounded-xl">
-              Volver a Servicios
-            </button>
+          /* APARTADO DE GALERÍA DISEÑADO HERMOSO Y ATRACTIVO */
+          <section className="px-6 py-20 max-w-7xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="text-cyan-400 font-semibold tracking-widest text-xs uppercase bg-cyan-950/50 px-3 py-1.5 rounded-full border border-cyan-800/50">
+                Portafolio Visual
+              </span>
+              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mt-4">
+                Nuestra <span className="text-cyan-400">Galería</span> de Trabajos
+              </h2>
+              <p className="text-zinc-400 mt-4 text-base md:text-lg">
+                Explora el nivel de detalle, acabado espejo y protección profesional que aplicamos en cada vehículo.
+              </p>
+            </div>
+
+            {/* Grid de imágenes con diseño moderno y hover atractivo */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {galleryImages.map((img, index) => (
+                <div 
+                  key={index}
+                  onClick={() => setSelectedImage(img)}
+                  className="group relative bg-[#16181d] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:border-cyan-500/50 hover:shadow-cyan-500/20"
+                >
+                  <div className="relative h-72 w-full overflow-hidden bg-zinc-900">
+                    <Image
+                      src={img.src}
+                      alt={img.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F11] via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity" />
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#16181d] via-[#16181d]/90 to-transparent">
+                    <span className="text-[10px] font-extrabold text-cyan-400 uppercase tracking-widest bg-cyan-950/60 px-2.5 py-1 rounded-md border border-cyan-800/40">
+                      {img.category}
+                    </span>
+                    <h3 className="text-lg font-bold text-white mt-2 group-hover:text-cyan-300 transition">
+                      {img.title}
+                    </h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-16 text-center">
+              <button 
+                onClick={() => setActiveSection('inicio')} 
+                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-bold px-8 py-3 rounded-2xl transition border border-zinc-700 shadow-xl"
+              >
+                ← Volver a Servicios
+              </button>
+            </div>
+
+            {/* Lightbox / Modal para ver imagen ampliada */}
+            {selectedImage && (
+              <div 
+                onClick={() => setSelectedImage(null)}
+                className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+              >
+                <div 
+                  onClick={(e) => e.stopPropagation()} 
+                  className="relative max-w-4xl w-full bg-[#16181d] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl p-4 md:p-6"
+                >
+                  <button 
+                    onClick={() => setSelectedImage(null)}
+                    className="absolute top-4 right-4 z-10 bg-zinc-800 hover:bg-zinc-700 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition border border-zinc-700"
+                  >
+                    ✕
+                  </button>
+                  <div className="relative h-[60vh] w-full rounded-2xl overflow-hidden bg-black">
+                    <Image
+                      src={selectedImage.src}
+                      alt={selectedImage.title}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="mt-4 text-center">
+                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">
+                      {selectedImage.category}
+                    </span>
+                    <h3 className="text-xl font-bold text-white mt-1">{selectedImage.title}</h3>
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         ) : (
           /* APARTADO PRINCIPAL (BIENVENIDA + BOTONES JUNTOS QUE ALTERNAN ENTRE SERVICIOS Y CONTACTO) */
