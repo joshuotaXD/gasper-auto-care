@@ -1,7 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 
@@ -10,11 +10,84 @@ export default function Home() {
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
   
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
+  // Estados para el formulario de cotización
+  const [vehicleType, setVehicleType] = useState('Mid-Sized SUV');
+  const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
+
+  // Estados de autenticación (Supabase)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null); // Simula el usuario logueado o registrado
+  const [fullName, setFullName] = useState('');
+  const [user, setUser] = useState(null);
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+
+  const vehicleOptions = [
+    { label: 'Coupe/Sedan', icon: '🚗' },
+    { label: 'Mid-Sized SUV', icon: '🚙' },
+    { label: 'Large SUV/Truck', icon: '🚐' },
+  ];
+
+  // Comprobar sesión activa al cargar
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      setAuthError(error.message);
+    } else {
+      setActiveSection('inicio');
+      setEmail('');
+      setPassword('');
+    }
+    setAuthLoading(false);
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName }
+      }
+    });
+
+    if (error) {
+      setAuthError(error.message);
+    } else {
+      alert('¡Cuenta creada con éxito! Ya puedes iniciar sesión o has sido logueado.');
+      setActiveSection('inicio');
+      setEmail('');
+      setPassword('');
+      setFullName('');
+    }
+    setAuthLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setActiveSection('inicio');
+  };
 
   const toggleService = (id) => {
     setOpenServices(prev => ({ ...prev, [id]: !prev[id] }));
@@ -121,9 +194,17 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             {user ? (
-              <span className="text-sm font-semibold text-cyan-400 px-3 py-2">
-                Hola, {user.name || 'Usuario'}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-cyan-400 hidden md:inline">
+                  Hola, {user.user_metadata?.full_name || user.email}
+                </span>
+                <button 
+                  onClick={handleLogout}
+                  className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition border border-zinc-700"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
             ) : (
               <>
                 <button 
@@ -145,7 +226,140 @@ export default function Home() {
 
         {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
 
-        {activeSection === 'cotizar' ? (
+        {activeSection === 'login' ? (
+          /* APARTADO DE INICIAR SESIÓN */
+          <section className="px-6 py-20 max-w-md mx-auto">
+            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+                Acceso a tu cuenta
+              </span>
+              <h2 className="text-2xl font-bold mt-4 text-white">Iniciar Sesión</h2>
+              
+              {authError && (
+                <div className="mt-4 bg-red-950/50 border border-red-800 text-red-400 text-xs p-3 rounded-xl">
+                  {authError}
+                </div>
+              )}
+
+              <form onSubmit={handleLogin} className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Correo Electrónico</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="correo@ejemplo.com" 
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
+                  <input 
+                    type="password" 
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••" 
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button 
+                    type="submit" 
+                    disabled={authLoading}
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+                  >
+                    {authLoading ? 'Iniciando sesión...' : 'Entrar'}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 text-center text-xs text-zinc-400">
+                ¿No tienes cuenta?{' '}
+                <button 
+                  onClick={() => { setActiveSection('register'); setAuthError(''); }}
+                  className="text-cyan-400 font-bold hover:underline ml-1"
+                >
+                  Registrarse
+                </button>
+              </div>
+            </div>
+          </section>
+        ) : activeSection === 'register' ? (
+          /* APARTADO DE REGISTRO */
+          <section className="px-6 py-20 max-w-md mx-auto">
+            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+                Únete a Gasper
+              </span>
+              <h2 className="text-2xl font-bold mt-4 text-white">Crear Cuenta</h2>
+              
+              {authError && (
+                <div className="mt-4 bg-red-950/50 border border-red-800 text-red-400 text-xs p-3 rounded-xl">
+                  {authError}
+                </div>
+              )}
+
+              <form onSubmit={handleRegister} className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Nombre Completo</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ej. Juan Pérez" 
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Correo Electrónico</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="correo@ejemplo.com" 
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Contraseña</label>
+                  <input 
+                    type="password" 
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••" 
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button 
+                    type="submit" 
+                    disabled={authLoading}
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+                  >
+                    {authLoading ? 'Registrando...' : 'Registrar Cuenta'}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 text-center text-xs text-zinc-400">
+                ¿Ya tienes cuenta?{' '}
+                <button 
+                  onClick={() => { setActiveSection('login'); setAuthError(''); }}
+                  className="text-cyan-400 font-bold hover:underline ml-1"
+                >
+                  Iniciar Sesión
+                </button>
+              </div>
+            </div>
+          </section>
+        ) : activeSection === 'cotizar' ? (
           /* APARTADO DE COTIZACIÓN INTELIGENTE */
           <section className="px-6 py-20 max-w-xl mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
@@ -154,58 +368,78 @@ export default function Home() {
               </span>
               <h2 className="text-2xl font-bold mt-4 text-white">Cotizar: {selectedServiceToQuote || 'Servicio General'}</h2>
               
-              {user ? (
-                /* SI ESTÁ REGISTRADO/LOGUEADO: Muestra sus datos precargados automáticamente */
-                <div className="mt-6 space-y-4">
-                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
+              <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
+                
+                {/* SELECTOR TIPO DE VEHÍCULO */}
+                <div className="relative">
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
+                  <div 
+                    onClick={() => setIsVehicleDropdownOpen(!isVehicleDropdownOpen)}
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between cursor-pointer hover:border-cyan-400 transition"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-cyan-400 text-base">
+                        {vehicleType === 'Coupe/Sedan' ? '🚗' : vehicleType === 'Mid-Sized SUV' ? '🚙' : '🚐'}
+                      </span>
+                      <span>{vehicleType}</span>
+                    </div>
+                    <span className={`transform transition-transform duration-300 text-zinc-400 ${isVehicleDropdownOpen ? 'rotate-180' : ''}`}>
+                      ⌄
+                    </span>
+                  </div>
+
+                  {isVehicleDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#16181d] border border-zinc-700 rounded-xl overflow-hidden shadow-2xl z-20">
+                      {vehicleOptions.map((option) => (
+                        <div
+                          key={option.label}
+                          onClick={() => {
+                            setVehicleType(option.label);
+                            setIsVehicleDropdownOpen(false);
+                          }}
+                          className={`px-4 py-3 text-sm flex items-center gap-2 cursor-pointer transition ${
+                            vehicleType === option.label ? 'bg-cyan-500/20 text-cyan-400 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
+                          }`}
+                        >
+                          <span>{option.icon}</span>
+                          <span>{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {user ? (
+                  /* SI ESTÁ LOGUEADO: Muestra sus datos precargados automáticamente */
+                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
                     <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Datos de tu cuenta:</p>
-                    <p className="text-sm font-bold text-white mt-1">👤 {user.name || 'Usuario Registrado'}</p>
-                    <p className="text-sm text-zinc-300">📧 {user.email || 'correo@registrado.com'}</p>
+                    <p className="text-sm font-bold text-white mt-1">👤 {user.user_metadata?.full_name || 'Usuario'}</p>
+                    <p className="text-sm text-zinc-300">📧 {user.email}</p>
                     <p className="text-xs text-cyan-400 mt-2">✓ Tus datos se usarán automáticamente para esta cita.</p>
                   </div>
-
-                  <form onSubmit={(e) => { e.preventDefault(); alert('¡Cotización enviada con éxito usando tus datos de cuenta!'); setActiveSection('inicio'); }} className="space-y-4">
+                ) : (
+                  /* SI NO ESTÁ LOGUEADO: Pide obligatoriamente nombre y teléfono o correo */
+                  <>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Modelo de tu Vehículo (Opcional)</label>
-                      <input type="text" placeholder="Ej. Toyota RAV4" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre *</label>
+                      <input type="text" required placeholder="Ej. Juan Pérez" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
                     </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono o Correo electrónico *</label>
+                      <input type="text" required placeholder="Ej. 9981234567 o correo@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                    </div>
+                  </>
+                )}
 
-                    <div className="pt-4 flex gap-3">
-                      <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
-                        Enviar Cotización
-                      </button>
-                      <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
-                        Volver
-                      </button>
-                    </div>
-                  </form>
+                <div className="pt-4 flex gap-3">
+                  <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
+                    Enviar Cotización
+                  </button>
+                  <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
+                    Volver
+                  </button>
                 </div>
-              ) : (
-                /* SI NO ESTÁ REGISTRADO: Pide obligatoriamente nombre y número de teléfono o correo */
-                <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre *</label>
-                    <input type="text" required placeholder="Ej. Juan Pérez" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono o Correo electrónico *</label>
-                    <input type="text" required placeholder="Ej. 9981234567 o correo@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-300 mb-1">Modelo de tu Vehículo</label>
-                    <input type="text" placeholder="Ej. Toyota RAV4" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                  </div>
-
-                  <div className="pt-4 flex gap-3">
-                    <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
-                      Enviar Cotización
-                    </button>
-                    <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
-                      Volver
-                    </button>
-                  </div>
-                </form>
-              )}
+              </form>
             </div>
           </section>
         ) : activeSection === 'galeria' ? (
