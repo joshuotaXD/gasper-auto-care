@@ -316,7 +316,7 @@ export default function Home() {
                     required 
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="correo@ejemplo.com o 9981234567" 
+                    placeholder="correo@ejemplo.com o +16154292253" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
@@ -408,7 +408,7 @@ export default function Home() {
                     required 
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ej. 9981234567" 
+                    placeholder="Ej. +1 615 429 2253" 
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
@@ -521,7 +521,7 @@ export default function Home() {
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-zinc-300 mb-1">Número de Teléfono o Correo electrónico *</label>
-                      <input type="text" required placeholder="Ej. 9981234567 o correo@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+                      <input type="text" required placeholder="Ej. +1 615 429 2253 o correo@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
                     </div>
                   </>
                 )}
@@ -806,7 +806,7 @@ export default function Home() {
 
                       <div className="mt-6 w-full">
                         <a 
-                          href="https://wa.me/message/OCXKMD5ZYESIE1" 
+                          href="https://wa.me/16154292253" 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
@@ -882,7 +882,7 @@ export default function Home() {
                   )}
 
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
-                    <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +52 998 123 4567</p>
+                    <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +1 (615) 429-2253</p>
                     <p className="text-sm text-zinc-300">📧 <strong className="text-white">Correo:</strong> contacto@gasperdetailing.com</p>
                   </div>
                 </div>
