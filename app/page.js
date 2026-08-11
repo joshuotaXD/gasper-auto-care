@@ -221,15 +221,8 @@ export default function Home() {
                         <div className="mt-4 pt-4 border-t border-zinc-800 space-y-4 text-sm text-zinc-300">
 
                           <div className="w-full flex justify-center mt-6 pt-4 border-t border-zinc-800">
-  <button 
-    onClick={(e) => {
-      e.stopPropagation();
-      alert("Servicio de " + service.name + " confirmado con éxito.");
-    }}
-    className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg"
-  >
-    Confirmar Servicio
-  </button>
+ 
+  
 </div>
                           {/* ENGINE WASH */}
                           {service.isEngineWash && (
@@ -260,14 +253,23 @@ export default function Home() {
                                       {vType}
                                     </button>
                                   ))}
-                                  <button
-                                  ></button> 
-                               
- 
-                                </div>
-                              </div>
-                            </div>
+                                <div className="w-full flex justify-center mt-6 pt-4 border-t border-zinc-800">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    alert("Servicio de " + service.name + " confirmado con éxito.");
+                  }}
+                  className="bg-white hover:bg-zinc-200 text-black font-bold py-3 px-10 rounded-xl transition duration-200 text-sm shadow-lg"
+                >
+                  Confirmar Servicio
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
                             
+                    
                             
 
                             
