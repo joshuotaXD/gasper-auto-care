@@ -201,7 +201,8 @@ export default function Home() {
             </span>
           </div>
 
-          <nav className="hidden md:flex items-center">
+          {/* Botón de galería desplazado hacia la derecha mediante pl-12 md:pl-24 */}
+          <nav className="hidden md:flex items-center pl-12 md:pl-24">
             <button 
               onClick={() => setActiveSection('galeria')}
               className={`relative px-5 py-2 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg animate-pulse ${
@@ -521,7 +522,7 @@ export default function Home() {
                   Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
                 </p>
 
-                {/* BOTONES JUNTOS QUE ALTERNAN EL CONTENIDO DE ABAJO (SERVICIOS / CONTÁCTANOS) */}
+                {/* BOTONES JUNTOS QUE ALTERNAN EL CONTENIDO DE ABAJO (SERVICIOS / CONTACTO) */}
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                   <button 
                     onClick={() => setMainView('servicios')}
