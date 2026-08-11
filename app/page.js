@@ -146,50 +146,76 @@ export default function Home() {
   const servicesList = [
     {
       id: 'engine',
-      title: 'Engine wash',
+      title: 'Engine Wash',
       price: '$60',
       time: '40 min',
-      description: 'Lavado especializado y desengrasado profundo del motor.',
+      details: [
+        'We protect the delicate parts of the water engine by covering them.',
+        'We use a degreaser and finish with a glossy look.'
+      ],
       borderColor: 'border-cyan-400/40',
     },
     {
       id: 'headlight',
-      title: 'Headlight restoration',
+      title: 'Headlight Restoration',
       price: '$90 - $120',
       time: '60 min',
-      description: 'Pulido, lijado y aplicación de capa protectora UV para recuperar la transparencia de los faros.',
+      details: [
+        '1. Assessment and preparation: Deep cleaning of the headlight to remove dirt and grease, while the surrounding paintwork is protected with special tape to prevent damage to the bodywork.',
+        '2. Sanding and polishing: Yellowing and cloudiness are removed through a multi-stage sanding process (ranging from coarse to fine grit), followed by machine polishing to restore original clarity and shine.',
+        '3. Sealing and UV protection: A sealant with UV protection is applied to prevent future yellowing, which restores the headlight to a like-new appearance, improves night-time visibility, and ensures it passes inspection.'
+      ],
       borderColor: 'border-yellow-400/40',
     },
     {
       id: 'standard',
-      title: 'Standard Wash – Regular Cleaning',
+      title: 'Standard Wash',
       price: '$120 - $200',
       time: '60-120 min',
-      description: 'Lavado exterior detallado y limpieza interior regular.',
+      details: [
+        'Our ideal maintenance service to keep your car clean, shiny, and presentable week after week.',
+        'Exterior: Hand wash with pH-neutral shampoo, cleaning of rims and tires, exterior window cleaning, and hand drying to prevent streaks.',
+        'Interior: Thorough vacuuming of seats, carpets, and trunk; cleaning of dashboard, doors, and console; interior window cleaning; and air freshener application.',
+        'Perfect for daily use, removing dust and light dirt while preserving your vehicle\'s value without damaging the paint.'
+      ],
       borderColor: 'border-red-400/40',
     },
     {
       id: 'deep',
-      title: 'Deep cleaning',
+      title: 'Deep Cleaning',
       price: '$220 - $310',
       time: '120-180 min',
-      description: 'Limpieza profunda integral de tapicería, alfombras y rincones difíciles.',
+      details: [
+        '100% Detailed Interior: Deep vacuuming of seats, carpets, trunk, and every nook and cranny; upholstery cleaning to remove stains and odors; cleaning of dashboard, door panels, console, and cup holders; spotless interior windows; and sanitization and long-lasting fresh scent.',
+        'Exterior with Premium Finish: Hand wash with foam, deep cleaning of rims and tires, tires conditioned and blackened, and finishing touches that make the difference.',
+        'Ideal for daily drivers, vehicles being prepared for sale, or after a long road trip to make your car look showroom-fresh (recommended every 6 months).'
+      ],
       borderColor: 'border-zinc-400/40',
     },
     {
       id: 'polishing',
-      title: 'Polishing and waxing',
+      title: 'Polishing and Waxing',
       price: '$550 - $1300',
       time: '300-540 min',
-      description: 'Corrección de pintura, remoción de remolinos y encerado de alta durabilidad.',
+      details: [
+        'Designed to restore a showroom shine when paint looks dull, scratched, and lifeless by removing sun damage, wash-induced micro-scratches, and oxidation, leaving a protected, mirror-like finish.',
+        'What does POLISHING do?: Focuses on correction by removing surface scratches, swirl marks, dull and sun-damaged paint, water spots, mineral deposits, and dried bird droppings.',
+        'What does WAXING do?: Seals and protects the finish to provide a deep, mirror-like shine, protection against sun, dust, and rain, silky-smooth paint that repels water, and longer-lasting cleanliness.',
+        'The result is vibrant color, intense shine, and months of protection.'
+      ],
       borderColor: 'border-purple-400/40',
     },
     {
       id: 'ceramic',
-      title: 'CERAMIC COATING',
+      title: 'Ceramic Coating 💎🚗',
       price: '$1100 - $1800',
       time: '300-600 min',
-      description: 'Aplicación de recubrimiento cerámico profesional para máxima protección y brillo espejo.',
+      details: [
+        'Ultimate protection for your paintwork that creates a hard, glossy layer protecting your car for months against the sun, rain, dust, and minor scratches.',
+        'Delivers an intense, mirror-like shine with extreme protection against sun and water, keeping your car cleaner for longer through a hydrophobic effect where water simply slides off.',
+        'It\'s not wax; it\'s professional, long-lasting protection that includes polishing and waxing.',
+        'The price may vary depending on the durability period (3 years or 5 years).'
+      ],
       borderColor: 'border-amber-400/40',
     },
   ];
@@ -684,8 +710,12 @@ export default function Home() {
 
                       {openServices[service.id] && (
                         <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
-                          <p>{service.description}</p>
-                          <div className="mt-3 flex justify-end">
+                          <ul className="space-y-2 list-disc pl-4 mt-2">
+                            {service.details.map((detail, idx) => (
+                              <li key={idx}>{detail}</li>
+                            ))}
+                          </ul>
+                          <div className="mt-4 flex justify-end">
                             <button 
                               onClick={() => handleQuoteClick(service.title)}
                               className="text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider"
@@ -723,7 +753,6 @@ export default function Home() {
 
                     {/* Contenedor del Código QR simulado con diseño elegante y limpio */}
                     <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
-                      {/* Generador de QR visual utilizando iconos y estética limpia */}
                       <div className="w-44 h-44 relative bg-white flex items-center justify-center border-4 border-black/90 rounded-lg p-2">
                         <div className="absolute inset-2 grid grid-cols-6 grid-rows-6 gap-1 opacity-90">
                           {Array.from({ length: 36 }).map((_, i) => (
