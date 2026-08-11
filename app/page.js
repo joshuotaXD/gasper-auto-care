@@ -218,7 +218,6 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Botón de galería centrado un poco más a la derecha mediante ml-8 md:ml-16 */}
           <nav className="hidden md:flex items-center pl-12 md:pl-24 ml-8 md:ml-16">
             <button 
               onClick={() => setActiveSection('galeria')}
@@ -267,7 +266,6 @@ export default function Home() {
         {/* CONTENIDO CONDICIONAL SEGÚN activeSection */}
 
         {activeSection === 'login' ? (
-          /* APARTADO DE INICIAR SESIÓN */
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -338,7 +336,6 @@ export default function Home() {
             </div>
           </section>
         ) : activeSection === 'register' ? (
-          /* APARTADO DE REGISTRO */
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -430,7 +427,6 @@ export default function Home() {
             </div>
           </section>
         ) : activeSection === 'cotizar' ? (
-          /* APARTADO DE COTIZACIÓN INTELIGENTE */
           <section className="px-6 py-20 max-w-xl mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
               <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -440,7 +436,6 @@ export default function Home() {
               
               <form onSubmit={(e) => { e.preventDefault(); alert('¡Solicitud enviada con éxito!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
                 
-                {/* SELECTOR TIPO DE VEHÍCULO */}
                 <div className="relative">
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
                   <div 
@@ -480,7 +475,6 @@ export default function Home() {
                 </div>
 
                 {user ? (
-                  /* SI ESTÁ LOGUEADO: Muestra sus datos precargados automáticamente */
                   <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
                     <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Datos de tu cuenta:</p>
                     <p className="text-sm font-bold text-white mt-1">👤 {user.user_metadata?.full_name || 'Usuario'}</p>
@@ -491,7 +485,6 @@ export default function Home() {
                     <p className="text-xs text-cyan-400 mt-2">✓ Tus datos se usarán automáticamente para esta cita.</p>
                   </div>
                 ) : (
-                  /* SI NO ESTÁ LOGUEADO: Pide obligatoriamente nombre y teléfono o correo */
                   <>
                     <div>
                       <label className="block text-xs font-semibold text-zinc-300 mb-1">Tu Nombre *</label>
@@ -516,7 +509,6 @@ export default function Home() {
             </div>
           </section>
         ) : activeSection === 'galeria' ? (
-          /* APARTADO DE GALERÍA DISEÑADO HERMOSO Y ATRACTIVO */
           <section className="px-6 py-20 max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="text-cyan-400 font-semibold tracking-widest text-xs uppercase bg-cyan-950/50 px-3 py-1.5 rounded-full border border-cyan-800/50">
@@ -530,7 +522,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Grid de imágenes con diseño moderno y hover atractivo */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {galleryImages.map((img, index) => (
                 <div 
@@ -569,7 +560,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Lightbox / Modal para ver imagen ampliada */}
             {selectedImage && (
               <div 
                 onClick={() => setSelectedImage(null)}
@@ -604,7 +594,6 @@ export default function Home() {
             )}
           </section>
         ) : (
-          /* APARTADO PRINCIPAL (BIENVENIDA + BOTONES JUNTOS QUE ALTERNAN ENTRE SERVICIOS Y CONTACTO) */
           <>
             <section className="px-6 py-20 text-center bg-gradient-to-b from-[#0F0F11] to-[#16181d] border-b border-zinc-800">
               <div className="max-w-4xl mx-auto">
@@ -618,7 +607,6 @@ export default function Home() {
                   Cuidado profesional de alto nivel con productos especializados, protección cerámica y detallado meticuloso en cada rincón.
                 </p>
 
-                {/* BOTONES JUNTOS QUE ALTERNAN EL CONTENIDO DE ABAJO (SERVICIOS / CONTACTO) */}
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                   <button 
                     onClick={() => setMainView('servicios')}
@@ -644,7 +632,6 @@ export default function Home() {
               </div>
             </section>
 
-            {/* SECCIÓN CONDICIONAL INFERIOR: MUESTRA SERVICIOS O CONTACTO SEGÚN EL BOTÓN CLICKEADO */}
             {mainView === 'servicios' ? (
               <section id="services-section" className="px-6 py-20 max-w-3xl mx-auto scroll-mt-20">
                 <div className="text-center mb-10">
@@ -713,18 +700,63 @@ export default function Home() {
                 </div>
               </section>
             ) : (
-              <section className="px-6 py-20 max-w-xl mx-auto">
-                <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl text-center">
-                  <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+              <section className="px-6 py-20 max-w-2xl mx-auto">
+                <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 md:p-10 shadow-2xl text-center">
+                  <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3.5 py-1.5 rounded-full border border-cyan-800/40">
                     Ponte en contacto
                   </span>
                   <h2 className="text-3xl font-bold mt-4 text-white">Contáctanos</h2>
-                  <p className="text-zinc-400 mt-2 text-sm">¿Tienes dudas o necesitas atención personalizada? Escríbenos o visítanos.</p>
+                  <p className="text-zinc-400 mt-2 text-sm max-w-md mx-auto">
+                    ¿Tienes dudas o necesitas atención personalizada? Escanea el código QR o haz clic abajo para chatear directamente por WhatsApp.
+                  </p>
                   
-                  <div className="mt-6 space-y-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
+                  {/* Tarjeta estilo tarjeta de presentación del QR de WhatsApp */}
+                  <div className="mt-8 bg-[#111318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
+                    
+                    {/* Insignia / Círculo de perfil superior como la imagen */}
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-2 border-cyan-400/60 flex items-center justify-center shadow-md mb-4">
+                      <span className="text-2xl">👤</span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-white tracking-wide">Gasper Auto Care</h3>
+                    <p className="text-xs text-zinc-400 mt-1 mb-6">Cuenta de empresa de WhatsApp</p>
+
+                    {/* Contenedor del Código QR simulado con diseño elegante y limpio */}
+                    <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+                      {/* Generador de QR visual utilizando iconos y estética limpia */}
+                      <div className="w-44 h-44 relative bg-white flex items-center justify-center border-4 border-black/90 rounded-lg p-2">
+                        <div className="absolute inset-2 grid grid-cols-6 grid-rows-6 gap-1 opacity-90">
+                          {Array.from({ length: 36 }).map((_, i) => (
+                            <div key={i} className={`bg-black rounded-[2px] ${i % 2 === 0 && i % 3 === 0 ? 'bg-transparent' : ''}`}></div>
+                          ))}
+                        </div>
+                        {/* Logo o ícono central de WhatsApp en el QR */}
+                        <div className="absolute w-12 h-12 bg-white rounded-full border-2 border-black flex items-center justify-center shadow-md">
+                          <span className="text-xl">💬</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
+                      Escanea este código para iniciar un chat de WhatsApp con Gasper Auto Care.
+                    </p>
+
+                    {/* Botón directo de enlace */}
+                    <div className="mt-6 w-full">
+                      <a 
+                        href="https://wa.me/message/OCXKMD5ZYESIE1" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold py-3.5 px-6 rounded-xl transition shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 text-sm tracking-wide"
+                      >
+                        <span>💬</span> Enviar mensaje por WhatsApp
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
                     <p className="text-sm text-zinc-300">📞 <strong className="text-white">Teléfono:</strong> +52 998 123 4567</p>
                     <p className="text-sm text-zinc-300">📧 <strong className="text-white">Correo:</strong> contacto@gasperdetailing.com</p>
-                    <p className="text-sm text-zinc-300">📍 <strong className="text-white">Ubicación:</strong> Cancún, Q.R., México</p>
                   </div>
                 </div>
               </section>
