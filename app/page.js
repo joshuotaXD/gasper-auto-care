@@ -265,9 +265,7 @@ export default function Home() {
                                       {vType}
                                     </button>
                                   ))}
-                            <div className="w-full flex justify-center items-center mt-6 pt-4 border-t border-zinc-800">
- 
-</div>
+                           
             </div>
           </div>
         </div>
