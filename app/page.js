@@ -821,14 +821,13 @@ export default function Home() {
                       <p className="text-xs text-zinc-400 mt-1 mb-6">Follow us on Instagram</p>
 
                       <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
-                        <div className="w-44 h-44 relative rounded-lg overflow-hidden border-4 border-black/90 shadow-md">
-                          <Image
-                            src="/image_81acd9.jpg"
-                            alt="QR Instagram Gasper Auto Detailing"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
+                       <div className="bg-white p-4 rounded-2xl shadow-inner border border-zinc-200 flex flex-col items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+            <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.instagram.com/gasper.auto.detailing" 
+                alt="QR Instagram Gasper Auto Detailing" 
+                className="w-36 h-36 object-contain rounded-lg"
+            />
+        </div>
                       </div>
 
                       <p className="text-xs text-zinc-400 mt-6 leading-relaxed px-2">
