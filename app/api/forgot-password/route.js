@@ -2,15 +2,20 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ANON_KEY
-);
-
 export async function POST(request) {
   try {
     const { email } = await request.json();
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const resendKey = process.env.RESEND_API_KEY;
+
+    if (!supabaseUrl || !serviceKey || !resendKey) {
+      throw new Error('Faltan variables de entorno en el servidor.');
+    }
+
+    const resend = new Resend(resendKey);
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
