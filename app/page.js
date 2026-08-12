@@ -15,7 +15,7 @@ export default function Home() {
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
   const [resetEmail, setResetEmail] = useState('');
-
+const [successMessage, setSuccessMessage] = useState('');
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
@@ -32,25 +32,23 @@ const guardarCita = async (datos) => {
 const handlePasswordReset = async (e) => {
     e.preventDefault();
     setAuthError('');
+    setSuccessMessage('');
 
-    // 1. Vamos a ver en la consola exactamente qué valor tiene el correo
-    console.log("Correo que se va a enviar:", resetEmail);
-
-    if (!resetEmail) {
-      setAuthError("Por favor ingresa un correo electrónico.");
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: window.location.origin,
+   try {
+      const response = await fetch('/api/recovery', { // Asegúrate de que apunte a tu ruta de API
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail }),
       });
 
-      if (error) throw error;
-      alert('¡Se han enviado las instrucciones a tu correo!');
-      setAuthView('login');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to send recovery code.');
+
+      // Mensaje de éxito en inglés directo en la UI
+      setSuccessMessage('Recovery instructions sent to your email!');
+      
+      // Opcional: limpiar el campo o cambiar de vista después de unos segundos
     } catch (error) {
-      console.error("Error completo de Supabase:", error);
       setAuthError(error.message);
     }
   };
