@@ -58,11 +58,12 @@ const handlePasswordReset = async (e) => {
     }
   };
   
-  const handleVerifyAndReset = async (e) => {
+ const handleVerifyAndReset = async (e) => {
     e.preventDefault();
     setAuthError('');
 
     try {
+      // 1. Validar el código de 6 dígitos con Supabase
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email: resetEmail,
         token: verificationCode,
@@ -71,6 +72,7 @@ const handlePasswordReset = async (e) => {
 
       if (verifyError) throw verifyError;
 
+      // 2. Actualizar la contraseña una vez verificado el código
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword
       });
