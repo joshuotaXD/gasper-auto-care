@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
+const [authView, setAuthView] = useState('login'); // 'login' or 'forgot'
 
 
 export default function Home() {
@@ -23,6 +24,21 @@ const guardarCita = async (datos) => {
     
   if (error) console.error('Error:', error);
   else alert('¡Cita guardada!');
+};
+
+// Manejar la recuperación de contraseña
+const handlePasswordReset = async (e) => {
+  e.preventDefault();
+  const { error } = await supabase.auth.resetPasswordForEmail(identifier, {
+    redirectTo: `${window.location.origin}/update-password`,
+  });
+
+  if (error) {
+    setAuthError(error.message);
+  } else {
+    alert('Check your email for the recovery instructions.');
+    setAuthView('login');
+  }
 };
 
   
@@ -44,6 +60,7 @@ const guardarCita = async (datos) => {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState('');
+  const [authView, setAuthView] = useState('login'); // 'login' o 'forgot'
   const [authLoading, setAuthLoading] = useState(false);
 
   // State for gallery modal (Lightbox)
@@ -460,7 +477,7 @@ const handleForgotPassword = async (e) => {
 <div className="mt-2 text-right">
   <button 
     type="button" 
-    onClick={handleForgotPassword}
+   onClick={() => { setAuthView('forgot'); setAuthError(''); }}
     className="text-xs text-cyan-400 hover:underline bg-transparent border-none cursor-pointer"
  >
     Forgot Password?
@@ -469,27 +486,71 @@ const handleForgotPassword = async (e) => {
 
 
                 <div className="pt-2">
-                  <button 
-                    type="submit" 
-                    disabled={authLoading}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
-                  >
-                    {authLoading ? 'Signing in...' : 'Enter'}
-                  </button>
-                </div>
-              </form>
+        <button
+          type="submit"
+          disabled={authLoading}
+          className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+        >
+          {authLoading ? 'Signing in...' : 'Enter'}
+        </button>
+      </div>
+    </form>
 
-              <div className="mt-6 text-center text-xs text-zinc-400">
-                Don't have an account?{' '}
-                <button 
-                  onClick={() => { setActiveSection('register'); setAuthError(''); }}
-                  className="text-cyan-400 font-bold hover:underline ml-1"
-                >
-                  Register
-                </button>
-              </div>
-            </div>
-          </section>
+    {/* APARTADO DE RECUPERACIÓN (SE MUESTRA SOLO SI DAS CLICK EN FORGOT PASSWORD) */}
+    {authView === 'forgot' && (
+      <form onSubmit={handlePasswordReset} className="mt-6 space-y-4">
+        <div className="border-t border-zinc-800 pt-6 mt-6">
+          <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+            Recovery
+          </span>
+          <h3 className="text-xl font-bold mt-3 text-white">Reset Password</h3>
+          <p className="text-zinc-400 text-xs mt-1 mb-4">Enter your registered email to receive recovery instructions.</p>
+          
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 mb-1">Email</label>
+            <input 
+              type="email" 
+              required
+              value={identifier} 
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="email@example.com"
+              className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-4"
+          >
+            Send Instructions
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => { setAuthView('login'); setAuthError(''); }}
+            className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold py-2.5 rounded-xl transition border border-zinc-700 mt-2"
+          >
+            Back to Sign In
+          </button>
+        </div>
+      </form>
+    )}
+
+    {/* Enlace para registrarse (solo se muestra si estás en el login normal) */}
+    {authView === 'login' && (
+      <div className="mt-6 text-center text-xs text-zinc-400">
+        Don't have an account?{' '}
+        <button
+          onClick={() => { setActiveSection('register'); setAuthError(''); }}
+          className="text-cyan-400 font-bold hover:underline ml-1"
+        >
+          Register
+        </button>
+      </div>
+    )}
+  </div>
+</section>
+git
         ) : activeSection === 'register' ? (
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
