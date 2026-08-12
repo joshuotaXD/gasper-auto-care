@@ -31,15 +31,18 @@ const guardarCita = async (datos) => {
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
   e.preventDefault();
+  setAuthError('');
+  try { 
   const { error } = await supabase.auth.resetPasswordForEmail(identifier, {
     redirectTo: `${window.location.origin}/update-password`,
   });
 
-  if (error) {
-    setAuthError(error.message);
-  } else {
-    alert('Check your email for the recovery instructions.');
+  if (error) throw error;
+  alert('¡Revisa tu correo!');
     setAuthView('login');
+  } catch (error) {
+    console.error("Error completo de Supabase:", error); // Esto te dirá exactamente el motivo del 400
+    setAuthError(error.message);
   }
 };
 
