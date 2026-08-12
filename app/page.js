@@ -550,7 +550,7 @@ const handleForgotPassword = async (e) => {
     )}
   </div>
 </section>
-git
+
         ) : activeSection === 'register' ? (
           <section className="px-6 py-20 max-w-md mx-auto">
             <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
