@@ -58,6 +58,79 @@ const handlePasswordReset = async (e) => {
     }
   };
   
+  const handleVerifyAndReset = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: resetEmail,
+        token: verificationCode,
+        type: 'recovery',
+      });
+
+      if (verifyError) throw verifyError;
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      alert('Password updated successfully!');
+      setAuthView('signin');
+    } catch (error) {
+      setAuthError(error.message);
+    }
+  };
+
+
+  {authView === 'verify-code' && (
+  <form onSubmit={handleVerifyAndReset} className="space-y-4">
+    <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+      Verification
+    </span>
+    <h2 className="text-2xl font-bold mt-4 text-white">Enter Code</h2>
+    <p className="text-zinc-400 text-xs mt-1 mb-6">Enter the 6-digit code sent to your email and your new password.</p>
+
+    <div>
+      <label className="block text-xs font-semibold text-zinc-300 mb-1">6-Digit Code</label>
+      <input 
+        type="text" 
+        maxLength={6}
+        required
+        value={verificationCode} 
+        onChange={(e) => setVerificationCode(e.target.value)}
+        placeholder="123456"
+        className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-center text-xl text-cyan-400 font-bold tracking-widest focus:outline-none focus:border-cyan-400"
+      />
+    </div>
+
+    <div>
+      <label className="block text-xs font-semibold text-zinc-300 mb-1">New Password</label>
+      <input 
+        type="password" 
+        required
+        value={newPassword} 
+        onChange={(e) => setNewPassword(e.target.value)}
+        placeholder="••••••••"
+        className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
+      />
+    </div>
+
+    <button
+      type="submit"
+      className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-2"
+    >
+      Reset Password
+    </button>
+  </form>
+)}
+
+
+
+
+
   // State to toggle between "services" and "contact" view on the main page
   const [mainView, setMainView] = useState('servicios'); // 'servicios' or 'contacto'
   
@@ -78,6 +151,8 @@ const handlePasswordReset = async (e) => {
   const [authError, setAuthError] = useState('');
   const [authView, setAuthView] = useState('login'); // 'login' o 'forgot'
   const [authLoading, setAuthLoading] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+const [newPassword, setNewPassword] = useState('');
 
   // State for gallery modal (Lightbox)
   const [selectedImage, setSelectedImage] = useState(null);
