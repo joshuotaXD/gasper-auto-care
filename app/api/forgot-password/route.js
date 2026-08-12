@@ -2,6 +2,24 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
+// HTML template with the verification code design in English
+const getEmailTemplate = (code) => {
+  return `
+    <div style="background-color: #0f0f11; color: #ffffff; padding: 40px; font-family: sans-serif; border-radius: 16px; max-width: 500px; margin: auto;">
+      <h2 style="color: #06b6d4; font-size: 24px; margin-bottom: 16px;">Password Recovery</h2>
+      <p style="color: #a1a1aa; font-size: 14px; line-height: 1.5; margin-bottom: 24px;">
+        You have requested to reset your password on Gasper. Use the following verification code:
+      </p>
+      <div style="background-color: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <span style="color: #06b6d4; font-size: 36px; font-weight: bold; letter-spacing: 6px;">${code}</span>
+      </div>
+      <p style="color: #71717a; font-size: 12px;">
+        If you did not request this change, you can safely ignore this message.
+      </p>
+    </div>
+  `;
+};
+
 export async function POST(request) {
   try {
     const { email } = await request.json();
@@ -11,35 +29,26 @@ export async function POST(request) {
     const resendKey = process.env.RESEND_API_KEY;
 
     if (!supabaseUrl || !serviceKey || !resendKey) {
-      throw new Error('Faltan variables de entorno en el servidor.');
+      throw new Error('Missing server environment variables.');
     }
 
     const resend = new Resend(resendKey);
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
-    const { data, error } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
-    });
+    // Generate a 6-digit random numeric verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-    if (error) throw error;
-
-    const resetLink = data.properties.action_link;
+    // Optional: You can save this verificationCode in your database linked to the user 
+    // to validate it later when they enter the code in your frontend UI.
 
     await resend.emails.send({
       from: 'Gasper <onboarding@resend.dev>',
       to: [email],
-      subject: 'Restablece tu contraseña - Gasper',
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
-          <h2>¿Solicitaste restablecer tu contraseña?</h2>
-          <p>Haz clic en el siguiente botón para crear una nueva contraseña para tu cuenta:</p>
-          <a href="${resetLink}" style="background-color: #06b6d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px;">Restablecer Contraseña</a>
-        </div>
-      `,
+      subject: 'Password Recovery Code - Gasper',
+      html: getEmailTemplate(verificationCode),
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, code: verificationCode });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
