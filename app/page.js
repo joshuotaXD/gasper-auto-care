@@ -28,7 +28,7 @@ const guardarCita = async (datos) => {
   
   // State to toggle between social media cards in the contact view
   const [socialTab, setSocialTab] = useState('whatsapp'); // 'whatsapp' or 'instagram'
-f
+
   // States for the quote form
   const [vehicleType, setVehicleType] = useState('Mid-Sized SUV');
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
