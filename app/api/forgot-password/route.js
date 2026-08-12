@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-// HTML template with the verification code design in English
 const getEmailTemplate = (code) => {
   return `
     <div style="background-color: #0f0f11; color: #ffffff; padding: 40px; font-family: sans-serif; border-radius: 16px; max-width: 500px; margin: auto;">
@@ -35,25 +34,26 @@ export async function POST(request) {
     const resend = new Resend(resendKey);
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
-    // 1. Usamos Supabase para generar el código OTP de recuperación real
-    const { data, error } = await supabaseAdmin.auth.signInWithOtp({
+    // 1. Validar si el usuario existe en Supabase antes de enviar nada
+    const { data: users, error: userError } = await supabaseAdmin.auth.admin.listUsers();
+    const userExists = users?.users.some(u => u.email === email);
+
+    if (!userExists) {
+      return NextResponse.json({ error: 'No account found with this email.' }, { status: 400 });
+    }
+
+    // 2. Generar código de 6 dígitos
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 3. Generar el enlace de recuperación oficial de Supabase por debajo (para aprovechar su token seguro)
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'recovery',
       email: email,
-      options: {
-        shouldCreateUser: false, // Evita registrar cuentas nuevas si el correo no existe
-      },
     });
 
-    if (error) throw error;
+    if (linkError) throw linkError;
 
-    // Nota: Como Supabase envía su propio correo por defecto al usar signInWithOtp,
-    // para evitar que le llegue el correo feo de Supabase y mandarle SÓLO el tuyo de Resend,
-    // puedes configurar un "Custom Mailer" en Supabase o usar la generación de tokens por base de datos.
-    // Sin embargo, para capturar el código exacto que manda Supabase y pintarlo en tu diseño de Resend:
-    
-    // (Opcional si quieres usar un número aleatorio controlado por ti y validarlo manualmente en tu BD):
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);
-
-    // 2. Enviamos el correo exclusivamente con Resend usando tu diseño estilizado
+    // 4. Enviar el correo personalizado con Resend
     await resend.emails.send({
       from: 'Gasper <onboarding@resend.dev>',
       to: [email],
@@ -61,6 +61,8 @@ export async function POST(request) {
       html: getEmailTemplate(verificationCode),
     });
 
+    // Guardamos temporalmente el código generado en la respuesta o metadata si lo requieres,
+    // o puedes usar directamente el sistema nativo de recuperación de Supabase.
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
