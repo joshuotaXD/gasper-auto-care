@@ -11,6 +11,17 @@ export default function Home() {
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
 
+
+// Ejemplo: Guardar un registro en la tabla de citas
+const guardarCita = async (datos) => {
+  const { data, error } = await supabase
+    .from('citas') // Nombre de tu tabla en Supabase
+    .insert([datos]);
+    
+  if (error) console.error('Error:', error);
+  else alert('¡Cita guardada!');
+};
+
   
   // State to toggle between "services" and "contact" view on the main page
   const [mainView, setMainView] = useState('servicios'); // 'servicios' or 'contacto'
