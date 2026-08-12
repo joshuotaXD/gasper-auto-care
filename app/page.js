@@ -605,54 +605,96 @@ const handleForgotPassword = async (e) => {
           </div>
         </div>
 
-      ) : (
+    ) : authView === 'forgot' ? (
 
-        /* ---------------- VISTA 2: APARTADO LIMPIO DE RECUPERACIÓN ---------------- */
-        <form onSubmit={handlePasswordReset}>
-          <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-            Recovery
-          </span>
-          <h2 className="text-2xl font-bold mt-4 text-white">Reset Password</h2>
-          <p className="text-zinc-400 text-xs mt-1 mb-6">Enter your registered email to receive recovery instructions.</p>
+  /* ------------ VISTA 2: RECUPERACIÓN POR CORREO ------------ */
+  <form onSubmit={handlePasswordReset} className="space-y-4">
+    <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+      Recovery
+    </span>
+    <h2 className="text-2xl font-bold mt-4 text-white">Reset Password</h2>
+    <p className="text-zinc-400 text-xs mt-1 mb-6">Enter your registered email to receive recovery instructions.</p>
 
-          {successMessage && (
-  <div className="mb-4 bg-emerald-950/50 border border-emerald-800 text-emerald-400 text-xs p-3 rounded-xl text-center">
-    {successMessage}
-  </div>
+    {successMessage && (
+      <div className="mb-4 bg-emerald-950/50 border border-emerald-800 text-emerald-400 text-xs p-3 rounded-xl text-center">
+        {successMessage}
+      </div>
+    )}
+
+    <div className="space-y-4">
+      <div>
+        <label className="block text-xs font-semibold text-zinc-300 mb-1">Email</label>
+        <input 
+          type="email" 
+          required
+          value={resetEmail}
+          onChange={(e) => setResetEmail(e.target.value)}
+          placeholder="email@example.com"
+          className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
+        />
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-2"
+    >
+      Send Instructions
+    </button>
+
+    <button
+      type="button"
+      onClick={() => { setAuthView('login'); setAuthError(''); }}
+      className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold py-3 rounded-xl transition border border-zinc-700 mt-2"
+    >
+      Back to Sign In
+    </button>
+  </form>
+
+) : (
+
+  /* ------------ VISTA 3: VERIFICACIÓN DEL CÓDIGO DE 6 DÍGITOS ------------ */
+  <form onSubmit={handleVerifyAndReset} className="space-y-4">
+    <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+      Verification
+    </span>
+    <h2 className="text-2xl font-bold mt-4 text-white">Enter Code</h2>
+    <p className="text-zinc-400 text-xs mt-1 mb-6">Enter the 6-digit code sent to your email and your new password.</p>
+
+    <div>
+      <label className="block text-xs font-semibold text-zinc-300 mb-1">6-Digit Code</label>
+      <input 
+        type="text" 
+        maxLength={6}
+        required
+        value={verificationCode} 
+        onChange={(e) => setVerificationCode(e.target.value)}
+        placeholder="123456"
+        className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-center text-xl text-cyan-400 font-bold tracking-widest focus:outline-none focus:border-cyan-400"
+      />
+    </div>
+
+    <div>
+      <label className="block text-xs font-semibold text-zinc-300 mb-1">New Password</label>
+      <input 
+        type="password" 
+        required
+        value={newPassword} 
+        onChange={(e) => setNewPassword(e.target.value)}
+        placeholder="••••••••"
+        className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
+      />
+    </div>
+
+    <button
+      type="submit"
+      className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-2"
+    >
+      Reset Password
+    </button>
+  </form>
+
 )}
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1">Email</label>
-              <input 
-                type="email" 
-                required
-                value={resetEmail} 
-                onChange={(e) => setResetEmail(e.target.value)}
-                placeholder="email@example.com"
-                className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
-              />
-            </div>
-
-            <button 
-              type="submit" 
-              className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-2"
-            >
-              Send Instructions
-            </button>
-
-            {/* Botón limpio para regresar al login */}
-            <button 
-              type="button" 
-              onClick={() => { setAuthView('login'); setAuthError(''); }}
-              className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold py-3 rounded-xl transition border border-zinc-700"
-            >
-              Back to Sign In
-            </button>
-          </div>
-        </form>
-
-      )}
 
   
 </div>
