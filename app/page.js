@@ -35,7 +35,7 @@ const handlePasswordReset = async (e) => {
     setSuccessMessage('');
 
    try {
-      const response = await fetch('/api/recovery', { // Asegúrate de que apunte a tu ruta de API
+      const response = await fetch('/api/forgot-password', { // Asegúrate de que apunte a tu ruta de API
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: resetEmail }),
