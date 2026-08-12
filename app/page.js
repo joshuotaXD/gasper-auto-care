@@ -558,20 +558,7 @@ const handleForgotPassword = async (e) => {
       )}
 
   
-
-    {/* Enlace para registrarse (solo se muestra si estás en el login normal) */}
-    {authView === 'login' && (
-      <div className="mt-6 text-center text-xs text-zinc-400">
-        Don't have an account?{' '}
-        <button
-          onClick={() => { setActiveSection('register'); setAuthError(''); }}
-          className="text-cyan-400 font-bold hover:underline ml-1"
-        >
-          Register
-        </button>
-      </div>
-    )}
-  </div>
+</div>
 </section>
 
         ) : activeSection === 'register' ? (
