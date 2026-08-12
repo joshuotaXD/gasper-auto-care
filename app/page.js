@@ -30,22 +30,30 @@ const guardarCita = async (datos) => {
 
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
-  e.preventDefault();
-  setAuthError('');
-  try { 
-  const { error } = await supabase.auth.resetPasswordForEmail(identifier, {
-    redirectTo: `${window.location.origin}/update-password`,
-  });
+    e.preventDefault();
+    setAuthError('');
 
-  if (error) throw error;
-  alert('¡Revisa tu correo!');
-    setAuthView('login');
-  } catch (error) {
-    console.error("Error completo de Supabase:", error); // Esto te dirá exactamente el motivo del 400
-    setAuthError(error.message);
-  }
-};
+    // 1. Vamos a ver en la consola exactamente qué valor tiene el correo
+    console.log("Correo que se va a enviar:", resetEmail);
 
+    if (!resetEmail) {
+      setAuthError("Por favor ingresa un correo electrónico.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: window.location.origin,
+      });
+
+      if (error) throw error;
+      alert('¡Se han enviado las instrucciones a tu correo!');
+      setAuthView('login');
+    } catch (error) {
+      console.error("Error completo de Supabase:", error);
+      setAuthError(error.message);
+    }
+  };
   
   // State to toggle between "services" and "contact" view on the main page
   const [mainView, setMainView] = useState('servicios'); // 'servicios' or 'contacto'
