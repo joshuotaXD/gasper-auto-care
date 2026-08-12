@@ -28,7 +28,7 @@ const guardarCita = async (datos) => {
   
   // State to toggle between social media cards in the contact view
   const [socialTab, setSocialTab] = useState('whatsapp'); // 'whatsapp' or 'instagram'
-
+f
   // States for the quote form
   const [vehicleType, setVehicleType] = useState('Mid-Sized SUV');
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
@@ -171,29 +171,29 @@ const guardarCita = async (datos) => {
   };
 
   // Sign up asking for phone and saving it in Supabase metadata
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthLoading(true);
+ const handleRegister = async (e) => {
+  e.preventDefault();
+  setAuthError('');
+  setAuthLoading(true);
 
-    let signupEmail = identifier.trim();
-    let userPhone = phone.trim();
+  let signupEmail = identifier.trim();
+  let userPhone = phone.trim();
 
-    if (!signupEmail.includes('@')) {
-      userPhone = signupEmail;
-      signupEmail = `phone_${userPhone}@gasper.com`;
-    }
+  if (!signupEmail.includes('@')) {
+    userPhone = signupEmail;
+    signupEmail = `phone_${userPhone}@gasper.com`;
+  }
 
-    const { error } = await supabase.auth.signUp({
-      email: signupEmail,
-      password,
-      options: {
-        data: { 
-          full_name: fullName,
-          phone: userPhone 
-        }
+  const { error } = await supabase.auth.signUp({
+    email: signupEmail,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        phone: userPhone,
       }
-    });
+    }
+  });
 
     if (error) {
       setAuthError(error.message);
