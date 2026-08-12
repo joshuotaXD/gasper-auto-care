@@ -427,132 +427,131 @@ const handleForgotPassword = async (e) => {
 
         {/* CONDITIONAL CONTENT ACCORDING TO activeSection */}
 
-       {activeSection === 'login' ? (
-  <section className="px-6 py-20 max-w-md mx-auto">
-    <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-      
-      {authView === 'login' ? (
-        /* ================= VISTA DE LOGIN ================= */
-        <div>
-          <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-            Account Access
-          </span>
-          <h2 className="text-2xl font-bold mt-4 text-white">Sign In</h2>
+        {activeSection === 'login' ? (
+          <section className="px-6 py-20 max-w-md mx-auto">
+            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+                Account Access
+              </span>
+              <h2 className="text-2xl font-bold mt-4 text-white">Sign In</h2>
+              
+              {authError && (
+                <div className="mt-4 bg-red-950/50 border border-red-800 text-red-400 text-xs p-3 rounded-xl">
+                  {authError}
+                </div>
+              )}
 
-          {authError && (
-            <div className="mt-4 bg-red-950/50 border border-red-800 text-red-400 text-xs p-3 rounded-xl">
-              {authError}
-            </div>
-          )}
+              <form onSubmit={handleLogin} className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Email or Phone Number</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="email@example.com or +16154292253" 
+                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                  />
+                </div>
 
-          <form onSubmit={handleLogin} className="mt-6 space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1">Email or Phone Number</label>
-              <input 
-                type="text"
-                required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="email@example.com or +16154292253"
-                className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
-              />
-            </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Password</label>
+                  <div className="relative">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••" 
+                      className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400" 
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+                
+{/* Pégalo aquí */}
+<div className="mt-2 text-right">
+  <button 
+    type="button" 
+   onClick={() => { setAuthView('forgot'); setAuthError(''); }}
+    className="text-xs text-cyan-400 hover:underline bg-transparent border-none cursor-pointer"
+ >
+    Forgot Password?
+ </button>
+</div>
 
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1">Password</label>
-              <div className="relative">
-                <input 
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 pr-12 text-sm text-white focus:outline-none focus:border-cyan-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
-                >
-                  {showPassword ? 'Hide' : 'Show'}
-                </button>
-              </div>
-            </div>
 
-            <div className="mt-2 text-right">
-              <button
-                type="button"
-                onClick={() => { setAuthView('forgot'); setAuthError(''); }}
-                className="text-xs text-cyan-400 hover:underline bg-transparent border-none cursor-pointer"
-              >
-                Forgot Password?
-              </button>
-            </div>
+                <div className="pt-2">
+        <button
+          type="submit"
+          disabled={authLoading}
+          className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+        >
+          {authLoading ? 'Signing in...' : 'Enter'}
+        </button>
+      </div>
+    </form>
 
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
-              >
-                {authLoading ? 'Signing in...' : 'Enter'}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 text-center text-xs text-zinc-400">
-            Don't have an account?{' '}
-            <button
-              onClick={() => { setActiveSection('register'); setAuthError(''); }}
-              className="text-cyan-400 font-bold hover:underline ml-1"
-            >
-              Register
-            </button>
-          </div>
-        </div>
-      ) : (
-        /* ================= VISTA DE RECUPERACIÓN (APARTADO DIFERENTE) ================= */
-        <form onSubmit={handlePasswordReset}>
+    {/* APARTADO DE RECUPERACIÓN (SE MUESTRA SOLO SI DAS CLICK EN FORGOT PASSWORD) */}
+    {authView === 'forgot' && (
+      <form onSubmit={handlePasswordReset} className="mt-6 space-y-4">
+        <div className="border-t border-zinc-800 pt-6 mt-6">
           <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
             Recovery
           </span>
-          <h2 className="text-2xl font-bold mt-4 text-white">Reset Password</h2>
-          <p className="text-zinc-400 text-xs mt-1 mb-6">Enter your registered email to receive recovery instructions.</p>
+          <h3 className="text-xl font-bold mt-3 text-white">Reset Password</h3>
+          <p className="text-zinc-400 text-xs mt-1 mb-4">Enter your registered email to receive recovery instructions.</p>
           
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1">Email</label>
-              <input 
-                type="email" 
-                required
-                value={resetEmail} 
-                onChange={(e) => setResetEmail(e.target.value)}
-                placeholder="email@example.com"
-                className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
-              />
-            </div>
-
-            <button 
-              type="submit" 
-              className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-2"
-            >
-              Send Instructions
-            </button>
-
-            <button 
-              type="button" 
-              onClick={() => { setAuthView('login'); setAuthError(''); }}
-              className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold py-3 rounded-xl transition border border-zinc-700"
-            >
-              Back to Sign In
-            </button>
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 mb-1">Email</label>
+            <input 
+              type="email" 
+              required
+              value={identifier} 
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="email@example.com"
+              className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400"
+            />
           </div>
-        </form>
-      )}
 
-    </div>
-  </section>
-) : null}
+          <button 
+            type="submit" 
+            className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20 mt-4"
+          >
+            Send Instructions
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => { setAuthView('login'); setAuthError(''); }}
+            className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold py-2.5 rounded-xl transition border border-zinc-700 mt-2"
+          >
+            Back to Sign In
+          </button>
+        </div>
+      </form>
+    )}
+
+    {/* Enlace para registrarse (solo se muestra si estás en el login normal) */}
+    {authView === 'login' && (
+      <div className="mt-6 text-center text-xs text-zinc-400">
+        Don't have an account?{' '}
+        <button
+          onClick={() => { setActiveSection('register'); setAuthError(''); }}
+          className="text-cyan-400 font-bold hover:underline ml-1"
+        >
+          Register
+        </button>
+      </div>
+    )}
+  </div>
+</section>
 
         ) : activeSection === 'register' ? (
           <section className="px-6 py-20 max-w-md mx-auto">
@@ -1076,7 +1075,7 @@ const handleForgotPassword = async (e) => {
               </section>
             )}
           </>
-        )
+        )}
 
       </main>
     </>
