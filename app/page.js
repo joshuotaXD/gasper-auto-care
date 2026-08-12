@@ -34,8 +34,8 @@ const handlePasswordReset = async (e) => {
     setAuthError('');
     setSuccessMessage('');
 
-   try {
-      const response = await fetch('/api/forgot-password', { // Asegúrate de que apunte a tu ruta de API
+    try {
+      const response = await fetch('/api/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: resetEmail }),
@@ -44,10 +44,15 @@ const handlePasswordReset = async (e) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to send recovery code.');
 
-      // Mensaje de éxito en inglés directo en la UI
-      setSuccessMessage('Recovery instructions sent to your email!');
-      
-      // Opcional: limpiar el campo o cambiar de vista después de unos segundos
+      // 1. Muestra el mensaje de éxito en la interfaz
+      setSuccessMessage('Recovery code sent! Please check your email.');
+
+      // 2. Cambia a la siguiente vista de tu app donde pides ingresar el código
+      // (Asegúrate de que 'verify-code' sea el nombre de la vista para meter los 6 dígitos)
+      setTimeout(() => {
+        setAuthView('verify-code'); 
+      }, 1500); // Da un pequeño respiro de 1.5 segundos para que lea el mensaje
+
     } catch (error) {
       setAuthError(error.message);
     }
@@ -532,6 +537,12 @@ const handleForgotPassword = async (e) => {
           </span>
           <h2 className="text-2xl font-bold mt-4 text-white">Reset Password</h2>
           <p className="text-zinc-400 text-xs mt-1 mb-6">Enter your registered email to receive recovery instructions.</p>
+
+          {successMessage && (
+  <div className="mb-4 bg-emerald-950/50 border border-emerald-800 text-emerald-400 text-xs p-3 rounded-xl text-center">
+    {successMessage}
+  </div>
+)}
           
           <div className="space-y-4">
             <div>
