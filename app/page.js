@@ -7,13 +7,14 @@ import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
-const [authView, setAuthView] = useState('login'); // 'login' or 'forgot'
+
 
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
+
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
