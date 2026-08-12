@@ -455,6 +455,18 @@ const handleForgotPassword = async (e) => {
                     </button>
                   </div>
                 </div>
+                
+{/* Pégalo aquí */}
+<div className="mt-2 text-right">
+  <button 
+    type="button" 
+    onClick={handleForgotPassword}
+    className="text-xs text-cyan-400 hover:underline bg-transparent border-none cursor-pointer"
+ >
+    Forgot Password?
+ </button>
+</div>
+
 
                 <div className="pt-2">
                   <button 
