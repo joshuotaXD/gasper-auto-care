@@ -4,6 +4,9 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
+import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 
 export default function Home() {
@@ -207,6 +210,40 @@ const guardarCita = async (datos) => {
     }
     setAuthLoading(false);
   };
+
+
+const handleForgotPassword = async (e) => {
+  e.preventDefault();
+  setAuthError('');
+
+  if (!identifier) {
+    setAuthError('Por favor ingresa tu correo.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: identifier.trim() }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    alert('¡Correo de recuperación enviado con éxito!');
+  } catch (err) {
+    setAuthError(err.message);
+  }
+};
+
+
+
+
+
+
+
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
