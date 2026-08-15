@@ -115,14 +115,7 @@ const handlePasswordReset = async (e) => {
     }
   };
 
-  // Dentro de tu archivo app/page.js, por ejemplo en el footer o menú:
-<footer className="mt-10 text-center">
-  {/* Aquí agregas la línea con el href */}
-  <a href="/admin/reservations" className="text-gray-500 hover:text-white text-sm">
-    Ver Reservaciones (Admin)
-  </a>
-</footer>
-
+ 
   {authView === 'verify-code' && (
   <form onSubmit={handleVerifyAndReset} className="space-y-4">
     <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -200,6 +193,10 @@ const [newPassword, setNewPassword] = useState('');
     { label: 'Mid-Sized SUV', icon: '🚙' },
     { label: 'Large SUV/Truck', icon: '🚐' },
   ];
+
+  <a href="/admin/reservations" className="text-sm text-gray-300 hover:text-white transition">
+  Reservations
+</a>
 
   // List of gallery images based on provided files
   const galleryImages = [
