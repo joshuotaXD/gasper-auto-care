@@ -788,7 +788,7 @@ const handleForgotPassword = async (e) => {
           </section>
           
         ) : activeSection === 'cotizar' ? (
-          <section className="px-6 py-20 max-w-xl mx-auto">
+<section className="px-6 py-20 max-w-xl mx-auto">
   <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
     <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
       Appointment / Booking
@@ -835,23 +835,25 @@ const handleForgotPassword = async (e) => {
         )}
       </div>
 
-      {/* Selector de Fecha */}
+      {/* Selector de Fecha (Calendario forzado en Inglés usando lang="en") */}
       <div>
         <label className="block text-xs font-semibold text-zinc-300 mb-1">Select Date</label>
-        <input 
-          type="date" 
-          required
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 [color-scheme:dark]"
-        />
+        <div lang="en">
+          <input 
+            type="date" 
+            required
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 [color-scheme:dark]"
+          />
+        </div>
       </div>
 
-      {/* Selector de Horarios Disponibles */}
+      {/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
       <div>
-        <label className="block text-xs font-semibold text-zinc-300 mb-1">Available Time Slots</label>
+        <label className="block text-xs font-semibold text-zinc-300 mb-1">Available Time Slots (6:00 AM - 12:00 PM)</label>
         <div className="grid grid-cols-3 gap-2">
-          {['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM', '06:00 PM'].map((time) => (
+          {['06:00 AM', '08:00 AM', '10:00 AM', '12:00 PM'].map((time) => (
             <button
               key={time}
               type="button"
