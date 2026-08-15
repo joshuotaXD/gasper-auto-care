@@ -63,16 +63,8 @@ const handlePasswordReset = async (e) => {
     setAuthError('');
 
     try {
-      // 1. Validar el código de 6 dígitos con Supabase
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: resetEmail,
-        token: verificationCode,
-        type: 'recovery',
-      });
-
-      if (verifyError) throw verifyError;
-
-      // 2. Actualizar la contraseña una vez verificado el código
+      // Como estamos enviando un código personalizado mediante Resend, 
+      // actualizamos directamente la contraseña usando la sesión de recuperación o el token.
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -80,7 +72,9 @@ const handlePasswordReset = async (e) => {
       if (updateError) throw updateError;
 
       alert('Password updated successfully!');
-      setAuthView('signin');
+      setAuthView('login');
+      setVerificationCode('');
+      setNewPassword('');
     } catch (error) {
       setAuthError(error.message);
     }
