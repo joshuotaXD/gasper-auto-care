@@ -287,31 +287,43 @@ const [newPassword, setNewPassword] = useState('');
   </div>
 )}
   // Sign in with Email or Phone Number
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthLoading(true);
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setAuthError('');
+  setAuthLoading(true);
 
-    let loginEmail = identifier.trim();
-    
-    if (!loginEmail.includes('@')) {
-      loginEmail = `phone_${loginEmail}@gasper.com`;
-    }
+  let loginEmail = identifier.trim();
 
-    const { error } = await supabase.auth.signInWithPassword({ 
-      email: loginEmail, 
-      password 
-    });
-    
-    if (error) {
-      setAuthError('Incorrect credentials or unregistered user.');
-    } else {
-      setActiveSection('inicio');
-      setIdentifier('');
-      setPassword('');
+  // Si el usuario ingresó un teléfono (no tiene '@'), buscamos su correo real en la tabla profiles
+  if (!loginEmail.includes('@')) {
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('phone', loginEmail)
+      .single();
+
+    if (profileError || !profileData) {
+      setAuthError('Número de teléfono no encontrado o no registrado.');
+      setAuthLoading(false);
+      return;
     }
-    setAuthLoading(false);
-  };
+    loginEmail = profileData.email; // Usamos el correo real encontrado en la base de datos
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: loginEmail,
+    password,
+  });
+
+  if (error) {
+    setAuthError('Incorrect credentials or unregistered user.');
+  } else {
+    setActiveSection('inicio');
+    setIdentifier('');
+    setPassword('');
+  }
+  setAuthLoading(false);
+};
 
   // Sign up asking for phone and saving it in Supabase metadata
  const handleRegister = async (e) => {
