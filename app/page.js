@@ -339,16 +339,23 @@ const [newPassword, setNewPassword] = useState('');
     signupEmail = `phone_${userPhone}@gasper.com`;
   }
 
-  const { error } = await supabase.auth.signUp({
-    email: signupEmail,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        phone: userPhone,
-      }
+ const { data, error } = await supabase.auth.signUp({
+  email: signupEmail,
+  password,
+  options: {
+    data: {
+      full_name: fullName,
+      phone: userPhone,
     }
-  });
+  }
+});
+
+if (error) {
+  console.error("Error detallado al registrarse:", error); // <--- Añade esto
+  setAuthError(error.message);
+  setAuthLoading(false);
+  return;
+}git 
 
     if (error) {
       setAuthError(error.message);
