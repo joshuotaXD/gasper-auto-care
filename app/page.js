@@ -29,6 +29,40 @@ const guardarCita = async (datos) => {
   else alert('¡Cita guardada!');
 };
 
+
+const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validar que haya seleccionado fecha y hora
+    if (!selectedDate || !selectedTime) {
+      alert('Please select a date and an available time slot.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .insert([
+          {
+            service_name: selectedServiceToQuote || 'General Service',
+            vehicle_type: vehicleType,
+            booking_date: selectedDate,
+            booking_time: selectedTime,
+            client_name: user ? (user.user_metadata?.full_name || 'User') : e.target.elements.clientName?.value || 'Guest',
+            client_contact: user ? user.email : e.target.elements.clientContact?.value || 'N/A',
+            user_id: user ? user.id : null
+          }
+        ]);
+
+      if (error) throw error;
+
+      alert('Booking confirmed successfully!');
+      setActiveSection('inicio');
+    } catch (error) {
+      alert('Error saving booking: ' + error.message);
+    }
+  };
+  
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
     e.preventDefault();
