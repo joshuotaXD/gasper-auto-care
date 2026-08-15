@@ -4,7 +4,9 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-
+import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 
 
@@ -28,38 +30,38 @@ const guardarCita = async (datos) => {
 };
 
 
-const handleConfirmBooking = async (e) => {
+const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    
-    const response = await fetch('/api/bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: nameState,
-        vehicleType: vehicleState,
-        date: dateState,
-        timeSlot: timeSlotState
-      })
-    });
 
-    const result = await response.json();
-    if (result.success) {
-      alert("Booking confirmed successfully!");
-    } else {
-      alert("Error: " + result.error);
+    // Validar que haya seleccionado fecha y hora
+    if (!selectedDate || !selectedTime) {
+      alert('Please select a date and an available time slot.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .insert([
+          {
+            service_name: selectedServiceToQuote || 'General Service',
+            vehicle_type: vehicleType,
+            booking_date: selectedDate,
+            booking_time: selectedTime,
+            client_name: user ? (user.user_metadata?.full_name || 'User') : e.target.elements.clientName?.value || 'Guest',
+            client_contact: user ? user.email : e.target.elements.clientContact?.value || 'N/A',
+            user_id: user ? user.id : null
+          }
+        ]);
+
+      if (error) throw error;
+
+      alert('Booking confirmed successfully!');
+      setActiveSection('inicio');
+    } catch (error) {
+      alert('Error saving booking: ' + error.message);
     }
   };
-
-  return (
-    <main>
-      {/* Tu formulario conecta el botón o el submit aquí */}
-      <form onSubmit={handleConfirmBooking}>
-        {/* Tus inputs irían aquí vinculados a sus respectivos estados */}
-        <button type="submit">Reservar</button>
-      </form>
-    </main>
-  );
-}
 
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
@@ -113,7 +115,8 @@ const handlePasswordReset = async (e) => {
     }
   };
 
- 
+  
+
   {authView === 'verify-code' && (
   <form onSubmit={handleVerifyAndReset} className="space-y-4">
     <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -191,10 +194,6 @@ const [newPassword, setNewPassword] = useState('');
     { label: 'Mid-Sized SUV', icon: '🚙' },
     { label: 'Large SUV/Truck', icon: '🚐' },
   ];
-
-  <a href="/admin/reservations" className="text-sm text-gray-300 hover:text-white transition">
-  Reservations
-</a>
 
   // List of gallery images based on provided files
   const galleryImages = [
@@ -1337,3 +1336,4 @@ const handleForgotPassword = async (e) => {
       </main>
     </>
   );
+}
