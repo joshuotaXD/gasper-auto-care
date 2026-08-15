@@ -62,7 +62,7 @@ const handleBookingSubmit = async (e) => {
       alert('Error saving booking: ' + error.message);
     }
   };
-  
+
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
     e.preventDefault();
@@ -115,6 +115,13 @@ const handlePasswordReset = async (e) => {
     }
   };
 
+  // Dentro de tu archivo app/page.js, por ejemplo en el footer o menú:
+<footer className="mt-10 text-center">
+  {/* Aquí agregas la línea con el href */}
+  <a href="/admin/reservations" className="text-gray-500 hover:text-white text-sm">
+    Ver Reservaciones (Admin)
+  </a>
+</footer>
 
   {authView === 'verify-code' && (
   <form onSubmit={handleVerifyAndReset} className="space-y-4">
