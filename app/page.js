@@ -16,7 +16,8 @@ export default function Home() {
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
   const [resetEmail, setResetEmail] = useState('');
 const [successMessage, setSuccessMessage] = useState('');
-
+const [selectedDate, setSelectedDate] = useState('');
+const [selectedTime, setSelectedTime] = useState('');
 
 // Ejemplo: Guardar un registro en la tabla de citas
 const guardarCita = async (datos) => {
@@ -785,88 +786,125 @@ const handleForgotPassword = async (e) => {
               </div>
             </div>
           </section>
+          
         ) : activeSection === 'cotizar' ? (
           <section className="px-6 py-20 max-w-xl mx-auto">
-            <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-              <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
-                Appointment / Quote Request
-              </span>
-              <h2 className="text-2xl font-bold mt-4 text-white">Quote: {selectedServiceToQuote || 'General Service'}</h2>
-              
-              <form onSubmit={(e) => { e.preventDefault(); alert('Request sent successfully!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
-                
-                <div className="relative">
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
-                  <div 
-                    onClick={() => setIsVehicleDropdownOpen(!isVehicleDropdownOpen)}
-                    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between cursor-pointer hover:border-cyan-400 transition"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-cyan-400 text-base">
-                        {vehicleType === 'Coupe/Sedan' ? '🚗' : vehicleType === 'Mid-Sized SUV' ? '🚙' : '🚐'}
-                      </span>
-                      <span>{vehicleType}</span>
-                    </div>
-                    <span className={`transform transition-transform duration-300 text-zinc-400 ${isVehicleDropdownOpen ? 'rotate-180' : ''}`}>
-                      ⌄
-                    </span>
-                  </div>
+  <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+    <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
+      Appointment / Booking
+    </span>
+    <h2 className="text-2xl font-bold mt-4 text-white">Book: {selectedServiceToQuote || 'General Service'}</h2>
 
-                  {isVehicleDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#16181d] border border-zinc-700 rounded-xl overflow-hidden shadow-2xl z-20">
-                      {vehicleOptions.map((option) => (
-                        <div
-                          key={option.label}
-                          onClick={() => {
-                            setVehicleType(option.label);
-                            setIsVehicleDropdownOpen(false);
-                          }}
-                          className={`px-4 py-3 text-sm flex items-center gap-2 cursor-pointer transition ${
-                            vehicleType === option.label ? 'bg-cyan-500/20 text-cyan-400 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
-                          }`}
-                        >
-                          <span>{option.icon}</span>
-                          <span>{option.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+    <form onSubmit={(e) => { e.preventDefault(); alert('Booking confirmed successfully!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
+      {/* Selector de Vehículo */}
+      <div className="relative">
+        <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
+        <div 
+          onClick={() => setIsVehicleDropdownOpen(!isVehicleDropdownOpen)}
+          className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between cursor-pointer hover:border-cyan-400 transition"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-cyan-400 text-base">
+              {vehicleType === 'Coupe/Sedan' ? '🚗' : vehicleType === 'Mid-Sized SUV' ? '🚙' : '🚐'}
+            </span>
+            <span>{vehicleType}</span>
+          </div>
+          <span className={`transform transition-transform duration-300 text-zinc-400 ${isVehicleDropdownOpen ? 'rotate-180' : ''}`}>
+            v
+          </span>
+        </div>
 
-                {user ? (
-                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
-                    <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Your account details:</p>
-                    <p className="text-sm font-bold text-white mt-1">👤 {user.user_metadata?.full_name || 'User'}</p>
-                    <p className="text-sm text-zinc-300">📧 {user.email?.startsWith('phone_') ? 'Registered phone' : user.email}</p>
-                    {user.user_metadata?.phone && (
-                      <p className="text-sm text-zinc-300">📞 {user.user_metadata.phone}</p>
-                    )}
-                    <p className="text-xs text-cyan-400 mt-2">✓ Your details will be used automatically for this appointment.</p>
-                  </div>
-                ) : (
-                  <>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Your Name *</label>
-                      <input type="text" required placeholder="E.g. John Smith" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number or Email *</label>
-                      <input type="text" required placeholder="E.g. +1 615 429 2253 or email@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
-                    </div>
-                  </>
-                )}
+        {isVehicleDropdownOpen && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-[#16181d] border border-zinc-700 rounded-xl overflow-hidden shadow-2xl z-20">
+            {vehicleOptions.map((option) => (
+              <div
+                key={option.label}
+                onClick={() => {
+                  setVehicleType(option.label);
+                  setIsVehicleDropdownOpen(false);
+                }}
+                className={`px-4 py-3 text-sm flex items-center gap-2 cursor-pointer transition ${
+                  vehicleType === option.label ? 'bg-cyan-500/20 text-cyan-400 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
+                }`}
+              >
+                <span>{option.icon}</span>
+                <span>{option.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-                <div className="pt-4 flex gap-3">
-                  <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
-                    Send Quote Request
-                  </button>
-                  <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-5 py-3 rounded-xl transition">
-                    Back
-                  </button>
-                </div>
-              </form>
-            </div>
-          </section>
+      {/* Selector de Fecha */}
+      <div>
+        <label className="block text-xs font-semibold text-zinc-300 mb-1">Select Date</label>
+        <input 
+          type="date" 
+          required
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 [color-scheme:dark]"
+        />
+      </div>
+
+      {/* Selector de Horarios Disponibles */}
+      <div>
+        <label className="block text-xs font-semibold text-zinc-300 mb-1">Available Time Slots</label>
+        <div className="grid grid-cols-3 gap-2">
+          {['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM', '06:00 PM'].map((time) => (
+            <button
+              key={time}
+              type="button"
+              onClick={() => setSelectedTime(time)}
+              className={`py-2 text-xs font-bold rounded-xl border transition ${
+                selectedTime === time 
+                  ? 'bg-cyan-500 text-black border-cyan-400 shadow-lg shadow-cyan-500/20' 
+                  : 'bg-[#0F0F11] text-zinc-300 border-zinc-700 hover:border-zinc-500'
+              }`}
+            >
+              {time}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Datos del usuario */}
+      {user ? (
+        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
+          <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Your account details:</p>
+          <p className="text-sm font-bold text-white mt-1">{user.user_metadata?.full_name || 'User'}</p>
+          <p className="text-sm text-zinc-300">{user.email?.startsWith('phone_') ? 'Registered phone' : user.email}</p>
+          {user.user_metadata?.phone && (
+            <p className="text-sm text-zinc-300">📞 {user.user_metadata.phone}</p>
+          )}
+          <p className="text-xs text-cyan-400 mt-2">✓ Your details will be used automatically for this appointment.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 mb-1">Your Name *</label>
+            <input type="text" required placeholder="E.g. John Smith" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number or Email *</label>
+            <input type="text" required placeholder="E.g. +1 615 429 2253 or email@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+          </div>
+        </div>
+      )}
+
+      {/* Botones de Acción */}
+      <div className="pt-4 flex gap-3">
+        <button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
+          Confirm Booking
+        </button>
+        <button type="button" onClick={() => setActiveSection('inicio')} className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-6 py-3 rounded-xl transition border border-zinc-700">
+          Back
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+          
         ) : activeSection === 'galeria' ? (
           <section className="px-6 py-20 max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-16">
