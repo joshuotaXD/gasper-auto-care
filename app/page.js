@@ -4,9 +4,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import { createClient } from '@supabase/supabase-js';
+
 
 
 
