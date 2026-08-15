@@ -11,12 +11,22 @@ const supabase = createClient(
 export async function POST(request) {
   try {
     const data = await request.json();
-    const { name, vehicleType, date, timeslot } = data;
+    const { name, phone, address, vehicleType, serviceName, price, date, timeslot } = data;
 
-    // 1. Guardar en Supabase (agregamos .select() para forzar la ejecución)
+    // 1. Guardar en Supabase usando los nombres exactos de columnas
     const { error: dbError } = await supabase
       .from('bookings')
-      .insert([{ name, vehicle_type: vehicleType, date, time_slot: timeslot }])
+      .insert([{ 
+        customer_name: name, 
+        customer_phone: phone, 
+        address: address,
+        vehicle_type: vehicleType, 
+        service_name: serviceName,
+        price: price ? parseFloat(price) : null,
+        booking_date: date, 
+        booking_time: timeslot,
+        status: 'pending' // Estado inicial por defecto
+      }])
       .select();
 
     if (dbError) {
@@ -25,20 +35,27 @@ export async function POST(request) {
     }
 
     // 2. Enviar correo con Resend
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: 'tu-correo@ejemplo.com', // Asegúrate de poner tu correo real aquí
-      subject: `Nueva Reserva: ${vehicleType || 'Auto Detailing'}`,
-      html: `
-        <h2>Tienes una nueva reserva!</h2>
-        <p><strong>Cliente:</strong> ${name}</p>
-        <p><strong>Vehículo:</strong> ${vehicleType}</p>
-        <p><strong>Fecha:</strong> ${date}</p>
-        <p><strong>Hora:</strong> ${timeslot}</p>
-      `,
-    });
+    try {
+      await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: 'tu-correo@ejemplo.com', // Pon aquí tu correo para recibir las alertas
+        subject: `Nueva Reserva: ${serviceName || 'Auto Detailing'}`,
+        html: `
+          <h2>¡Tienes una nueva reserva!</h2>
+          <p><strong>Cliente:</strong> ${name}</p>
+          <p><strong>Teléfono:</strong> ${phone}</p>
+          <p><strong>Dirección:</strong> ${address}</p>
+          <p><strong>Vehículo:</strong> ${vehicleType}</p>
+          <p><strong>Servicio:</strong> ${serviceName}</p>
+          <p><strong>Precio:</strong> $${price || '0'}</p>
+          <p><strong>Fecha y Hora:</strong> ${date} a las ${timeslot}</p>
+        `,
+      });
+    } catch (emailErr) {
+      console.error("Error al enviar correo:", emailErr);
+    }
 
-    return NextResponse.json({ success: true, message: "Reserva guardada y correo enviado" });
+    return NextResponse.json({ success: true, message: "Reserva guardada con éxito" });
 
   } catch (error) {
     console.error("Error general:", error);
