@@ -835,17 +835,57 @@ const handleForgotPassword = async (e) => {
         )}
       </div>
 
-      {/* Selector de Fecha (Calendario forzado en Inglés usando lang="en") */}
-      <div>
-        <label className="block text-xs font-semibold text-zinc-300 mb-1">Select Date</label>
-        <div lang="en">
-          <input 
-            type="date" 
-            required
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 [color-scheme:dark]"
-          />
+      {/* CALENDARIO INTERACTIVO EN TIEMPO REAL (En Inglés) */}
+      <div className="bg-[#0F0F11] border border-zinc-700 rounded-2xl p-4">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-sm font-bold text-white">
+            {new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+          </span>
+          <span className="text-xs text-cyan-400 font-semibold">{selectedDate ? `Selected: ${selectedDate}` : 'Select a date'}</span>
+        </div>
+
+        {/* Días de la semana en Inglés */}
+        <div className="grid grid-cols-7 gap-1 text-center mb-2">
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+            <span key={day} className="text-[10px] font-bold text-zinc-500 uppercase">{day}</span>
+          ))}
+        </div>
+
+        {/* Generador dinámico de días del mes actual */}
+        <div className="grid grid-cols-7 gap-1">
+          {(() => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Ajustar para que empiece en Lunes
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            
+            const days = [];
+            // Espacios vacíos antes del primer día del mes
+            for (let i = 0; i < firstDayIndex; i++) {
+              days.push(<div key={`empty-${i}`} />);
+            }
+            // Días del mes
+            for (let d = 1; d <= totalDays; d++) {
+              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+              const isSelected = selectedDate === dateStr;
+              days.push(
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setSelectedDate(dateStr)}
+                  className={`py-2 text-xs rounded-xl font-semibold transition ${
+                    isSelected 
+                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20' 
+                      : 'text-zinc-300 hover:bg-zinc-800'
+                  }`}
+                >
+                  {d}
+                </button>
+              );
+            }
+            return days;
+          })()}
         </div>
       </div>
 
