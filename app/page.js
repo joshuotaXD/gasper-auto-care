@@ -30,38 +30,38 @@ const guardarCita = async (datos) => {
 };
 
 
-const handleBookingSubmit = async (e) => {
+const handleConfirmBooking = async (e) => {
     e.preventDefault();
+    
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: nameState,
+        vehicleType: vehicleState,
+        date: dateState,
+        timeSlot: timeSlotState
+      })
+    });
 
-    // Validar que haya seleccionado fecha y hora
-    if (!selectedDate || !selectedTime) {
-      alert('Please select a date and an available time slot.');
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('appointments')
-        .insert([
-          {
-            service_name: selectedServiceToQuote || 'General Service',
-            vehicle_type: vehicleType,
-            booking_date: selectedDate,
-            booking_time: selectedTime,
-            client_name: user ? (user.user_metadata?.full_name || 'User') : e.target.elements.clientName?.value || 'Guest',
-            client_contact: user ? user.email : e.target.elements.clientContact?.value || 'N/A',
-            user_id: user ? user.id : null
-          }
-        ]);
-
-      if (error) throw error;
-
-      alert('Booking confirmed successfully!');
-      setActiveSection('inicio');
-    } catch (error) {
-      alert('Error saving booking: ' + error.message);
+    const result = await response.json();
+    if (result.success) {
+      alert("Booking confirmed successfully!");
+    } else {
+      alert("Error: " + result.error);
     }
   };
+
+  return (
+    <main>
+      {/* Tu formulario conecta el botón o el submit aquí */}
+      <form onSubmit={handleConfirmBooking}>
+        {/* Tus inputs irían aquí vinculados a sus respectivos estados */}
+        <button type="submit">Reservar</button>
+      </form>
+    </main>
+  );
+}
 
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
@@ -1339,4 +1339,3 @@ const handleForgotPassword = async (e) => {
       </main>
     </>
   );
-}
