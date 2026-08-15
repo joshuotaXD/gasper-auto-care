@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient'; // Ajusta la ruta a tu cliente de supabase
+
+import { supabase } from '@/lib/supabase'; // Ajusta la ruta a tu cliente de supabase
 
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState([]);
