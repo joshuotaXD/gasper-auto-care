@@ -18,7 +18,10 @@ export default function Home() {
 const [successMessage, setSuccessMessage] = useState('');
 const [selectedDate, setSelectedDate] = useState('');
 const [selectedTime, setSelectedTime] = useState('');
-
+const [authView, setAuthView] = useState('login');
+const [password, setPassword] = useState('');
+const [identifier, setIdentifier] = useState('');
+const [bookingMessage, setBookingMessage] = useState(null); // { type: 'success' | 'error', text: '...' }
 // Ejemplo: Guardar un registro en la tabla de citas
 const guardarCita = async (datos) => {
   const { data, error } = await supabase
@@ -31,67 +34,68 @@ const guardarCita = async (datos) => {
 
 
 const handleBookingSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Validar que haya seleccionado fecha y hora
-    if (!selectedDate || !selectedTime) {
-      alert('Please select a date and an available time slot.');
-      return;
+  if (!selectedDate || !selectedTime) {
+    setBookingMessage({ type: 'error', text: 'Please select a date and an available time slot.' });
+    return;
+  }
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const payload = {
+      service_name: selectedServiceToQuote || 'General Service',
+      vehicle_type: vehicleType,
+      booking_date: selectedDate,
+      booking_time: selectedTime,
+      client_name: user?.user_metadata?.full_name || user?.email || 'User',
+      client_contact: user?.phone || user?.user_metadata?.phone || '9983945580', 
+      user_id: user?.id || null
+    };
+
+    const { error } = await supabase
+      .from('appointments')
+      .insert([payload]);
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      setBookingMessage({ type: 'error', text: 'Error saving appointment: ' + error.message });
+    } else {
+      setBookingMessage({ type: 'success', text: 'Appointment booked successfully!' });
+      setTimeout(() => {
+        setActiveSection('inicio');
+      }, 2000); // Te regresa al inicio después de 2 segundos de mostrar el mensaje
     }
-
-    try {
-      const { error } = await supabase
-        .from('appointments')
-        .insert([
-          {
-            service_name: selectedServiceToQuote || 'General Service',
-            vehicle_type: vehicleType,
-            booking_date: selectedDate,
-            booking_time: selectedTime,
-            client_name: user ? (user.user_metadata?.full_name || 'User') : e.target.elements.clientName?.value || 'Guest',
-            client_contact: user ? user.email : e.target.elements.clientContact?.value || 'N/A',
-            user_id: user ? user.id : null
-          }
-        ]);
-
-      if (error) throw error;
-
-      alert('Booking confirmed successfully!');
-      setActiveSection('inicio');
-    } catch (error) {
-      alert('Error saving booking: ' + error.message);
-    }
-  };
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    setBookingMessage({ type: 'error', text: 'An unexpected error occurred.' });
+  }
+};
 
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    setSuccessMessage('');
+  e.preventDefault();
+  setAuthError('');
+  setSuccessMessage('');
 
-    try {
-      const response = await fetch('/api/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resetEmail }),
-      });
+  try {
+    const response = await fetch('/api/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: resetEmail }),
+    });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to send recovery code.');
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to send recovery code.');
 
-      // 1. Muestra el mensaje de éxito en la interfaz
-      setSuccessMessage('Recovery code sent! Please check your email.');
+    // 1. Muestra el mensaje de éxito en la interfaz
+    setSuccessMessage('Recovery code sent successfully!');
 
-      // 2. Cambia a la siguiente vista de tu app donde pides ingresar el código
-      // (Asegúrate de que 'verify-code' sea el nombre de la vista para meter los 6 dígitos)
-      setTimeout(() => {
-        setAuthView('verify-code'); 
-      }, 1500); // Da un pequeño respiro de 1.5 segundos para que lea el mensaje
-
-    } catch (error) {
-      setAuthError(error.message);
-    }
-  };
+  } catch (error) { // <--- ESTO ES LO QUE FALTA
+    setAuthError(error.message);
+  }
+};
   
  const handleVerifyAndReset = async (e) => {
     e.preventDefault();
@@ -174,14 +178,13 @@ const handlePasswordReset = async (e) => {
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false);
 
   // Authentication states (Supabase)
-  const [identifier, setIdentifier] = useState(''); // Can be email or phone number
-  const [password, setPassword] = useState('');
+   // Can be email or phone number
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState('');
-  const [authView, setAuthView] = useState('login'); // 'login' o 'forgot'
+// 'login' o 'forgot'
   const [authLoading, setAuthLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
 const [newPassword, setNewPassword] = useState('');
@@ -296,11 +299,11 @@ const [newPassword, setNewPassword] = useState('');
 
   // Si el usuario ingresó un teléfono (no tiene '@'), buscamos su correo real en la tabla profiles
   if (!loginEmail.includes('@')) {
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('email')
-      .eq('phone', loginEmail)
-      .single();
+   const { data: profileData, error: profileError } = await supabase
+  .from('profiles')
+  .select('email')
+  .eq('phone', loginEmail)
+  .maybeSingle(); // <--- Así
 
     if (profileError || !profileData) {
       setAuthError('Número de teléfono no encontrado o no registrado.');
@@ -355,7 +358,7 @@ if (error) {
   setAuthError(error.message);
   setAuthLoading(false);
   return;
-}git 
+}
 
     if (error) {
       setAuthError(error.message);
@@ -849,7 +852,19 @@ const handleForgotPassword = async (e) => {
     </span>
     <h2 className="text-2xl font-bold mt-4 text-white">Book: {selectedServiceToQuote || 'General Service'}</h2>
 
-    <form onSubmit={(e) => { e.preventDefault(); alert('Booking confirmed successfully!'); setActiveSection('inicio'); }} className="mt-6 space-y-4">
+   <form onSubmit={handleBookingSubmit} className="mt-6 space-y-4">
+{/* Pégalo aquí */}
+  {bookingMessage && (
+    <div className={`p-3 rounded-xl text-xs font-semibold ${
+      bookingMessage.type === 'success' 
+        ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-400' 
+        : 'bg-red-950/50 border border-red-800 text-red-400'
+    }`}>
+      {bookingMessage.text}
+    </div>
+  )}
+
+
       {/* Selector de Vehículo */}
       <div className="relative">
         <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
