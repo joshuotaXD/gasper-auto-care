@@ -537,6 +537,8 @@ const handleForgotPassword = async (e) => {
                 <button
                   onClick={() => setActiveSection('perfil')}
                   className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition hidden md:inline cursor-pointer">
+                  
+                    Hello, {user.user_metedata.full_name || user.email || 'User'}
                 </button>
                 <button 
                   onClick={handleLogout}
