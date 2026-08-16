@@ -579,7 +579,7 @@ const handleForgotPassword = async (e) => {
             </span>
           </div>
 
-          <nav className="hidden md:flex items-center pl-12 md:pl-24 ml-8 md:ml-16">
+        <nav className="flex flex-col md:flex-row items-center gap-2 md:pl-12">
             <button 
               onClick={() => setActiveSection('galeria')}
               className={`relative px-5 py-2 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg animate-pulse ${
@@ -592,7 +592,7 @@ const handleForgotPassword = async (e) => {
             </button>
           </nav>
 
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
             {user ? (
              <div className="flex items-center gap-3">
         <button
@@ -1336,7 +1336,7 @@ const handleForgotPassword = async (e) => {
                       key={service.id}
                       className={`bg-[#16181d] border-2 ${service.borderColor} rounded-2xl overflow-hidden transition shadow-lg`}
                     >
-                      <div className="px-5 py-4 flex items-center justify-between">
+                    <div className="px-4 py-4 sm:px-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-400/50 flex-shrink-0 bg-black">
                             <Image
@@ -1355,7 +1355,7 @@ const handleForgotPassword = async (e) => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                    <div className="w-full md:w-auto flex flex-wrap sm:flex-nowrap items-center justify-between md:justify-end gap-3 mt-3 md:mt-0">
                           <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
                             <span>⏱️</span>
                             <span>{service.time}</span>
@@ -1406,7 +1406,7 @@ const handleForgotPassword = async (e) => {
                   </p>
                   
                   {/* Tab selector for Social Media / Contact Channels */}
-                  <div className="mt-8 flex justify-center gap-2">
+                 <div className="mt-8 flex flex-wrap justify-center gap-2">
                     <button
                       onClick={() => setSocialTab('whatsapp')}
                       className={`px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 ${
@@ -1441,7 +1441,7 @@ const handleForgotPassword = async (e) => {
 
                {/* Dynamic Content Card according to socialTab */}
 {socialTab === 'whatsapp' ? (
-    <div className="mt-6 bg-[#11318] border border-zinc-700/80 rounded-3xl p-6 md:p-8 shadow-xl max-w-sm mx-auto flex flex-col items-center relative overflow-hidden group">
+   <div className="mt-6 mx-4 sm:mx-auto bg-[#111318] border border-zinc-700/80 rounded-3xl p-5 sm:p-8 shadow-xl max-w-sm flex flex-col items-center relative overflow-hidden group">
         <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-2 border-cyan-400/60 flex items-center justify-center shadow-md mb-4">
             <span className="text-2xl">👤</span>
         </div>
