@@ -41,50 +41,30 @@ const guardarCita = async (datos) => {
 const handleBookingSubmit = async (e) => {
   e.preventDefault();
 
-  if (!selectedDate || !selectedTime) {
-    setBookingMessage({ type: 'error', text: 'Please select a date and an available time slot.' });
-    return;
-  }
-
-  // Validación opcional por si el input de dirección está vacío
-  if (!clientAddress || !clientAddress.trim()) {
-    setBookingMessage({ type: 'error', text: 'Please enter your address.' });
-    return;
-  }
-
   try {
     const { data: { user } } = await supabase.auth.getUser();
-
-    const finalName = clientName || user?.user_metadata?.full_name || user?.email || 'User';
-    const finalContact = clientContact || user?.phone || user?.user_metadata?.phone || '9983945580';
+    
+    // Si no es usuario, usamos la dirección que escribió en el input.
+    // Si es usuario, usamos la dirección de su perfil o la que escribió si la cambió.
+    const finalAddress = address; 
 
     const payload = {
-      service_name: selectedServiceToQuote || 'General Service',
-      vehicle_type: vehicleType,
+      service_name: selectedServiceToQuote,
       booking_date: selectedDate,
       booking_time: selectedTime,
-      client_name: finalName,
-      client_contact: finalContact,
-      client_address: clientAddress, // <-- Dirección añadida
+      client_name: user ? user.user_metadata.full_name : clientName,
+      client_contact: user ? user.user_metadata.phone : clientContact,
+      client_address: finalAddress, // Esta es la columna nueva que creamos
       user_id: user?.id || null
     };
 
-    const { error } = await supabase
-      .from('appointments')
-      .insert([payload]);
-
-    if (error) {
-      console.error("Supabase Error:", error);
-      setBookingMessage({ type: 'error', text: 'Error saving appointment: ' + error.message });
-    } else {
-      setBookingMessage({ type: 'success', text: 'Appointment booked successfully!' });
-      setTimeout(() => {
-        setActiveSection('inicio');
-      }, 2000); // Te regresa al inicio después de 2 segundos de mostrar el mensaje
-    }
+    const { error } = await supabase.from('appointments').insert([payload]);
+    
+    if (error) throw error;
+    
+    setBookingMessage({ type: 'success', text: 'Appointment booked!' });
   } catch (err) {
-    console.error("Unexpected error:", err);
-    setBookingMessage({ type: 'error', text: 'An unexpected error occurred.' });
+    setBookingMessage({ type: 'error', text: err.message });
   }
 };
 
@@ -1028,6 +1008,18 @@ const handleForgotPassword = async (e) => {
           <div>
             <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number or Email *</label>
             <input type="text" required placeholder="E.g. +1 615 429 2253 or email@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 mb-1">Address *</label>
+            <input 
+              type="text" 
+              required 
+              value={clientAddress} 
+              onChange={(e) => setClientAddress(e.target.value)} 
+              placeholder="E.g. 123 Main Street" 
+              className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+            />
           </div>
         </div>
       )}
