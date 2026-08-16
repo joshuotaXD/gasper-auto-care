@@ -281,8 +281,8 @@ const [newPassword, setNewPassword] = useState('');
     return () => subscription.unsubscribe();
   }, []);
 {/* Sección de Galería de Trabajos */}
-<section className="py-16 px-4 max-w-7xl mx-auto">
-  <div className="text-center mb-12">
+<section className="py-16 px-4 max-w-7xl mx-auto flex flex-col items-center">
+  <div className="flex flex-col items-center text-center mb-12">
     <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Nuestros Trabajos</h2>
     <p className="text-zinc-400 mt-2 text-sm md:text-base">Explora los resultados de nuestro detallado automotriz.</p>
   </div>
@@ -290,11 +290,11 @@ const [newPassword, setNewPassword] = useState('');
   {/* Grid que recorre tu arreglo galleryImages */}
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {galleryImages.map((img, index) => (
-      <div 
-        key={index} 
-        onClick={() => setSelectedImage(img)}
-        className="group relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-lg cursor-pointer transform transition duration-300 hover:scale-[1.02] hover:border-zinc-700"
-      >
+     <div
+  key={index}
+  onClick={() => setSelectedImage(img)}
+  className="group relative flex flex-col bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-lg cursor-pointer transform transition duration-300 hover:scale-[1.02] hover:border-zinc-700"
+>
         <div className="relative h-64 w-full overflow-hidden">
           <Image 
             src={img.src} 
@@ -315,7 +315,7 @@ const [newPassword, setNewPassword] = useState('');
 {/* Modal para ver la imagen en grande */}
 {selectedImage && (
   <div 
-    className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+ className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
     onClick={() => setSelectedImage(null)}
   >
     <div 
@@ -324,7 +324,7 @@ const [newPassword, setNewPassword] = useState('');
     >
       <button 
         onClick={() => setSelectedImage(null)}
-        className="absolute top-4 right-4 z-10 bg-zinc-800/80 hover:bg-zinc-700 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold transition"
+     className="absolute top-4 right-4 z-10 bg-zinc-800/80 hover:bg-zinc-700 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold transition"
       >
         ✕
       </button>
@@ -645,8 +645,7 @@ const handleForgotPassword = async (e) => {
     {profileMessage.text}
   </div>
 )}
-      
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">   
         <div>
           <label className="block text-xs font-semibold text-zinc-300 mb-1">Full Name</label>
           <input 
@@ -749,7 +748,7 @@ const handleForgotPassword = async (e) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-zinc-400 hover:text-white text-xs font-bold px-2 py-1"
                 >
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
