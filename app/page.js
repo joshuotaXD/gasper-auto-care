@@ -8,8 +8,6 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-
-
 export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
@@ -24,6 +22,9 @@ const [identifier, setIdentifier] = useState('');
 const [bookingMessage, setBookingMessage] = useState(null); // { type: 'success' | 'error', text: '...' }
 const [clientAddress, setClientAddress] = useState('');
 const [address, setAddress] = useState('');
+const [profileMessage, setProfileMessage] = useState({ text: '', type: '' });
+const [selectedVehicle, setSelectedVehicle] = useState('Coupe/Sedan');
+const today = new Date().toISOString().split('T')[0];
 
 
 
@@ -44,26 +45,36 @@ const handleBookingSubmit = async (e) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     
+    
     // Si no es usuario, usamos la dirección que escribió en el input.
     // Si es usuario, usamos la dirección de su perfil o la que escribió si la cambió.
     const finalAddress = address; 
 
-    const payload = {
+   const payload = {
       service_name: selectedServiceToQuote,
       booking_date: selectedDate,
       booking_time: selectedTime,
-      client_name: user ? user.user_metadata.full_name : clientName,
-      client_contact: user ? user.user_metadata.phone : clientContact,
-      client_address: finalAddress, // Esta es la columna nueva que creamos
+      vehicle_type: selectedVehicle, // 👈 Agregamos esta línea con tu estado real de vehículo
+      client_name: user ? user.user_metadata?.full_name : 'Invitado',
+      client_contact: user ? user.user_metadata?.phone : 'Sin contacto',
+      client_address: finalAddress,
       user_id: user?.id || null
     };
 
-    const { error } = await supabase.from('appointments').insert([payload]);
+   const { data, error } = await supabase.from('appointments').insert([payload]);
     
     if (error) throw error;
     
     setBookingMessage({ type: 'success', text: 'Appointment booked!' });
+setTimeout(() => {
+      setBookingMessage(null);
+      setActiveSection('inicio');
+    }, 1500);
+
   } catch (err) {
+    
+
+    
     setBookingMessage({ type: 'error', text: err.message });
   }
 };
@@ -113,6 +124,56 @@ const handlePasswordReset = async (e) => {
       setAuthError(error.message);
     }
   };
+
+
+
+  const [profileAddress, setProfileAddress] = useState('');
+
+// Cargar la dirección actual al iniciar sesión
+useEffect(() => {
+  const fetchAddress = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('address')
+          .eq('id', session.user.id)
+          .single();
+        if (data?.address) setProfileAddress(data.address);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  fetchAddress();
+}, []);
+
+// Función para guardar la dirección en Supabase
+const handleUpdateProfileAddress = async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) throw new Error("No user logged in");
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ address: profileAddress })
+      .eq('id', session.user.id);
+
+    if (error) throw error;
+    
+    // Mostramos mensaje de éxito integrado
+    setProfileMessage({ text: 'Address updated successfully!', type: 'success' });
+    
+    // Opcional: lo regresa al inicio automáticamente después de 1.5 segundos
+    setTimeout(() => {
+      setActiveSection('inicio');
+    }, 1500);
+
+  } catch (err) {
+    setProfileMessage({ text: err.message, type: 'error' });
+  }
+};
 
   
 
@@ -533,15 +594,15 @@ const handleForgotPassword = async (e) => {
 
           <div className="flex items-center gap-3">
             {user ? (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setActiveSection('perfil')}
-                  className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition hidden md:inline cursor-pointer">
-                  
-                    Hello, {user.user_metedata.full_name || user.email || 'User'}
-                </button>
-                <button 
-                  onClick={handleLogout}
+             <div className="flex items-center gap-3">
+        <button
+          onClick={() => setActiveSection('perfil')}
+          className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition hidden md:inline cursor-pointer"
+        >
+          Hello, {user.user_metadata?.full_name || 'User'}
+        </button>
+        <button
+          onClick={handleLogout}
                   className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition border border-zinc-700"
                 >
                   Sign Out
@@ -566,7 +627,80 @@ const handleForgotPassword = async (e) => {
           </div>
         </header>
 
-        {/* CONDITIONAL CONTENT ACCORDING TO activeSection */}
+
+
+
+
+{activeSection === 'perfil' && (
+  <section className="px-6 py-20 max-w-xl mx-auto">
+    <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+      <h2 className="text-2xl font-bold text-white mb-6">Account Settings</h2>
+
+      {profileMessage.text && (
+  <div className={`mb-4 p-3 rounded-xl text-xs font-semibold ${
+    profileMessage.type === 'success' 
+      ? 'bg-cyan-950/50 border border-cyan-800 text-cyan-400' 
+      : 'bg-red-950/50 border border-red-800 text-red-400'
+  }`}>
+    {profileMessage.text}
+  </div>
+)}
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-semibold text-zinc-300 mb-1">Full Name</label>
+          <input 
+            type="text" 
+            disabled 
+            value={user?.user_metadata?.full_name || ''} 
+            className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-400 cursor-not-allowed" 
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-zinc-300 mb-1">Email / Contact</label>
+          <input 
+            type="text" 
+            disabled 
+            value={user?.email || user?.user_metadata?.phone || ''} 
+            className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-400 cursor-not-allowed" 
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-zinc-300 mb-1">Delivery / Home Address</label>
+          <input 
+            type="text" 
+            value={profileAddress} 
+            onChange={(e) => setProfileAddress(e.target.value)} 
+            placeholder="E.g. 123 Main Street" 
+            className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+          />
+        </div>
+
+        <div className="pt-4 flex gap-3">
+          <button 
+            onClick={handleUpdateProfileAddress}
+            className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-cyan-500/20"
+          >
+            Save Address
+          </button>
+          <button 
+            type="button" 
+            onClick={() => setActiveSection('inicio')} 
+            className="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-xl transition border border-zinc-700"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+
+
+     
 
     {activeSection === 'login' ? (
   <section className="px-6 py-20 max-w-md mx-auto">
@@ -932,64 +1066,90 @@ const handleForgotPassword = async (e) => {
           ))}
         </div>
 
-        {/* Generador dinámico de días del mes actual */}
-        <div className="grid grid-cols-7 gap-1">
-          {(() => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Ajustar para que empiece en Lunes
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            
-            const days = [];
-            // Espacios vacíos antes del primer día del mes
-            for (let i = 0; i < firstDayIndex; i++) {
-              days.push(<div key={`empty-${i}`} />);
-            }
-            // Días del mes
-            for (let d = 1; d <= totalDays; d++) {
-              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-              const isSelected = selectedDate === dateStr;
-              days.push(
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => setSelectedDate(dateStr)}
-                  className={`py-2 text-xs rounded-xl font-semibold transition ${
-                    isSelected 
-                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20' 
-                      : 'text-zinc-300 hover:bg-zinc-800'
-                  }`}
-                >
-                  {d}
-                </button>
-              );
-            }
-            return days;
-          })()}
-        </div>
+     {/* Generador dinámico de días del mes actual */}
+  <div className="grid grid-cols-7 gap-1">
+    {(() => {
+      const nowLocal = new Date();
+      const currentYear = nowLocal.getFullYear();
+      const currentMonth = nowLocal.getMonth();
+      
+      const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7; 
+      const computedTotalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      const daysArray = [];
+      
+      // Espacios vacíos antes del primer día del mes
+      for (let i = 0; i < firstDayIndex; i++) {
+        daysArray.push(<div key={`empty-${i}`} />);
+      }
+
+      // Variables de fecha y hora actual
+      const todayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
+      const currentHour = nowLocal.getHours();
+      const currentMinute = nowLocal.getMinutes();
+      const isTodayExpired = currentHour >= 12 && currentMinute > 0;
+
+      // Días del mes
+      for (let d = 1; d <= computedTotalDays; d++) {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isSelected = selectedDate === dateStr;
+        const isPast = dateStr < todayStr || (dateStr === todayStr && isTodayExpired);
+
+        daysArray.push(
+          <button
+            key={d}
+            type="button"
+            disabled={isPast}
+            onClick={() => setSelectedDate(dateStr)}
+            className={`py-2 text-xs rounded-xl font-semibold transition ${
+              isPast 
+                ? 'bg-zinc-900 text-zinc-600 opacity-40 cursor-not-allowed' 
+                : isSelected 
+                  ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20' 
+                  : 'text-zinc-300 hover:bg-zinc-800'
+            }`}
+          >
+            {d}
+          </button>
+        );
+      }
+
+      return daysArray;
+    })()}
+  </div>  
       </div>
 
-      {/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
-      <div>
-        <label className="block text-xs font-semibold text-zinc-300 mb-1">Available Time Slots (6:00 AM - 12:00 PM)</label>
-        <div className="grid grid-cols-3 gap-2">
-          {['06:00 AM', '08:00 AM', '10:00 AM', '12:00 PM'].map((time) => (
-            <button
-              key={time}
-              type="button"
-              onClick={() => setSelectedTime(time)}
-              className={`py-2 text-xs font-bold rounded-xl border transition ${
-                selectedTime === time 
-                  ? 'bg-cyan-500 text-black border-cyan-400 shadow-lg shadow-cyan-500/20' 
-                  : 'bg-[#0F0F11] text-zinc-300 border-zinc-700 hover:border-zinc-500'
-              }`}
-            >
-              {time}
-            </button>
-          ))}
-        </div>
-      </div>
+ {/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
+<div>
+  <label className="block text-xs font-semibold text-zinc-300 mb-1">Available Time Slots (6:00 AM - 12:00 PM)</label>
+  <div className="grid grid-cols-3 gap-2">
+    {[
+      '06:00 AM',
+      '07:00 AM',
+      '08:00 AM',
+      '09:00 AM',
+      '10:00 AM',
+      '11:00 AM',
+      '12:00 PM'
+    ].map((time) => {
+      const isSelected = selectedTime === time;
+      return (
+        <button
+          key={time}
+          type="button"
+          onClick={() => setSelectedTime(time)}
+          className={`py-2 text-xs rounded-xl font-semibold transition ${
+            isSelected 
+              ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20' 
+              : 'text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800'
+          }`}
+        >
+          {time}
+        </button>
+      );
+    })}
+  </div>
+</div>
 
       {/* Datos del usuario */}
       {user ? (
