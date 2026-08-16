@@ -560,7 +560,7 @@ const handleForgotPassword = async (e) => {
       <main className="min-h-screen bg-[#0F0F11] text-white">
         
         {/* HEADER AND NAVIGATION */}
-      <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-3 sm:px-6 py-3 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 shadow-xl">git 
+      <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-3 sm:px-6 py-3 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 shadow-xl">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => { setActiveSection('inicio'); setMainView('servicios'); }}
