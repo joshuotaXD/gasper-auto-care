@@ -595,12 +595,12 @@ const handleForgotPassword = async (e) => {
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
             {user ? (
              <div className="flex items-center gap-3">
-        <button
-          onClick={() => setActiveSection('perfil')}
-          className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition hidden md:inline cursor-pointer"
-        >
-          Hello, {user.user_metadata?.full_name || 'User'}
-        </button>
+       <button
+  onClick={() => setActiveSection('perfil')}
+  className="text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition inline cursor-pointer"
+>
+  Hello, {user.user_metadata?.full_name || 'User'}
+</button>
         <button
           onClick={handleLogout}
                   className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition border border-zinc-700"
