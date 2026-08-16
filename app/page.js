@@ -560,7 +560,7 @@ const handleForgotPassword = async (e) => {
       <main className="min-h-screen bg-[#0F0F11] text-white">
         
         {/* HEADER AND NAVIGATION */}
-        <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-3 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-50 bg-[#111318]/90 backdrop-blur-md border-b border-zinc-800 px-3 sm:px-6 py-3 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 shadow-xl">git 
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => { setActiveSection('inicio'); setMainView('servicios'); }}
@@ -574,7 +574,7 @@ const handleForgotPassword = async (e) => {
                 priority
               />
             </div>
-            <span className="font-extrabold text-base md:text-lg tracking-wider text-white group-hover:text-cyan-400 transition">
+           <span className="font-extrabold text-xs sm:text-base md:text-lg tracking-wider text-white group-hover:text-cyan-400 transition">
               GASPER <span className="text-cyan-400 text-[10px] block font-normal tracking-widest uppercase">Auto Detailing</span>
             </span>
           </div>
