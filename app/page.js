@@ -25,7 +25,9 @@ const [address, setAddress] = useState('');
 const [profileMessage, setProfileMessage] = useState({ text: '', type: '' });
 const [selectedVehicle, setSelectedVehicle] = useState('Coupe/Sedan');
 const today = new Date().toISOString().split('T')[0];
-
+const [paymentMethod, setPaymentMethod] = useState('Zelle');
+const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
+const [ceramicYears, setCeramicYears] = useState(2); // Por defecto en 2 años
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
@@ -55,6 +57,7 @@ const handleBookingSubmit = async (e) => {
       booking_date: selectedDate,
       booking_time: selectedTime,
       vehicle_type: selectedVehicle, // 👈 Agregamos esta línea con tu estado real de vehículo
+      payment_method: paymentMethod,
       client_name: user ? user.user_metadata?.full_name : 'Invitado',
       client_contact: user ? user.user_metadata?.phone : 'Sin contacto',
       client_address: finalAddress,
@@ -175,6 +178,68 @@ const handleUpdateProfileAddress = async () => {
   }
 };
 
+const getCeramicPrice = (vehicle, years) => {
+  let basePrice = 800;
+  switch (vehicle) {
+    case 'Coupe/Sedan': basePrice = 800; break;
+    case 'Compact SUV': basePrice = 950; break;
+    case 'Mid-Sized SUV': basePrice = 1100; break;
+    case 'Large SUV/Truck': basePrice = 1300; break;
+    case 'Trucks, Suburbans, Minivans': basePrice = 1500; break;
+    case 'Motorcycle': basePrice = 500; break;
+    case 'RVs': basePrice = 1600; break;
+    default: basePrice = 800;
+  }
+  
+  // Si elige más de 2 años, se incrementa $100 por cada año extra sobre la base de 2 años
+  const extraYears = Math.max(0, years - 2);
+  const finalPrice = basePrice + (extraYears * 100);
+  
+  return `$${finalPrice}`;
+};
+
+const calculateTotalPrice = (service, vehicle, years, paymentMethod) => {
+  let basePrice = 0;
+  const isDeepCleaning = service?.toLowerCase().includes('deep cleaning');
+  const isCeramic = service?.toLowerCase().includes('ceramic');
+
+  if (isDeepCleaning) {
+    switch (vehicle) {
+      case 'Coupe/Sedan': basePrice = 220; break;
+      case 'Compact SUV': basePrice = 240; break;
+      case 'Mid-Sized SUV': basePrice = 260; break;
+      case 'Large SUV/Truck': basePrice = 270; break;
+      case 'Trucks, Suburbans, Minivans': basePrice = 310; break;
+      case 'Motorcycle': basePrice = 70; break;
+      case 'RVs': basePrice = 150; break; // Tomamos el inicio del rango
+      default: basePrice = 220;
+    }
+  } else if (isCeramic) {
+    switch (vehicle) {
+      case 'Coupe/Sedan': basePrice = 800; break;
+      case 'Compact SUV': basePrice = 950; break;
+      case 'Mid-Sized SUV': basePrice = 1100; break;
+      case 'Large SUV/Truck': basePrice = 1300; break;
+      case 'Trucks, Suburbans, Minivans': basePrice = 1500; break;
+      case 'Motorcycle': basePrice = 500; break;
+      case 'RVs': basePrice = 1600; break;
+      default: basePrice = 800;
+    }
+    const extraYears = Math.max(0, years - 2);
+    basePrice += (extraYears * 100);
+  }
+
+  const isCard = paymentMethod?.toLowerCase().includes('card');
+  const tax = isCard ? basePrice * 0.0975 : 0;
+  const total = basePrice + tax;
+
+  return {
+    subtotal: basePrice,
+    tax: tax.toFixed(2),
+    total: total.toFixed(2),
+    hasTax: isCard
+  };
+};
   
 
   {authView === 'verify-code' && (
@@ -249,9 +314,13 @@ const [newPassword, setNewPassword] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
 
   const vehicleOptions = [
-    { label: 'Coupe/Sedan', icon: '🚗' },
-    { label: 'Mid-Sized SUV', icon: '🚙' },
-    { label: 'Large SUV/Truck', icon: '🚐' },
+   { label: 'Coupe/Sedan', icon: '🚗' },
+  { label: 'Compact SUV', icon: '🚙' },         // <-- SUV chicas
+  { label: 'Mid-Sized SUV', icon: '🚙' },
+  { label: 'Large SUV/Truck', icon: '🚚' },
+  { label: 'Trucks, Suburbans, Minivans', icon: '🚐' }, // <-- Nueva categoría
+  { label: 'RVs', icon: '🚌' },                     // <-- RVs
+  { label: 'Motorcycle', icon: '🏍️' },
   ];
 
   // List of gallery images based on provided files
@@ -505,7 +574,7 @@ const handleForgotPassword = async (e) => {
     {
       id: 'standard',
       title: 'Standard Wash',
-      price: '$120 - $200',
+      price:'$35 - $200',
       time: '60-120 min',
       details: [
         'Our ideal maintenance service to keep your car clean, shiny, and presentable week after week.',
@@ -518,7 +587,7 @@ const handleForgotPassword = async (e) => {
     {
       id: 'deep',
       title: 'Deep Cleaning',
-      price: '$220 - $310',
+      price: '$70 - $310',
       time: '120-180 min',
       details: [
         '100% Detailed Interior: Deep vacuuming of seats, carpets, trunk, and every nook and cranny; upholstery cleaning to remove stains and odors; cleaning of dashboard, door panels, console, and cup holders; spotless interior windows; and sanitization and long-lasting fresh scent.',
@@ -530,7 +599,7 @@ const handleForgotPassword = async (e) => {
     {
       id: 'polishing',
       title: 'Polishing and Waxing',
-      price: '$550 - $1300',
+      price: '$250 - $1300',
       time: '300-540 min',
       details: [
         'Designed to restore a showroom shine when paint looks dull, scratched, and lifeless by removing sun damage, wash-induced micro-scratches, and oxidation, leaving a protected, mirror-like finish.',
@@ -1010,6 +1079,45 @@ const handleForgotPassword = async (e) => {
   )}
 
 
+
+ {/* Precio dinámico y selector de años para Ceramic Coating */}
+{selectedServiceToQuote?.toLowerCase().includes('ceramic') && (
+  <div className="mb-6 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl space-y-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div>
+        <p className="text-xs text-zinc-400">Package & Protection:</p>
+        <p className="text-sm font-semibold text-white">Polishing + Ceramic Coating ({ceramicYears} Years Protection)</p>
+      </div>
+      <div className="text-left sm:text-right w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-cyan-500/20">
+        <span className="text-lg font-bold text-cyan-400">
+          {getCeramicPrice(vehicleType, ceramicYears)}
+        </span>
+      </div>
+    </div>
+
+    {/* Selector de Años (De 2 a 10 años) */}
+    <div>
+      <label className="block text-xs font-medium text-zinc-300 mb-2">Select Duration (Years):</label>
+      <div className="flex flex-wrap gap-2">
+        {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((year) => (
+          <button
+            key={year}
+            type="button"
+            onClick={() => setCeramicYears(year)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              ceramicYears === year
+                ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/30'
+                : 'bg-zinc-900 border border-zinc-700 text-zinc-300 hover:border-cyan-400'
+            }`}
+          >
+            {year} Years
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
       {/* Selector de Vehículo */}
       <div className="relative">
         <label className="block text-xs font-semibold text-zinc-300 mb-1">Vehicle Type</label>
@@ -1019,8 +1127,14 @@ const handleForgotPassword = async (e) => {
         >
           <div className="flex items-center gap-2">
             <span className="text-cyan-400 text-base">
-              {vehicleType === 'Coupe/Sedan' ? '🚗' : vehicleType === 'Mid-Sized SUV' ? '🚙' : '🚐'}
-            </span>
+ {vehicleType === 'Coupe/Sedan' ? '🚗' : 
+     vehicleType === 'Compact SUV' ? '🚙' : 
+     vehicleType === 'Mid-Sized SUV' ? '🚙' : 
+     vehicleType === 'Large SUV/Truck' ? '🚚' : 
+     vehicleType === 'Trucks, Suburbans, Minivans' ? '🚐' : 
+     vehicleType === 'RVs' ? '🚌' : 
+     vehicleType === 'Motorcycle' ? '🏍️' : '❓'}
+  </span>
             <span>{vehicleType}</span>
           </div>
           <span className={`transform transition-transform duration-300 text-zinc-400 ${isVehicleDropdownOpen ? 'rotate-180' : ''}`}>
@@ -1030,21 +1144,33 @@ const handleForgotPassword = async (e) => {
 
         {isVehicleDropdownOpen && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-[#16181d] border border-zinc-700 rounded-xl overflow-hidden shadow-2xl z-20">
-            {vehicleOptions.map((option) => (
-              <div
-                key={option.label}
-                onClick={() => {
-                  setVehicleType(option.label);
-                  setIsVehicleDropdownOpen(false);
-                }}
-                className={`px-4 py-3 text-sm flex items-center gap-2 cursor-pointer transition ${
-                  vehicleType === option.label ? 'bg-cyan-500/20 text-cyan-400 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
-                }`}
-              >
-                <span>{option.icon}</span>
-                <span>{option.label}</span>
-              </div>
-            ))}
+         {vehicleOptions
+    .filter((option) => {
+  // Si la opción es la moto, validamos si se permite
+  if (option.label === 'Motorcycle') {
+    const isCeramic = selectedServiceToQuote?.toLowerCase().includes('ceramic');
+    const allowedServicesForMoto = ['standard wash', 'deep cleaning', 'polishing and waxing'];
+    
+    // Se muestra si es Ceramic o si está en la lista de permitidos
+    return isCeramic || allowedServicesForMoto.some(s => selectedServiceToQuote?.toLowerCase().includes(s));
+  }
+  return true;
+})
+      .map((option) => (
+      <div
+        key={option.label}
+        onClick={() => {
+          setVehicleType(option.label);
+          setIsVehicleDropdownOpen(false);
+        }}
+        className={`px-4 py-3 text-sm flex items-center gap-2 cursor-pointer transition ${
+          vehicleType === option.label ? 'bg-cyan-500/20 text-cyan-400 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
+        }`}
+      >
+        <span>{option.icon}</span>
+        <span>{option.label}</span>
+      </div>
+    ))}
           </div>
         )}
       </div>
@@ -1185,6 +1311,77 @@ const handleForgotPassword = async (e) => {
           </div>
         </div>
       )}
+
+
+      {/* Selector de Método de Pago */}
+<div className="relative mb-4">
+  <label className="block text-xs font-semibold text-zinc-300 mb-1">Payment Method *</label>
+  <div
+    onClick={() => setIsPaymentDropdownOpen(!isPaymentDropdownOpen)}
+    className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between cursor-pointer hover:border-cyan-400 transition"
+  >
+    <span className="text-cyan-400 font-medium">{paymentMethod}</span>
+    <span className={`transform transition-transform duration-300 text-zinc-400 ${isPaymentDropdownOpen ? 'rotate-180' : ''}`}>
+      v
+    </span>
+  </div>
+
+  {isPaymentDropdownOpen && (
+    <div className="absolute top-full left-0 right-0 mt-2 bg-[#16181d] border border-zinc-700 rounded-xl overflow-hidden shadow-2xl z-20">
+      {[
+        'Zelle',
+        'Venmo',
+        'Cash',
+        'Credit Card (Visa, MC, AMEX) - PLUS TAX',
+        'Debit Card - PLUS TAX'
+      ].map((method) => (
+        <div
+          key={method}
+          onClick={() => {
+            setPaymentMethod(method);
+            setIsPaymentDropdownOpen(false);
+          }}
+          className={`px-4 py-3 text-sm cursor-pointer transition ${
+            paymentMethod === method ? 'bg-cyan-500/20 text-cyan-400 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
+          }`}
+        >
+          {method}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* Resumen de Estimación de Precio y Taxes (Para Ceramic y Deep Cleaning) */}
+{(selectedServiceToQuote?.toLowerCase().includes('ceramic') || selectedServiceToQuote?.toLowerCase().includes('deep cleaning')) && (
+  <div className="mb-6 p-4 bg-zinc-900/80 border border-zinc-700/80 rounded-xl space-y-2 text-sm">
+    <div className="flex justify-between text-zinc-400">
+      <span>Service Subtotal:</span>
+      <span>${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).subtotal}</span>
+    </div>
+
+    {calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).hasTax && (
+      <div className="flex justify-between text-zinc-400 text-xs">
+        <span>Estimated Tax (9.75%):</span>
+        <span>+${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).tax}</span>
+      </div>
+    )}
+
+    <div className="pt-2 border-t border-zinc-800 flex justify-between items-center font-bold text-white">
+      <span>Estimated Total:</span>
+      <span className="text-cyan-400 text-lg">
+        ${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).total} USD
+      </span>
+    </div>
+    
+    <p className="text-[11px] text-zinc-500 text-right">
+      {calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).hasTax 
+        ? 'Tax applied for Card payment.' 
+        : 'No taxes applied for Cash/Zelle/Venmo.'}
+    </p>
+  </div>
+)}
+      
 
       {/* Botones de Acción */}
       <div className="pt-4 flex gap-3">
@@ -1379,7 +1576,19 @@ const handleForgotPassword = async (e) => {
                             {service.details.map((detail, idx) => (
                               <li key={idx}>{detail}</li>
                             ))}
-                          </ul>
+                          </ul> 
+
+                          {/* Accepted Payment Methods */}
+      <div className="mt-4 pt-3 border-t border-zinc-800/80">
+        <p className="text-xs text-zinc-400 font-medium mb-2">Accepted Payment Methods:</p>
+        <div className="flex flex-wrap gap-2">
+          <span className="px-2.5 py-1 bg-zinc-900 border border-zinc-700/60 rounded-md text-[11px] text-zinc-300">Zelle</span>
+          <span className="px-2.5 py-1 bg-zinc-900 border border-zinc-700/60 rounded-md text-[11px] text-zinc-300">Venmo</span>
+          <span className="px-2.5 py-1 bg-zinc-900 border border-zinc-700/60 rounded-md text-[11px] text-zinc-300">Cash</span>
+          <span className="px-2.5 py-1 bg-zinc-900 border border-zinc-700/60 rounded-md text-[11px] text-zinc-300">Credit Card (Visa, MC, AMEX) - PLUS TAX</span>
+          <span className="px-2.5 py-1 bg-zinc-900 border border-zinc-700/60 rounded-md text-[11px] text-zinc-300">Debit Card - PLUS TAX</span>
+        </div>
+      </div>
                           <div className="mt-4 flex justify-end">
                             <button 
                               onClick={() => handleQuoteClick(service.title)}
