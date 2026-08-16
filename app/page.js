@@ -22,6 +22,11 @@ const [authView, setAuthView] = useState('login');
 const [password, setPassword] = useState('');
 const [identifier, setIdentifier] = useState('');
 const [bookingMessage, setBookingMessage] = useState(null); // { type: 'success' | 'error', text: '...' }
+const [clientAddress, setClientAddress] = useState('');
+const [address, setAddress] = useState('');
+
+
+
 // Ejemplo: Guardar un registro en la tabla de citas
 const guardarCita = async (datos) => {
   const { data, error } = await supabase
@@ -41,16 +46,26 @@ const handleBookingSubmit = async (e) => {
     return;
   }
 
+  // Validación opcional por si el input de dirección está vacío
+  if (!clientAddress || !clientAddress.trim()) {
+    setBookingMessage({ type: 'error', text: 'Please enter your address.' });
+    return;
+  }
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
+
+    const finalName = clientName || user?.user_metadata?.full_name || user?.email || 'User';
+    const finalContact = clientContact || user?.phone || user?.user_metadata?.phone || '9983945580';
 
     const payload = {
       service_name: selectedServiceToQuote || 'General Service',
       vehicle_type: vehicleType,
       booking_date: selectedDate,
       booking_time: selectedTime,
-      client_name: user?.user_metadata?.full_name || user?.email || 'User',
-      client_contact: user?.phone || user?.user_metadata?.phone || '9983945580', 
+      client_name: finalName,
+      client_contact: finalContact,
+      client_address: clientAddress, // <-- Dirección añadida
       user_id: user?.id || null
     };
 
@@ -800,6 +815,20 @@ const handleForgotPassword = async (e) => {
                     className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
                   />
                 </div>
+
+<div style={{ marginBottom: '16px' }}>
+  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px' }}>Address *</label>
+  <input 
+    type="text" 
+    placeholder="E.g. 123 Main Street" 
+    value={clientAddress}
+    onChange={(e) => setClientAddress(e.target.value)}
+    style={{ width: '100%', padding: '12px', background: '#1a1a1e', border: '1px solid #2a2a30', borderRadius: '8px', color: '#fff' }}
+    required
+  />
+</div>
+
+
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">Password</label>
                   <div className="relative">
