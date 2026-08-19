@@ -11,6 +11,8 @@ import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
 export default function Home() {
+  const [verificationCode, setVerificationCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [activeSection, setActiveSection] = useState('inicio');
   const [openServices, setOpenServices] = useState({});
   const [selectedServiceToQuote, setSelectedServiceToQuote] = useState('');
@@ -32,6 +34,7 @@ const [ceramicYears, setCeramicYears] = useState(2); // Por defecto en 2 años
 const [clientName, setClientName] = useState("");
 const [clientContact, setClientContact] = useState(""); // Teléfono o Email
 const [clientAddress, setClientAddress] = useState("");
+const [showNewPassword, setShowNewPassword] = useState(false);
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
@@ -47,6 +50,8 @@ const guardarCita = async (datos) => {
 
 const handleBookingSubmit = async (e) => {
     e.preventDefault();
+
+    
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -114,33 +119,47 @@ const handlePasswordReset = async (e) => {
 
     // 1. Muestra el mensaje de éxito en la interfaz
     setSuccessMessage('Recovery code sent successfully!');
+    // 👇 AGREGA ESTO: Cambia automáticamente a la vista de meter el código tras 1.5 segundos
+    setTimeout(() => {
+      setAuthView('verify-code');
+      setSuccessMessage('');
+    }, 1500);
 
-  } catch (error) { // <--- ESTO ES LO QUE FALTA
+  } catch (error) {
     setAuthError(error.message);
   }
 };
+
+
   
- const handleVerifyAndReset = async (e) => {
-    e.preventDefault();
-    setAuthError('');
+const handleVerifyAndReset = async (e) => {
+  e.preventDefault();
+  setAuthError('');
 
-    try {
-      // Como estamos enviando un código personalizado mediante Resend, 
-      // actualizamos directamente la contraseña usando la sesión de recuperación o el token.
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword
-      });
+  try {
+    const response = await fetch('/api/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: resetEmail,
+        code: verificationCode,
+        newPassword: newPassword,
+      }),
+    });
 
-      if (updateError) throw updateError;
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to update password.');
 
-      alert('Password updated successfully!');
-      setAuthView('login');
-      setVerificationCode('');
-      setNewPassword('');
-    } catch (error) {
-      setAuthError(error.message);
-    }
-  };
+    alert('Password updated successfully!');
+    setAuthView('login');
+    setVerificationCode('');
+    setNewPassword('');
+    setResetEmail('');
+
+  } catch (error) {
+    setAuthError(error.message);
+  }
+};
 
 
 
@@ -367,8 +386,8 @@ const handleConfirmBooking = async (e) => {
   const [authError, setAuthError] = useState('');
 // 'login' o 'forgot'
   const [authLoading, setAuthLoading] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-const [newPassword, setNewPassword] = useState('');
+
+
 
   // State for gallery modal (Lightbox)
   const [selectedImage, setSelectedImage] = useState(null);

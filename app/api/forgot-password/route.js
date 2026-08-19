@@ -22,6 +22,7 @@ const getEmailTemplate = (code) => {
 export async function POST(request) {
   try {
     const { email } = await request.json();
+    console.log("Correo recibido para recuperar contraseña:", email); // <-- Agrega esto
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -32,27 +33,23 @@ export async function POST(request) {
     }
 
     const resend = new Resend(resendKey);
+    console.log("Llave actual:", serviceKey);
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
-    // 1. Validar si el usuario existe en Supabase antes de enviar nada
-    const { data: users, error: userError } = await supabaseAdmin.auth.admin.listUsers();
-    const userExists = users?.users.some(u => u.email === email);
+  // 3. Generar el enlace de recuperación oficial de Supabase directamente para ese correo
+  const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+    type: 'recovery',
+    email: email,
+  });
 
-    if (!userExists) {
-      return NextResponse.json({ error: 'No account found with this email.' }, { status: 400 });
-    }
+  // Si Supabase no encuentra el correo, aquí cachamos el error exacto
+  if (linkError) {
+    console.error("Error de Supabase al generar link:", linkError);
+    return NextResponse.json({ error: 'No account found with this email or invalid request.' }, { status: 400 });
+  }
 
-    // 2. Generar código de 6 dígitos
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // 3. Generar el enlace de recuperación oficial de Supabase por debajo (para aprovechar su token seguro)
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
-    });
-
-    if (linkError) throw linkError;
-
+  // 2. Generar código de 6 dígitos
+  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     // 4. Enviar el correo personalizado con Resend
     await resend.emails.send({
       from: 'Gasper <onboarding@resend.dev>',
