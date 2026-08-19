@@ -1134,16 +1134,6 @@ const handleForgotPassword = async (e) => {
   </div>
 )}
   <form onSubmit={handleConfirmBooking} className="mt-6 space-y-4">
-{/* Pégalo aquí */}
-  {bookingMessage && (
-    <div className={`p-3 rounded-xl text-xs font-semibold ${
-      bookingMessage.type === 'success' 
-        ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-400' 
-        : 'bg-red-950/50 border border-red-800 text-red-400'
-    }`}>
-      {bookingMessage.text}
-    </div>
-  )}
 
 
 
