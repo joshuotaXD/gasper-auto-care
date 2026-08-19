@@ -233,8 +233,14 @@ const getCeramicPrice = (vehicle, years) => {
 
 const calculateTotalPrice = (service, vehicle, years, paymentMethod) => {
   let basePrice = 0;
-  const isDeepCleaning = service?.toLowerCase().includes('deep cleaning');
-  const isCeramic = service?.toLowerCase().includes('ceramic');
+  const serviceLower = service?.toLowerCase() || '';
+
+ const isDeepCleaning = serviceLower.includes('deep');
+  const isCeramic = serviceLower.includes('ceramic');
+  const isStandard = serviceLower.includes('standard') || serviceLower.includes('standard wash');
+  const isPolish = serviceLower.includes('polish') || serviceLower.includes('wax') || serviceLower.includes('polishing');
+  const isEngine = serviceLower.includes('engine');
+  const isHeadlight = serviceLower.includes('headlight');
 
   if (isDeepCleaning) {
     switch (vehicle) {
@@ -244,7 +250,7 @@ const calculateTotalPrice = (service, vehicle, years, paymentMethod) => {
       case 'Large SUV/Truck': basePrice = 270; break;
       case 'Trucks, Suburbans, Minivans': basePrice = 310; break;
       case 'Motorcycle': basePrice = 70; break;
-      case 'RVs': basePrice = 150; break; // Tomamos el inicio del rango
+      case 'RVs': basePrice = 150; break;
       default: basePrice = 220;
     }
   } else if (isCeramic) {
@@ -260,6 +266,32 @@ const calculateTotalPrice = (service, vehicle, years, paymentMethod) => {
     }
     const extraYears = Math.max(0, years - 2);
     basePrice += (extraYears * 100);
+  } else if (isStandard) {
+    switch (vehicle) {
+      case 'Motorcycle': basePrice = 35; break;
+      case 'Coupe/Sedan': basePrice = 120; break;
+      case 'Compact SUV': basePrice = 140; break;
+      case 'Mid-Sized SUV': basePrice = 140; break;
+      case 'Large SUV/Truck': basePrice = 170; break;
+      case 'Trucks, Suburbans, Minivans': basePrice = 170; break;
+      case 'RVs': basePrice = 190; break;
+      default: basePrice = 120;
+    }
+  } else if (isPolish) {
+    switch (vehicle) {
+      case 'Motorcycle': basePrice = 250; break;
+      case 'Coupe/Sedan': basePrice = 490; break;
+      case 'Compact SUV': basePrice = 600; break;
+      case 'Mid-Sized SUV': basePrice = 600; break;
+      case 'Large SUV/Truck': basePrice = 750; break;
+      case 'Trucks, Suburbans, Minivans': basePrice = 850; break;
+      case 'RVs': basePrice = 980; break;
+      default: basePrice = 490;
+    }
+  } else if (isEngine) {
+    basePrice = 60;
+  } else if (isHeadlight) {
+    basePrice = 90;
   }
 
   const isCard = paymentMethod?.toLowerCase().includes('card');
@@ -273,7 +305,6 @@ const calculateTotalPrice = (service, vehicle, years, paymentMethod) => {
     hasTax: isCard
   };
 };
-
 
 const handleConfirmBooking = async (e) => {
   e.preventDefault();
@@ -1445,35 +1476,34 @@ const handleForgotPassword = async (e) => {
   )}
 </div>
 
-{/* Resumen de Estimación de Precio y Taxes (Para Ceramic y Deep Cleaning) */}
-{(selectedServiceToQuote?.toLowerCase().includes('ceramic') || selectedServiceToQuote?.toLowerCase().includes('deep cleaning')) && (
-  <div className="mb-6 p-4 bg-zinc-900/80 border border-zinc-700/80 rounded-xl space-y-2 text-sm">
-    <div className="flex justify-between text-zinc-400">
-      <span>Service Subtotal:</span>
-      <span>${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).subtotal}</span>
-    </div>
-
-    {calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).hasTax && (
-      <div className="flex justify-between text-zinc-400 text-xs">
-        <span>Estimated Tax (9.75%):</span>
-        <span>+${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).tax}</span>
-      </div>
-    )}
-
-    <div className="pt-2 border-t border-zinc-800 flex justify-between items-center font-bold text-white">
-      <span>Estimated Total:</span>
-      <span className="text-cyan-400 text-lg">
-        ${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).total} USD
-      </span>
-    </div>
-    
-    <p className="text-[11px] text-zinc-500 text-right">
-      {calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).hasTax 
-        ? 'Tax applied for Card payment.' 
-        : 'No taxes applied for Cash/Zelle/Venmo.'}
-    </p>
+{/* Resumen de Estimación de Precio y Taxes */}
+<div className="mb-6 p-4 bg-zinc-900/80 border border-zinc-700/80 rounded-xl space-y-2 text-sm">
+  <div className="flex justify-between text-zinc-400">
+    <span>Service Subtotal:</span>
+    <span className="text-white font-semibold">${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).subtotal}</span>
   </div>
-)}
+
+  {calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).hasTax && (
+    <div className="flex justify-between text-zinc-400 text-xs">
+      <span>Estimated Tax (9.75%):</span>
+      <span>+${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).tax}</span>
+    </div>
+  )}
+
+  <div className="pt-2 border-t border-zinc-800 flex justify-between items-center font-bold text-white">
+    <span>Estimated Total:</span>
+    <span className="text-cyan-400 text-lg">
+      ${calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).total} USD
+    </span>
+  </div>
+
+  <p className="text-[11px] text-zinc-500 text-right">
+    {calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).hasTax
+      ? 'Tax applied for Card payment.'
+      : 'No taxes applied for Cash/Zelle/Venmo.'}
+  </p>
+</div>
+
       
 
       {/* Botones de Acción */}
@@ -1844,7 +1874,7 @@ const handleForgotPassword = async (e) => {
 
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-left bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800">
                     <p className="text-sm text-zinc-300">📞 <strong className="text-white">Phone:</strong> +1 (615) 429-2253</p>
-                    <p className="text-sm text-zinc-300">📧 <strong className="text-white">Email:</strong> contacto@gasperdetailing.com</p>
+                    <p className="text-sm text-zinc-300">📧 <strong className="text-white">Email:</strong> gasper@gasperdetailing.com</p>
                   </div>
                 </div>
               </section>
