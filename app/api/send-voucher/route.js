@@ -34,9 +34,8 @@ const emailHtml = await render(
     console.log("3. HTML del correo renderizado con éxito");
 
   // Validamos si clientContact tiene una '@', si no, te mandamos el correo a ti para que no falle
-const recipientEmail = (data.clientContact && data.clientContact.includes('@')) 
-  ? data.clientContact 
-  : 'gasper@gasperautodetailing.com';
+console.log("CLIENT CONTACT RECIBIDO:", data.clientContact);
+const recipientEmail = data.clientContact || 'gasper@gasperautodetailing.com';
 
 const response = await resend.emails.send({
   from: 'Gasper Auto Detailing <gasper@gasperautodetailing.com>',
