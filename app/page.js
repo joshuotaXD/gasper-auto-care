@@ -745,15 +745,13 @@ const handleForgotPassword = async (e) => {
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => { setActiveSection('inicio'); setMainView('servicios'); }}
           >
-            <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-cyan-500/40 group-hover:border-cyan-400 transition shadow-md shadow-cyan-500/10">
-              <Image
-                src="/logo.png"
-                alt="Gasper Auto Detailing Logo"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+           <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-cyan-500/40 group-hover:border-cyan-400 transition shadow-md shadow-cyan-500/10 flex items-center justify-center bg-black">
+  <img
+    src="/logo.png"
+    alt="Gasper Auto Detailing Logo"
+    className="w-full h-full object-cover"
+  />
+</div>
            <span className="font-extrabold text-xs sm:text-base md:text-lg tracking-wider text-white group-hover:text-cyan-400 transition">
               GASPER <span className="text-cyan-400 text-[10px] block font-normal tracking-widest uppercase">Auto Detailing</span>
             </span>
