@@ -35,6 +35,7 @@ const [clientName, setClientName] = useState("");
 const [clientContact, setClientContact] = useState(""); // Teléfono o Email
 const [clientAddress, setClientAddress] = useState("");
 const [showNewPassword, setShowNewPassword] = useState(false);
+const [email, setEmail] = useState('');
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
@@ -1409,18 +1410,19 @@ const handleForgotPassword = async (e) => {
   className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
 />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number or Email *</label>
-           <input 
-  type="text" 
-  required 
-  value={clientContact}
-  onChange={(e) => setClientContact(e.target.value)}
-  placeholder="E.g. +1 615 429 2253 or email@gmail.com" 
-  className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
-/>
-            
-          </div>
+        <div>
+  <label className="block text-sm font-medium text-zinc-300 mb-1">
+    Email *
+  </label>
+  <input
+    type="email"
+    required
+    value={email}
+onChange={(e) => setEmail(e.target.value)}
+    placeholder="E.g. email@gmail.com"
+    className="w-full bg-[#121214] border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition"
+  />
+</div>
 
           <div>
             <label className="block text-xs font-semibold text-zinc-300 mb-1">Address *</label>
