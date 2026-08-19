@@ -1,6 +1,8 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
+
+
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
@@ -20,7 +22,6 @@ const [authView, setAuthView] = useState('login');
 const [password, setPassword] = useState('');
 const [identifier, setIdentifier] = useState('');
 const [bookingMessage, setBookingMessage] = useState(null); // { type: 'success' | 'error', text: '...' }
-const [clientAddress, setClientAddress] = useState('');
 const [address, setAddress] = useState('');
 const [profileMessage, setProfileMessage] = useState({ text: '', type: '' });
 const [selectedVehicle, setSelectedVehicle] = useState('Coupe/Sedan');
@@ -28,6 +29,9 @@ const today = new Date().toISOString().split('T')[0];
 const [paymentMethod, setPaymentMethod] = useState('Zelle');
 const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
 const [ceramicYears, setCeramicYears] = useState(2); // Por defecto en 2 años
+const [clientName, setClientName] = useState("");
+const [clientContact, setClientContact] = useState(""); // Teléfono o Email
+const [clientAddress, setClientAddress] = useState("");
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
@@ -42,45 +46,53 @@ const guardarCita = async (datos) => {
 
 
 const handleBookingSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    
-    // Si no es usuario, usamos la dirección que escribió en el input.
-    // Si es usuario, usamos la dirección de su perfil o la que escribió si la cambió.
-    const finalAddress = address; 
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-   const payload = {
-      service_name: selectedServiceToQuote,
-      booking_date: selectedDate,
-      booking_time: selectedTime,
-      vehicle_type: selectedVehicle, // 👈 Agregamos esta línea con tu estado real de vehículo
-      payment_method: paymentMethod,
-      client_name: user ? user.user_metadata?.full_name : 'Invitado',
-      client_contact: user ? user.user_metadata?.phone : 'Sin contacto',
-      client_address: finalAddress,
-      user_id: user?.id || null
-    };
+      const finalAddress = address;
 
-   const { data, error } = await supabase.from('appointments').insert([payload]);
-    
-    if (error) throw error;
-    
-    setBookingMessage({ type: 'success', text: 'Appointment booked!' });
-setTimeout(() => {
-      setBookingMessage(null);
-      setActiveSection('inicio');
-    }, 1500);
+      const payload = {
+        service_name: selectedServiceToQuote,
+        booking_date: selectedDate,
+        booking_time: selectedTime,
+        vehicle_type: selectedVehicle,
+        F_method: paymentMethod,
+        client_name: user ? user.user_metadata?.full_name : clientName, // Si es invitado, agarra el estado del input
+        client_contact: user ? user.user_metadata?.phone : clientContact, // Si es invitado, agarra el correo/teléfono del input
+        client_address: finalAddress,
+        user_id: user?.id || null
+      };
 
-  } catch (err) {
-    
+      const { data, error } = await supabase.from('appointments').insert([payload]);
 
-    
-    setBookingMessage({ type: 'error', text: err.message });
-  }
-};
+      if (error) throw error;
+
+      // 👉 AQUÍ AGREGAMOS EL FETCH A RESEND PARA MANDAR EL CORREO
+      await fetch('/api/send-voucher', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: payload.client_name,
+          clientContact: payload.client_contact, // Este es el correo que usará la API
+          selectedService: payload.service_name,
+          selectedDate: payload.selectedDate,
+          selectedTime: payload.selectedTime,
+          total: '0.00' // O tu variable de total real
+        }),
+      });
+
+      setBookingMessage({ type: 'success', text: 'Appointment booked!' });
+      setTimeout(() => {
+        setBookingMessage(null);
+        setActiveSection('inicio');
+      }, 1500);
+
+    } catch (err) {
+      setBookingMessage({ type: 'error', text: err.message });
+    }
+  };
 
 // Manejar la recuperación de contraseña
 const handlePasswordReset = async (e) => {
@@ -240,7 +252,53 @@ const calculateTotalPrice = (service, vehicle, years, paymentMethod) => {
     hasTax: isCard
   };
 };
-  
+
+
+const handleConfirmBooking = async (e) => {
+  e.preventDefault();
+  console.log("Datos a enviar:", { selectedService: selectedServiceToQuote, vehicleType: vehicleType });
+  // Aquí recogemos los datos. Asegúrate de que los estados (clientName, etc.)
+  // coincidan con los que pusiste en tus inputs.
+  const bookingData = {
+    clientName: user ? user.user_metadata.full_name : clientName,
+    clientContact: user ? user.email : clientContact,
+    clientAddress: clientAddress,
+    selectedService: selectedServiceToQuote,
+    vehicleType: vehicleType,
+    paymentMethod: paymentMethod,
+    selectedDate: selectedDate,
+    selectedTime: selectedTime,
+    total: calculateTotalPrice(selectedServiceToQuote, vehicleType, ceramicYears, paymentMethod).total
+  };
+
+  // Esto llama a la API que creamos en el archivo route.js
+  const response = await fetch('/api/send-voucher', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(bookingData),
+  });
+
+  if (response.ok) {
+    const currentScrollPos = window.scrollY;
+
+    setBookingMessage({ 
+      type: 'success', 
+      text: 'Booking confirmed! The confirmation voucher has been sent to your email.' 
+    });
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    setTimeout(() => {
+      setBookingMessage(null);
+      window.scrollTo({ top: currentScrollPos, behavior: 'smooth' });
+    }, 5000);
+  } else {
+    setBookingMessage({ 
+      type: 'error', 
+      text: 'There was an error sending the voucher. Please try again.' 
+    });
+  }
+}; // <-- Aquí se cierra correctamente la función handleConfirmBooking
 
   {authView === 'verify-code' && (
   <form onSubmit={handleVerifyAndReset} className="space-y-4">
@@ -1065,8 +1123,17 @@ const handleForgotPassword = async (e) => {
       Appointment / Booking
     </span>
     <h2 className="text-2xl font-bold mt-4 text-white">Book: {selectedServiceToQuote || 'General Service'}</h2>
-
-   <form onSubmit={handleBookingSubmit} className="mt-6 space-y-4">
+{/* Mensaje de éxito o error flotante (visible en cualquier servicio) */}
+{bookingMessage && (
+  <div className={`mb-4 p-4 rounded-xl border text-sm font-medium ${
+    bookingMessage.type === 'success' 
+      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+      : 'bg-red-500/10 border-red-500/30 text-red-400'
+  }`}>
+    {bookingMessage.text}
+  </div>
+)}
+  <form onSubmit={handleConfirmBooking} className="mt-6 space-y-4">
 {/* Pégalo aquí */}
   {bookingMessage && (
     <div className={`p-3 rounded-xl text-xs font-semibold ${
@@ -1291,11 +1358,26 @@ const handleForgotPassword = async (e) => {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-zinc-300 mb-1">Your Name *</label>
-            <input type="text" required placeholder="E.g. John Smith" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+           <input 
+  type="text" 
+  required 
+  value={clientName}
+  onChange={(e) => setClientName(e.target.value)}
+  placeholder="E.g. John Smith" 
+  className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+/>
           </div>
           <div>
             <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number or Email *</label>
-            <input type="text" required placeholder="E.g. +1 615 429 2253 or email@gmail.com" className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" />
+           <input 
+  type="text" 
+  required 
+  value={clientContact}
+  onChange={(e) => setClientContact(e.target.value)}
+  placeholder="E.g. +1 615 429 2253 or email@gmail.com" 
+  className="w-full bg-[#0F0F11] border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400" 
+/>
+            
           </div>
 
           <div>
