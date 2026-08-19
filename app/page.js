@@ -84,10 +84,12 @@ const handleBookingSubmit = async (e) => {
       });
 
       setBookingMessage({ type: 'success', text: 'Appointment booked!' });
-      setTimeout(() => {
-        setBookingMessage(null);
-        setActiveSection('inicio');
-      }, 1500);
+    // ... dentro de handleConfirmBooking, en el if (response.ok)
+setTimeout(() => {
+  setBookingMessage(null); // Borra el mensaje
+  setActiveSection('servicios'); // <--- ESTO ES LO QUE BUSCAS: Regresa a la vista de servicios
+  window.scrollTo({ top: 0, behavior: 'smooth' }); // Te sube al inicio de la página
+}, 5000);
 
     } catch (err) {
       setBookingMessage({ type: 'error', text: err.message });
