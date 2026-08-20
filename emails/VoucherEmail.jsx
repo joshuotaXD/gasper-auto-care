@@ -94,7 +94,23 @@ export default function VoucherEmail({
               </table>
             </Section>
           </Section>
-
+     {/* Footer Profesional con Redes, Horarios y Reseñas */}
+<Section style={{ textAlign: 'center', marginTop: '30px', borderTop: '1px solid #222222', paddingTop: '20px' }}>
+  <Text style={{ fontSize: '12px', color: '#aaaaaa', margin: '0 0 4px 0', fontWeight: 'bold' }}>
+    Gasper Auto Detailing
+  </Text>
+  <Text style={{ fontSize: '11px', color: '#888888', margin: '0 0 4px 0' }}>
+    1717 Hobson Pike, Antioch, TN 37013 | Phone: +1 615-429-2253
+  </Text>
+  <Text style={{ fontSize: '11px', color: '#888888', margin: '0 0 10px 0' }}>
+    Hours: Mon - Sun (6:00 AM - 12:00 PM)
+  </Text>
+  <Text style={{ fontSize: '11px', margin: '0' }}>
+    <a href="https://search.google.com/local/writereview?placeid=ChIJLY0uAWxtZIgRu-FeRJJIm-c"target="_blank" style={{ color: '#00e5ff', textDecoration: 'underline' }}>
+      Leave us a Review on Google! ⭐
+    </a>
+  </Text>
+</Section>
         </Container>
       </Body>
     </Html>
