@@ -1415,8 +1415,8 @@ const handleForgotPassword = async (e) => {
   <input
     type="email"
     required
-    value={email}
-onChange={(e) => setEmail(e.target.value)}
+    value={clientContact}
+onChange={(e) => setClientContact(e.target.value)}
     placeholder="E.g. email@gmail.com"
     className="w-full bg-[#121214] border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition"
   />

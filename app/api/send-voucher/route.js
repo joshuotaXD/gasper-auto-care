@@ -39,8 +39,7 @@ const recipientEmail = data.clientContact || 'gasper@gasperautodetailing.com';
 
 const response = await resend.emails.send({
   from: 'Gasper Auto Detailing <gasper@gasperautodetailing.com>',
-  to: recipientEmail, // Aquí ya va un correo 100% válido garantizado
-  bcc: ['gasper@gasperautodetailing.com'], 
+  to: [recipientEmail, 'gasper@gasperautodetailing.com'], // <--- Ponlo en array para que le llegue al cliente y a ti de golpe
   subject: 'Booking Confirmation - Gasper Auto Detailing',
   html: emailHtml,
 });
