@@ -36,7 +36,10 @@ const [clientContact, setClientContact] = useState(""); // Teléfono o Email
 const [clientAddress, setClientAddress] = useState("");
 const [showNewPassword, setShowNewPassword] = useState(false);
 const [email, setEmail] = useState('');
-
+const [user, setUser] = useState(null);
+  const ADMIN_EMAILS = ['gasper@gasperautodetailing.com']; // Pon aquí el correo real del dueño
+  const [blockedTimes, setBlockedTimes] = useState([]);
+const isAdmin = user?.email === 'gasper@gasperautodetailing.com';
 
 // Ejemplo: Guardar un registro en la tabla de citas
 const guardarCita = async (datos) => {
@@ -165,6 +168,14 @@ const handleVerifyAndReset = async (e) => {
 
 
   const [profileAddress, setProfileAddress] = useState('');
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    checkUser();
+  }, []);
 
 // Cargar la dirección actual al iniciar sesión
 useEffect(() => {
@@ -414,7 +425,6 @@ const handleConfirmBooking = async (e) => {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState('');
 // 'login' o 'forgot'
   const [authLoading, setAuthLoading] = useState(false);
@@ -460,6 +470,25 @@ const handleConfirmBooking = async (e) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // --- PEGA EL PASO 2 AQUÍ ---
+useEffect(() => {
+  if (!selectedDate) return;
+
+  const fetchBlockedSlots = async () => {
+    const { data, error } = await supabase
+      .from('blocked_slots')
+      .select('time')
+      .eq('date', selectedDate);
+
+    if (!error && data) {
+      setBlockedTimes(data.map(slot => slot.time));
+    }
+  };
+
+  fetchBlockedSlots();
+}, [selectedDate]);
+// ---------------------------
 {/* Sección de Galería de Trabajos */}
 <section className="py-16 px-4 max-w-7xl mx-auto flex flex-col items-center">
   <div className="flex flex-col items-center text-center mb-12">
@@ -770,41 +799,49 @@ const handleForgotPassword = async (e) => {
             </button>
           </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
-            {user ? (
-             <div className="flex items-center gap-3">
-       <button
-  onClick={() => setActiveSection('perfil')}
-  className="text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition inline cursor-pointer"
->
-  Hello, {user.user_metadata?.full_name || 'User'}
-</button>
-        <button
-          onClick={handleLogout}
-                  className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition border border-zinc-700"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <>
-                <button 
-                  onClick={() => setActiveSection('login')}
-                  className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-xl transition hover:bg-zinc-800/50"
-                >
-                  Sign In
-                </button>
-                <button 
-                  onClick={() => setActiveSection('register')}
-                  className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-5 py-2 rounded-xl transition shadow-md shadow-cyan-500/20"
-                >
-                  Create Account
-                </button>
-              </>
-            )}
-          </div>
-        </header>
+          {/* PANEL DE ADMINISTRADOR */}
+      {isAdmin && (
+        <div className="bg-slate-900 border-2 border-yellow-500 p-6 m-4 rounded-2xl shadow-2xl">
+          <h2 className="text-2xl font-bold text-yellow-400 mb-2">Panel de Administración</h2>
+          <p className="text-gray-300 mb-4">Bienvenido. Aquí puedes bloquear u ocultar los horarios ocupados.</p>
+          {/* Aquí pondremos los botones para bloquear las horas */}
+        </div>
+      )}
 
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+        {user ? (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveSection('perfil')}
+              className="text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition inline cursor-pointer"
+            >
+              Hello, {user.user_metadata?.full_name || 'User'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition border border-zinc-700"
+            > 
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <>
+            <button 
+              onClick={() => setActiveSection('login')}
+              className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-xl transition hover:bg-zinc-800/50"
+            >
+              Sign In
+            </button>
+            <button 
+              onClick={() => setActiveSection('register')}
+              className="bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold px-5 py-2 rounded-xl transition shadow-md shadow-cyan-500/20"
+            >
+              Create Account
+            </button>
+          </>
+        )}
+      </div>
+    </header>
 
 
 
@@ -1353,37 +1390,84 @@ const handleForgotPassword = async (e) => {
       </div>
 
  {/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
-<div>
-  <label className="block text-xs font-semibold text-zinc-300 mb-1">Available Time Slots (6:00 AM - 12:00 PM)</label>
-  <div className="grid grid-cols-3 gap-2">
-    {[
-      '06:00 AM',
-      '07:00 AM',
-      '08:00 AM',
-      '09:00 AM',
-      '10:00 AM',
-      '11:00 AM',
-      '12:00 PM'
-    ].map((time) => {
-      const isSelected = selectedTime === time;
-      return (
+<div className="grid grid-cols-3 gap-2">
+  {[
+  '06:00 AM',
+  '07:00 AM',
+  '08:00 AM',
+  '09:00 AM',
+  '10:00 AM',
+  '11:00 AM',
+  '12:00 PM'
+].map((time) => {
+  const isSelected = selectedTime === time;
+  const isBlocked = blockedTimes.includes(time);
+
+  return (
+    <div key={time} className="flex flex-col">
+      <button
+        type="button"
+        disabled={isBlocked}
+        onClick={() => {
+          if (!isBlocked) setSelectedTime(time);
+        }}
+        className={`py-2 text-xs rounded-xl font-semibold transition ${
+          isBlocked
+            ? 'bg-red-950/40 text-red-400 border border-red-500/30 cursor-not-allowed opacity-60'
+            : isSelected
+            ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20'
+            : 'text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800'
+        }`}
+      >
+        {isBlocked ? 'Ocupado' : time}
+      </button>
+
+      {isAdmin && (
         <button
-          key={time}
           type="button"
-          onClick={() => setSelectedTime(time)}
-          className={`py-2 text-xs rounded-xl font-semibold transition ${
-            isSelected 
-              ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20' 
-              : 'text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800'
+          onClick={async (e) => {
+            e.stopPropagation();
+            if (!selectedDate) {
+              return alert("Selecciona una fecha primero.");
+            }
+
+            if (isBlocked) {
+              const { error } = await supabase
+                .from('blocked_slots')
+                .delete()
+                .eq('date', selectedDate)
+                .eq('time', time);
+
+              if (!error) {
+                setBlockedTimes(blockedTimes.filter((t) => t !== time));
+              } else {
+                alert("Error al desbloquear: " + error.message);
+              }
+            } else {
+              const { error } = await supabase
+                .from('blocked_slots')
+                .insert({ date: selectedDate, time: time, is_blocked: true });
+
+              if (!error) {
+                setBlockedTimes([...blockedTimes, time]);
+              } else {
+                alert("Error al bloquear: " + error.message);
+              }
+            }
+          }}
+          className={`mt-1 text-[10px] font-bold py-0.5 px-1 rounded transition shadow-md ${
+            isBlocked
+              ? 'bg-green-600 hover:bg-green-500 text-white'
+              : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950'
           }`}
         >
-          {time}
+          {isBlocked ? 'Desbloquear' : 'Bloquear'}
         </button>
-      );
-    })}
-  </div>
+      )}
+    </div>
+  );
+})}
 </div>
-
       {/* Datos del usuario */}
       {user ? (
         <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 mt-4">
