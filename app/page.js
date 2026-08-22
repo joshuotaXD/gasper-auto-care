@@ -197,6 +197,24 @@ useEffect(() => {
   fetchAddress();
 }, []);
 
+// Cargar las horas bloqueadas cuando cambia la fecha seleccionada
+  useEffect(() => {
+    async function fetchBlockedSlots() {
+      if (!selectedDate) return;
+      
+      const { data, error } = await supabase
+        .from('blocked_slots')
+        .select('time')
+        .eq('date', selectedDate);
+
+      if (!error && data) {
+        setBlockedTimes(data.map(item => item.time));
+      }
+    }
+
+    fetchBlockedSlots();
+  }, [selectedDate]);
+
 // Función para guardar la dirección en Supabase
 const handleUpdateProfileAddress = async () => {
   try {
