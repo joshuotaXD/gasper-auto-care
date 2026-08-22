@@ -1430,53 +1430,54 @@ const handleForgotPassword = async (e) => {
         </button>
 
         {isAdmin && (
-          <button
-            type="button"
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (!selectedDate) {
-                return alert("Selecciona una fecha primero.");
-              }
+  <button
+    type="button"
+    onClick={async (e) => {
+      e.stopPropagation();
+      if (!selectedDate) return alert("Selecciona una fecha primero.");
+      if (!selectedServiceToQuote) return alert("Selecciona un servicio primero.");
 
-              if (isBlocked) {
-              const { error } = await supabase
-  .from('blocked_slots')
-  .delete()
-  .eq('date', selectedDate)
-  .eq('time', time)
-  .eq('service', selectedService); // <--- Agrega esta línea
+      if (isBlocked) {
+        // DESBLOQUEAR
+        const { error } = await supabase
+          .from('blocked_slots')
+          .delete()
+          .eq('date', selectedDate)
+          .eq('time', time)
+          .eq('service', selectedServiceToQuote); // Filtra por servicio
 
-                if (!error) {
-                  setBlockedTimes(blockedTimes.filter((t) => t !== time));
-                } else {
-                  alert("Error al desbloquear: " + error.message);
-                }
-              } else {
-              const { error } = await supabase
-  .from('blocked_slots')
-  .insert({ 
-    date: selectedDate, 
-    time: time, 
-    is_blocked: true,
-    service: selectedService // <--- Agrega esta línea
-  });
+        if (!error) {
+          setBlockedTimes(blockedTimes.filter((t) => t !== time));
+        } else {
+          alert("Error al desbloquear: " + error.message);
+        }
+      } else {
+        // BLOQUEAR
+        const { error } = await supabase
+          .from('blocked_slots')
+          .insert({ 
+            date: selectedDate, 
+            time: time, 
+            is_blocked: true, 
+            service: selectedServiceToQuote // Guarda el servicio actual
+          });
 
-                if (!error) {
-                  setBlockedTimes([...blockedTimes, time]);
-                } else {
-                  alert("Error al bloquear: " + error.message);
-                }
-              }
-            }}
-            className={`mt-1 text-[10px] font-bold py-0.5 px-1 rounded transition shadow-md ${
-              isBlocked
-                ? 'bg-green-600 hover:bg-green-500 text-white'
-                : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950'
-            }`}
-          >
-            {isBlocked ? 'Desbloquear' : 'Bloquear'}
-          </button>
-        )}
+        if (!error) {
+          setBlockedTimes([...blockedTimes, time]);
+        } else {
+          alert("Error al bloquear: " + error.message);
+        }
+      }
+    }}
+    className={`mt-1 text-[10px] font-bold py-0.5 px-1 rounded transition shadow-md ${
+      isBlocked
+        ? 'bg-green-600 hover:bg-green-500 text-white'
+        : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950'
+    }`}
+  >
+    {isBlocked ? 'Desbloquear' : 'Bloquear'}
+  </button>
+)}
       </div>
     );
   })}
