@@ -478,34 +478,23 @@ const handleConfirmBooking = async (e) => {
 
   // Check active session on load
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+    if (!selectedDate || !selectedServiceToQuote) return;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const fetchBlockedSlots = async () => {
+      const { data, error } = await supabase
+        .from('blocked_slots')
+        .select('time')
+        .eq('date', selectedDate)
+        .eq('service', selectedServiceToQuote);
 
-    return () => subscription.unsubscribe();
-  }, []);
+      if (!error && data) {
+        setBlockedTimes(data.map(slot => slot.time));
+      }
+    };
 
-  // --- PEGA EL PASO 2 AQUÍ ---
-useEffect(() => {
-  if (!selectedDate) return;
+    fetchBlockedSlots();
+  }, [selectedDate, selectedServiceToQuote]);
 
-  const fetchBlockedSlots = async () => {
-    const { data, error } = await supabase
-      .from('blocked_slots')
-      .select('time')
-      .eq('date', selectedDate);
-
-    if (!error && data) {
-      setBlockedTimes(data.map(slot => slot.time));
-    }
-  };
-
-  fetchBlockedSlots();
-}, [selectedDate]);
 // ---------------------------
 {/* Sección de Galería de Trabajos */}
 <section className="py-16 px-4 max-w-7xl mx-auto flex flex-col items-center">
@@ -1410,81 +1399,87 @@ const handleForgotPassword = async (e) => {
  {/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
 <div className="grid grid-cols-3 gap-2">
   {[
-  '06:00 AM',
-  '07:00 AM',
-  '08:00 AM',
-  '09:00 AM',
-  '10:00 AM',
-  '11:00 AM',
-  '12:00 PM'
-].map((time) => {
-  const isSelected = selectedTime === time;
-  const isBlocked = blockedTimes.includes(time);
+    '06:00 AM',
+    '07:00 AM',
+    '08:00 AM',
+    '09:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM'
+  ].map((time) => {
+    const isSelected = selectedTime === time;
+    const isBlocked = blockedTimes.includes(time);
 
-  return (
-    <div key={time} className="flex flex-col">
-      <button
-        type="button"
-        disabled={isBlocked}
-        onClick={() => {
-          if (!isBlocked) setSelectedTime(time);
-        }}
-        className={`py-2 text-xs rounded-xl font-semibold transition ${
-          isBlocked
-            ? 'bg-red-950/40 text-red-400 border border-red-500/30 cursor-not-allowed opacity-60'
-            : isSelected
-            ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20'
-            : 'text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800'
-        }`}
-      >
-        {isBlocked ? 'Ocupado' : time}
-      </button>
-
-      {isAdmin && (
+    return (
+      <div key={time} className="flex flex-col">
         <button
           type="button"
-          onClick={async (e) => {
-            e.stopPropagation();
-            if (!selectedDate) {
-              return alert("Selecciona una fecha primero.");
-            }
-
-            if (isBlocked) {
-              const { error } = await supabase
-                .from('blocked_slots')
-                .delete()
-                .eq('date', selectedDate)
-                .eq('time', time);
-
-              if (!error) {
-                setBlockedTimes(blockedTimes.filter((t) => t !== time));
-              } else {
-                alert("Error al desbloquear: " + error.message);
-              }
-            } else {
-              const { error } = await supabase
-                .from('blocked_slots')
-                .insert({ date: selectedDate, time: time, is_blocked: true });
-
-              if (!error) {
-                setBlockedTimes([...blockedTimes, time]);
-              } else {
-                alert("Error al bloquear: " + error.message);
-              }
-            }
+          disabled={isBlocked}
+          onClick={() => {
+            if (!isBlocked) setSelectedTime(time);
           }}
-          className={`mt-1 text-[10px] font-bold py-0.5 px-1 rounded transition shadow-md ${
+          className={`py-2 text-xs rounded-xl font-semibold transition ${
             isBlocked
-              ? 'bg-green-600 hover:bg-green-500 text-white'
-              : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950'
+              ? 'bg-red-950/40 text-red-400 border border-red-500/30 cursor-not-allowed opacity-60'
+              : isSelected
+              ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/20'
+              : 'text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800'
           }`}
         >
-          {isBlocked ? 'Desbloquear' : 'Bloquear'}
+          {isBlocked ? 'Booked' : time}
         </button>
-      )}
-    </div>
-  );
-})}
+
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!selectedDate) {
+                return alert("Selecciona una fecha primero.");
+              }
+
+              if (isBlocked) {
+              const { error } = await supabase
+  .from('blocked_slots')
+  .delete()
+  .eq('date', selectedDate)
+  .eq('time', time)
+  .eq('service', selectedService); // <--- Agrega esta línea
+
+                if (!error) {
+                  setBlockedTimes(blockedTimes.filter((t) => t !== time));
+                } else {
+                  alert("Error al desbloquear: " + error.message);
+                }
+              } else {
+              const { error } = await supabase
+  .from('blocked_slots')
+  .insert({ 
+    date: selectedDate, 
+    time: time, 
+    is_blocked: true,
+    service: selectedService // <--- Agrega esta línea
+  });
+
+                if (!error) {
+                  setBlockedTimes([...blockedTimes, time]);
+                } else {
+                  alert("Error al bloquear: " + error.message);
+                }
+              }
+            }}
+            className={`mt-1 text-[10px] font-bold py-0.5 px-1 rounded transition shadow-md ${
+              isBlocked
+                ? 'bg-green-600 hover:bg-green-500 text-white'
+                : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950'
+            }`}
+          >
+            {isBlocked ? 'Desbloquear' : 'Bloquear'}
+          </button>
+        )}
+      </div>
+    );
+  })}
 </div>
       {/* Datos del usuario */}
       {user ? (
