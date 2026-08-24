@@ -817,7 +817,48 @@ const handleForgotPassword = async (e) => {
             >
               ✨ Gallery
             </button>
+
+
+            {/* Botón de Reviews en el Header */}
+  <button
+    onClick={() => {
+      // 1. Aseguramos que esté activa la vista principal donde se encuentran las reseñas
+      setActiveSection('inicio');
+      
+      // 2. Esperamos un instante a que React pinte el DOM y hacemos scroll suave hacia el ID
+      setTimeout(() => {
+        const element = document.getElementById('reviews');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }}
+    className="flex items-center justify-center px-5 py-2 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/50 hover:scale-105 hover:border-cyan-400 shadow-cyan-500/20 cursor-pointer"
+  >
+    Reviews
+  </button>
+{/* Pega el nuevo botón aquí en la línea 806 */}
+ <button
+    onClick={() => {
+      // 1. Cambiamos a la sección principal usando el nombre exacto de tu estado ('inicio' o 'inciio')
+      setActiveSection('inicio'); 
+      
+      // 2. Le damos 300ms a React para que pinte el DOM completo antes de buscar el ID
+      setTimeout(() => {
+        const element = document.getElementById('new-product-section');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }}
+    className="px-5 py-2 rounded-xl font-extrabold text-sm tracking-widest uppercase transition-all duration-300 shadow-lg bg-gradient-to-r from-red-500/20 to-orange-500/20 text-red-400 border border-red-500/50 hover:border-red-400 hover:scale-105 shadow-red-500/20 cursor-pointer"
+  >
+    🔥 New Product
+  </button>
+            
           </nav>
+
+          
 
           {/* PANEL DE ADMINISTRADOR */}
       {isAdmin && (
@@ -1772,6 +1813,11 @@ onChange={(e) => setClientContact(e.target.value)}
                 </div>
               </div>
             </section>
+            
+
+            
+
+            
 
             {mainView === 'servicios' ? (
               <section id="services-section" className="px-6 py-20 max-w-3xl mx-auto scroll-mt-20">
@@ -1779,6 +1825,8 @@ onChange={(e) => setClientContact(e.target.value)}
                   <h2 className="text-3xl font-bold tracking-tight text-white">Services</h2>
                   <p className="text-zinc-400 text-sm mt-1">Preview Sample Profile</p>
                 </div>
+
+                
 
                 <div className="space-y-4">
                   {servicesList.map((service) => (
@@ -1804,6 +1852,7 @@ onChange={(e) => setClientContact(e.target.value)}
                             </div>
                           </div>
                         </div>
+                        
 
                     <div className="w-full md:w-auto flex flex-wrap sm:flex-nowrap items-center justify-between md:justify-end gap-3 mt-3 md:mt-0">
                           <div className="text-zinc-400 text-xs md:text-sm flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1.5 rounded-full border border-zinc-800">
@@ -1822,6 +1871,9 @@ onChange={(e) => setClientContact(e.target.value)}
                           </button>
                         </div>
                       </div>
+
+                      
+
 
                       {openServices[service.id] && (
                         <div className="px-6 pb-5 pt-2 text-zinc-400 border-t border-zinc-800/60 text-sm leading-relaxed bg-[#111318]/50">
@@ -1842,6 +1894,7 @@ onChange={(e) => setClientContact(e.target.value)}
           <span className="px-2.5 py-1 bg-zinc-900 border border-zinc-700/60 rounded-md text-[11px] text-zinc-300">Debit Card - PLUS TAX</span>
         </div>
       </div>
+      
                           <div className="mt-4 flex justify-end">
                             <button 
                               onClick={() => handleQuoteClick(service.title)}
@@ -1851,11 +1904,115 @@ onChange={(e) => setClientContact(e.target.value)}
                             </button>
                           </div>
                         </div>
+                        
                       )}
                     </div>
                   ))}
                 </div>
-              </section>
+              <section id="new-product-section" className="py-12 md:py-20 px-4 bg-[#0B0F19] text-white text-center border-t border-zinc-800 my-8"></section>
+           <div className="max-w-4xl mx-auto flex flex-col items-center">
+    
+    <span className="text-xs uppercase tracking-widest text-red-500 font-extrabold bg-red-500/10 py-1 px-3 rounded-full border border-red-500/30 mb-3">
+      Featured Releases
+    </span>
+    
+    <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 tracking-wide text-white">
+      Latest Product Highlights
+    </h2>
+    <p className="text-xs text-red-400 font-semibold mb-8 tracking-wider">
+      EXPLORE OUR TOP PERFORMANCE COATINGS
+    </p>
+    
+    {/* CONTENEDOR DE LA GRID PARA LOS DOS VIDEOS */}
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
+      
+      {/* VIDEO 1 */}
+      <div className="flex flex-col items-center">
+        <div className="w-full relative rounded-2xl overflow-hidden shadow-2xl border-2 border-red-500/40 bg-black aspect-[9/16]">
+          <video
+            src="/slick-guard.mp4" 
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <p className="text-sm text-slate-300 mt-4 leading-relaxed">
+          OPSZ Hybrid Surface Sealant - Up to 10 months protection!
+        </p>
+      </div>
+      
+
+      {/* VIDEO 2 */}
+      <div className="flex flex-col items-center">
+        <div className="w-full relative rounded-2xl overflow-hidden shadow-2xl border-2 border-red-500/40 bg-black aspect-[9/16]">
+          <video
+            src="/slick-guard2.mp4" 
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <p className="text-sm text-slate-300 mt-4 leading-relaxed">
+         🔥 ONE SYSTEM. THREE LEVELS OF SERVICE.
+        </p>
+        
+      </div>
+      
+
+    </div>
+    {/* Botón centrado que abarca toda la sección */}
+<div className="mt-10 w-full flex justify-center">
+  <a
+    href="https://slickguard.net/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-red-600 hover:bg-red-500 text-white font-extrabold py-4 px-10 rounded-2xl transition-all shadow-xl shadow-red-600/40 flex items-center justify-center gap-3 text-sm tracking-wide transform hover:scale-105 text-center max-w-xl w-full"
+  >
+    <span>🛡️</span> Click Here to Visit Slick Guard Official Website
+  </a>
+    </div>
+   {/* SECCIÓN DE RESEÑAS DE GOOGLE Y COMPROMISO ECO-FRIENDLY */}
+<div id="reviews" className="mt-16 mb-10 w-full max-w-5xl mx-auto px-4 scroll-mt-24">
+  
+  {/* Mensaje Eco-Friendly (Flexbox centrado) */}
+  <div className="flex flex-col items-center justify-center bg-gradient-to-r from-emerald-950/60 to-zinc-900/80 border border-emerald-500/30 rounded-2xl p-6 mb-12 text-center shadow-xl">
+    <span className="text-3xl mb-2">🌿</span>
+    <h3 className="text-xl font-bold text-white mb-2">100% Eco-Friendly Commitment</h3>
+    <p className="text-sm text-zinc-300 max-w-2xl mx-auto leading-relaxed">
+      We care deeply about our planet. That is why we exclusively use 100% eco-friendly, biodegradable products that deliver a showroom shine while protecting the environment.
+    </p>
+  </div>
+
+  {/* Título de Reviews (Flexbox centrado) */}
+  <div className="flex flex-col items-center justify-center text-center mb-8">
+    <span className="text-xs font-bold uppercase tracking-widest text-cyan-400 bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/50">
+      Google Business Reviews
+    </span>
+    <h3 className="text-2xl font-bold text-white mt-3">What Our Clients Say</h3>
+  </div>
+
+  {/* Widget Oficial de Elfsight (Contenedor adaptable con Flexbox) */}
+  <div className="flex flex-col w-full overflow-hidden rounded-2xl">
+    <script src="https://elfsightcdn.com/platform.js" async></script>
+    <div className="elfsight-app-0f9749c2-f5f7-4d48-b3c9-b394cf54a9c7" data-elfsight-app-lazy></div>
+
+  </div>
+
+</div>
+  </div>
+</section>
+
+              
+              
+
+              
+              
+
+              
             ) : (
               <section className="px-6 py-20 max-w-2xl mx-auto">
                 <div className="bg-[#16181d] border border-zinc-800 rounded-3xl p-8 md:p-10 shadow-2xl text-center">
@@ -1867,32 +2024,8 @@ onChange={(e) => setClientContact(e.target.value)}
                     Have questions or need personalized assistance? Scan the QR code or click the buttons to connect directly with us.
                   </p>
 
-                  {/* SECCIÓN DEL NUEVO PRODUCTO (VIDEO) */}
-<section id="new-product-section" className="py-16 px-4 bg-[#0B0F19] text-white text-center border-t border-slate-800 my-8">
-  <div className="max-w-md mx-auto">
-    <span className="text-xs uppercase tracking-widest text-red-500 font-extrabold bg-red-500/10 py-1 px-3 rounded-full border border-red-500/30">
-      Featured Release
-    </span>
-    <h2 className="text-3xl font-extrabold mt-3 mb-2 tracking-wide">OPSZ Hybrid Surface Sealant</h2>
-    <p className="text-xs text-red-400 font-semibold mb-6 tracking-wider">UP TO 10 MONTHS PROTECTION!</p>
-    
-    {/* Contenedor del video con diseño vertical estilizado */}
-    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-red-500/40 bg-black aspect-[9/16]">
-      <video
-        src="/slick-guard.mp4" 
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="w-full h-full object-cover"
-      />
-    </div>
-
-    <p className="text-sm text-slate-300 mt-6 leading-relaxed">
-      Next-generation surface protection engineered for superior gloss, hydrophobic performance, and effortless maintenance.
-    </p>
-  </div>
-</section>
+                  
+            
                   
                   {/* Tab selector for Social Media / Contact Channels */}
                  <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -2043,3 +2176,4 @@ onChange={(e) => setClientContact(e.target.value)}
     </>
   );
 }
+
