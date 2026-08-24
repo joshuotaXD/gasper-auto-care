@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [verificationCode, setVerificationCode] = useState('');
@@ -37,9 +38,13 @@ const [clientAddress, setClientAddress] = useState("");
 const [showNewPassword, setShowNewPassword] = useState(false);
 const [email, setEmail] = useState('');
 const [user, setUser] = useState(null);
-  const ADMIN_EMAILS = ['gasper@gasperautodetailing.com']; // Pon aquí el correo real del dueño
-  const [blockedTimes, setBlockedTimes] = useState([]);
+const ADMIN_EMAILS = ['gasper@gasperautodetailing.com']; // Pon aquí el correo real del dueño
+const [blockedTimes, setBlockedTimes] = useState([]);
 const isAdmin = user?.email === 'gasper@gasperautodetailing.com';
+const router = useRouter();
+const [adminMessage, setAdminMessage] = useState('');
+
+
 
 // Ejemplo: Guardar un registro en la tabla de citas
 const guardarCita = async (datos) => {
@@ -382,6 +387,11 @@ const handleConfirmBooking = async (e) => {
   }
 }; // <-- Aquí se cierra correctamente la función handleConfirmBooking
 
+
+
+
+
+
   {authView === 'verify-code' && (
   <form onSubmit={handleVerifyAndReset} className="space-y-4">
     <span className="text-cyan-400 text-xs font-bold uppercase tracking-widest bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/40">
@@ -560,44 +570,47 @@ const handleConfirmBooking = async (e) => {
       </div>
     </div>
   </div>
-)}
-  // Sign in with Email or Phone Number
- const handleLogin = async (e) => {
+  
+)}// Sign in with Email or Phone Number
+const handleLogin = async (e) => {
   e.preventDefault();
   setAuthError('');
   setAuthLoading(true);
 
   let loginEmail = identifier.trim();
 
-  // Si el usuario ingresó un teléfono (no tiene '@'), buscamos su correo real en la tabla profiles
+  // Si el usuario ingresó un teléfono, buscamos su correo real
   if (!loginEmail.includes('@')) {
-   const { data: profileData, error: profileError } = await supabase
-  .from('profiles')
-  .select('email')
-  .eq('phone', loginEmail)
-  .maybeSingle(); // <--- Así
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('phone', loginEmail)
+      .maybeSingle();
 
     if (profileError || !profileData) {
-      setAuthError('Número de teléfono no encontrado o no registrado.');
+      setAuthError('No se encontró una cuenta con este número.');
       setAuthLoading(false);
       return;
     }
-    loginEmail = profileData.email; // Usamos el correo real encontrado en la base de datos
+    loginEmail = profileData.email;
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: loginEmail,
     password,
   });
 
   if (error) {
-    setAuthError('Incorrect credentials or unregistered user.');
-  } else {
-    setActiveSection('inicio');
-    setIdentifier('');
-    setPassword('');
+    setAuthError(error.message);
+    setAuthLoading(false);
+    return;
   }
+
+  // ¡Aquí aplicamos el truco para refrescar y redirigir sin recargar a la fuerza!
   setAuthLoading(false);
+  window.location.href = '/';    
+  router.refresh();
+  router.push('/');
 };
 
   // Sign up asking for phone and saving it in Supabase metadata
@@ -1396,6 +1409,16 @@ const handleForgotPassword = async (e) => {
   </div>  
       </div>
 
+      {/* Mensaje de advertencia integrado en medio del formulario */}
+{adminMessage && (
+  <div className="my-4 p-3 bg-red-500/10 border border-red-500 text-red-400 text-center text-sm rounded-lg">
+    {adminMessage}
+  </div>
+)}
+
+{/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
+<div className="grid grid-cols-3 gap-2"></div>
+
  {/* Horarios Disponibles de 6:00 AM a 12:00 PM */}
 <div className="grid grid-cols-3 gap-2">
   {[
@@ -1432,43 +1455,52 @@ const handleForgotPassword = async (e) => {
         {isAdmin && (
   <button
     type="button"
-    onClick={async (e) => {
-      e.stopPropagation();
-      if (!selectedDate) return alert("Selecciona una fecha primero.");
-      if (!selectedServiceToQuote) return alert("Selecciona un servicio primero.");
+   onClick={async (e) => {
+    e.stopPropagation();
+    
+    if (!selectedDate) {
+      setAdminMessage("Selecciona una fecha primero.");
+      return;
+    }
+    if (!selectedServiceToQuote) {
+      setAdminMessage("Selecciona un servicio primero.");
+      return;
+    }
+    
+    setAdminMessage(""); // Limpiamos el mensaje si todo está bien
 
-      if (isBlocked) {
-        // DESBLOQUEAR
-        const { error } = await supabase
-          .from('blocked_slots')
-          .delete()
-          .eq('date', selectedDate)
-          .eq('time', time)
-          .eq('service', selectedServiceToQuote); // Filtra por servicio
+    if (isBlocked) {
+      // DESBLOQUEAR
+      const { error } = await supabase
+        .from('blocked_slots')
+        .delete()
+        .eq('date', selectedDate)
+        .eq('time', time)
+        .eq('service', selectedServiceToQuote);
 
-        if (!error) {
-          setBlockedTimes(blockedTimes.filter((t) => t !== time));
-        } else {
-          alert("Error al desbloquear: " + error.message);
-        }
+      if (!error) {
+        setBlockedTimes(blockedTimes.filter((t) => t !== time));
       } else {
-        // BLOQUEAR
-        const { error } = await supabase
-          .from('blocked_slots')
-          .insert({ 
-            date: selectedDate, 
-            time: time, 
-            is_blocked: true, 
-            service: selectedServiceToQuote // Guarda el servicio actual
-          });
-
-        if (!error) {
-          setBlockedTimes([...blockedTimes, time]);
-        } else {
-          alert("Error al bloquear: " + error.message);
-        }
+        setAdminMessage("Error al desbloquear: " + error.message);
       }
-    }}
+    } else {
+      // BLOQUEAR
+      const { error } = await supabase
+        .from('blocked_slots')
+        .insert({
+          date: selectedDate,
+          time: time,
+          is_blocked: true,
+          service: selectedServiceToQuote,
+        });
+
+      if (!error) {
+        setBlockedTimes([...blockedTimes, time]);
+      } else {
+        setAdminMessage("Error al bloquear: " + error.message);
+      }
+    }
+  }}
     className={`mt-1 text-[10px] font-bold py-0.5 px-1 rounded transition shadow-md ${
       isBlocked
         ? 'bg-green-600 hover:bg-green-500 text-white'
@@ -1834,6 +1866,33 @@ onChange={(e) => setClientContact(e.target.value)}
                   <p className="text-zinc-400 mt-2 text-sm max-w-md mx-auto">
                     Have questions or need personalized assistance? Scan the QR code or click the buttons to connect directly with us.
                   </p>
+
+                  {/* SECCIÓN DEL NUEVO PRODUCTO (VIDEO) */}
+<section id="new-product-section" className="py-16 px-4 bg-[#0B0F19] text-white text-center border-t border-slate-800 my-8">
+  <div className="max-w-md mx-auto">
+    <span className="text-xs uppercase tracking-widest text-red-500 font-extrabold bg-red-500/10 py-1 px-3 rounded-full border border-red-500/30">
+      Featured Release
+    </span>
+    <h2 className="text-3xl font-extrabold mt-3 mb-2 tracking-wide">OPSZ Hybrid Surface Sealant</h2>
+    <p className="text-xs text-red-400 font-semibold mb-6 tracking-wider">UP TO 10 MONTHS PROTECTION!</p>
+    
+    {/* Contenedor del video con diseño vertical estilizado */}
+    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-red-500/40 bg-black aspect-[9/16]">
+      <video
+        src="/slick-guard.mp4" 
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="w-full h-full object-cover"
+      />
+    </div>
+
+    <p className="text-sm text-slate-300 mt-6 leading-relaxed">
+      Next-generation surface protection engineered for superior gloss, hydrophobic performance, and effortless maintenance.
+    </p>
+  </div>
+</section>
                   
                   {/* Tab selector for Social Media / Contact Channels */}
                  <div className="mt-8 flex flex-wrap justify-center gap-2">
