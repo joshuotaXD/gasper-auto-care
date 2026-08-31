@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 
-
+import Script from 'next/script';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
@@ -28,7 +28,11 @@ const [bookingMessage, setBookingMessage] = useState(null); // { type: 'success'
 const [address, setAddress] = useState('');
 const [profileMessage, setProfileMessage] = useState({ text: '', type: '' });
 const [selectedVehicle, setSelectedVehicle] = useState('Coupe/Sedan');
-const today = new Date().toISOString().split('T')[0];
+const [today, setToday] = useState('');
+
+useEffect(() => {
+  setToday(new Date().toISOString().split('T')[0]);
+}, []);
 const [paymentMethod, setPaymentMethod] = useState('Zelle');
 const [isPaymentDropdownOpen, setIsPaymentDropdownOpen] = useState(false);
 const [ceramicYears, setCeramicYears] = useState(2); // Por defecto en 2 años
@@ -43,7 +47,7 @@ const [blockedTimes, setBlockedTimes] = useState([]);
 const isAdmin = user?.email === 'gasper@gasperautodetailing.com';
 const router = useRouter();
 const [adminMessage, setAdminMessage] = useState('');
-
+const [clientPhone, setClientPhone] = useState('');
 
 
 // Ejemplo: Guardar un registro en la tabla de citas
@@ -79,7 +83,9 @@ const handleBookingSubmit = async (e) => {
         user_id: user?.id || null
       };
 
-      const { data, error } = await supabase.from('appointments').insert([payload]);
+      
+
+      const { data, error } = await supabase.from('npm r').insert([payload]);
 
       if (error) throw error;
 
@@ -97,6 +103,19 @@ const handleBookingSubmit = async (e) => {
         }),
       });
 
+// Envío de mensaje al celular / WhatsApp
+  await fetch('/api/send-whatsapp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      phone: payload.client_contact,
+      clientName: payload.client_name,
+      serviceName: payload.service_name,
+      bookingDate: payload.booking_date,
+      bookingTime: payload.booking_time
+    }),
+  })
+      
       setBookingMessage({ type: 'success', text: 'Appointment booked!' });
     // ... dentro de handleConfirmBooking, en el if (response.ok)
 setTimeout(() => {
@@ -350,6 +369,7 @@ const handleConfirmBooking = async (e) => {
     clientName: user ? user.user_metadata.full_name : clientName,
     clientContact: user ? user.email : clientContact,
     clientAddress: clientAddress,
+    clientPhone: clientPhone,
     selectedService: selectedServiceToQuote,
     vehicleType: vehicleType,
     paymentMethod: paymentMethod,
@@ -742,6 +762,7 @@ const handleForgotPassword = async (e) => {
         'Interior: Thorough vacuuming of seats, carpets, and trunk; cleaning of dashboard, doors, and console; interior window cleaning; and air freshener application.',
         'Perfect for daily use, removing dust and light dirt while preserving your vehicle\'s value without damaging the paint.'
       ],
+      note: 'Important Note: If your car has excessive pet hair, paint stains, drywall mud, silicone, or any other construction materials, as well as excessive mud or dust, the price for this service may increase or it may require a deep cleaning.',
       borderColor: 'border-red-400/40',
     },
     {
@@ -754,6 +775,7 @@ const handleForgotPassword = async (e) => {
         'Exterior with Premium Finish: Hand wash with foam, deep cleaning of rims and tires, tires conditioned and blackened, and finishing touches that make the difference.',
         'Ideal for daily drivers, vehicles being prepared for sale, or after a long road trip to make your car look showroom-fresh (recommended every 6 months).'
       ],
+      note: 'Important Note: If your car has excessive pet hair, paint stains, drywall mud, silicone, or any other construction materials, as well as excessive mud or dust, the price for this service may increase.',
       borderColor: 'border-zinc-400/40',
     },
     {
@@ -1593,6 +1615,21 @@ onChange={(e) => setClientContact(e.target.value)}
   />
 </div>
 
+{/* Campo de Teléfono */}
+<div>
+  <label className="block text-sm font-medium text-zinc-300 mb-1">
+    Phone Number (WhatsApp) *
+  </label>
+  <input
+    type="tel"
+    required
+    value={clientPhone}
+    onChange={(e) => setClientPhone(e.target.value)}
+    placeholder="E.g. +529981234567"
+    className="w-full bg-[#121214] border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+  />
+</div>
+
           <div>
             <label className="block text-xs font-semibold text-zinc-300 mb-1">Address *</label>
             <input 
@@ -1882,6 +1919,15 @@ onChange={(e) => setClientContact(e.target.value)}
                               <li key={idx}>{detail}</li>
                             ))}
                           </ul> 
+                       {/* Nota importante destacada (Usando Flexbox para alinear el icono y el texto) */}
+      {service.note && (
+        <div className="mt-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-medium flex items-start gap-2">
+          <span className="text-amber-400 font-bold shrink-0">⚠️</span>
+          <p>{service.note}</p>
+        </div>
+      )}
+
+                          
 
                           {/* Accepted Payment Methods */}
       <div className="mt-4 pt-3 border-t border-zinc-800/80">
@@ -1998,7 +2044,7 @@ onChange={(e) => setClientContact(e.target.value)}
   {/* Widget Oficial de Elfsight (Contenedor adaptable con Flexbox) */}
   <div className="flex flex-col w-full overflow-hidden rounded-2xl">
     <script src="https://elfsightcdn.com/platform.js" async></script>
-    <div className="elfsight-app-0f9749c2-f5f7-4d48-b3c9-b394cf54a9c7" data-elfsight-app-lazy></div>
+   <div className="elfsight-app-0f9749c2-f5f7-4d48-b3c9-b394cf54a9c7" data-elfsight-app-lazy={true}></div>
 
   </div>
 
